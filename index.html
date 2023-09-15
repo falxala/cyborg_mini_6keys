@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+  <title>Cyborg Remapper</title>
+</head>
+
+<body>
+  <div class="parent">
+    <div class="property">
+      <div id="area1">
+        <p class="headline">Devices</p>
+        <div class="devices">
+          <div class="keys">
+            <label><input id="key1" name="Layerkey1" type="radio" value=1 onclick="setKeyNum(event)" checked /><span>1</span></label>
+            <div id="separator">
+              <br>
+            </div>
+            <label><input id="key4" name="Layerkey1" type="radio" value=4 onclick="setKeyNum(event)" /><span>4</span></label>
+          </div>
+          <div class="keys">
+            <label><input id="key2" name="Layerkey1" type="radio" value=2 onclick="setKeyNum(event)" /><span>2</span></label>
+            <div id="separator">
+              <br>
+            </div>
+            <label><input id="key5" name="Layerkey1" type="radio" value=5 onclick="setKeyNum(event)" /><span>5</span></label>
+          </div>
+          <div class="keys">
+            <label><input id="key3" name="Layerkey1" type="radio" value=3 onclick="setKeyNum(event)" /><span>3</span></label>
+            <div id="separator">
+              <br>
+            </div>
+            <label><input id="key6" name="Layerkey1" type="radio" value=6 onclick="setKeyNum(event)" /><span>6</span></label>
+          </div>
+          <div class="keys" id="knob">
+            <label><input id="keyL" name="Layerkey1" type="radio" value=8 onclick="setKeyNum(event)" /><span id="left">L</span></label>
+            <label><input id="keyR" name="Layerkey1" type="radio" value=7 onclick="setKeyNum(event)" /><span id="right">R</span></label>
+          </div>
+        </div>
+      </div>
+      <div id="area2">
+        <p class="headline">Allocation
+          <button onclick="delete_last_line()">delete line</button>
+        </p>
+        <textarea id="allocation" readonly></textarea>
+        <p class="headline">Data
+        </p>
+        <textarea id="pending" readonly></textarea>
+      </div>
+      <div id="write">
+        <input id="connect" type="button" value="Connect" onclick="openSerial(event)" />
+        <input disabled id="send" type="button" value="Perpetuation" onclick="" />
+      </div>
+    </div>
+    <div class="main">
+      <a href="OFFLINE_TOOL.zip" id="download" download>DOWNLOAD OFFLINE TOOL</a>
+      <div>
+        <div id="panel">
+          <div class="Layer">
+            <label class="label">Layer</label>
+            <label><input type="radio" name="Layer" value=0 checked onclick="setLayerNum(event)" id="layer0"><span>0</span></label>
+            <label><input type="radio" name="Layer" value=1 onclick="setLayerNum(event)" id="layer1" /><span>1</span></label>
+            <label><input type="radio" name="Layer" value=2 onclick="setLayerNum(event)" id="layer2" /><span>2</span></label>
+            <label><input type="radio" name="Layer" value=3 onclick="setLayerNum(event)" id="layer3" /><span>3</span></label>
+            <label><input type="radio" name="Layer" value=4 onclick="setLayerNum(event)" id="layer4" /><span>4</span></label>
+            <label><input type="radio" name="Layer" value=5 onclick="setLayerNum(event)" id="layer5" /><span>5</span></label>
+            <label id="clear"><input type="button" value="Clear" onclick="clearKeys(true)" /><span>ClearKeys</span></label>
+          </div>
+        </div>
+        <div id="first">
+
+          <input type="radio" name="tab_name" id="tab1" checked>
+          <label class="tab_class" for="tab1">JIS</label>
+          <div class="content_class">
+            <div class="keybord-wrapper">
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=41 onclick="typed(event)" /><span id="fkeys">Esc</span></label>
+                <label><input name="trigger" type="checkbox" value=58 onclick="typed(event)" /><span id="fkeys">F1</span></label>
+                <label><input name="trigger" type="checkbox" value=59 onclick="typed(event)" /><span id="fkeys">F2</span></label>
+                <label><input name="trigger" type="checkbox" value=60 onclick="typed(event)" /><span id="fkeys">F3</span></label>
+                <label><input name="trigger" type="checkbox" value=61 onclick="typed(event)" /><span id="fkeys">F4</span></label>
+                <label><input name="trigger" type="checkbox" value=62 onclick="typed(event)" /><span id="fkeys">F5</span></label>
+                <label><input name="trigger" type="checkbox" value=63 onclick="typed(event)" /><span id="fkeys">F6</span></label>
+                <label><input name="trigger" type="checkbox" value=64 onclick="typed(event)" /><span id="fkeys">F7</span></label>
+                <label><input name="trigger" type="checkbox" value=65 onclick="typed(event)" /><span id="fkeys">F8</span></label>
+                <label><input name="trigger" type="checkbox" value=66 onclick="typed(event)" /><span id="fkeys">F9</span></label>
+                <label><input name="trigger" type="checkbox" value=67 onclick="typed(event)" /><span id="fkeys">F10</span></label>
+                <label><input name="trigger" type="checkbox" value=68 onclick="typed(event)" /><span id="fkeys">F11</span></label>
+                <label><input name="trigger" type="checkbox" value=69 onclick="typed(event)" /><span id="fkeys">F12</span></label>
+              </div>
+              <div id="separator">
+                <br />
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=53 onclick="typed(event)" /><span value="半角/">半角/</span></label>
+                <label><input name="trigger" type="checkbox" value=30 onclick="typed(event)" /><span>1</span></label>
+                <label><input name="trigger" type="checkbox" value=31 onclick="typed(event)" /><span>2</span></label>
+                <label><input name="trigger" type="checkbox" value=32 onclick="typed(event)" /><span>3</span></label>
+                <label><input name="trigger" type="checkbox" value=33 onclick="typed(event)" /><span>4</span></label>
+                <label><input name="trigger" type="checkbox" value=34 onclick="typed(event)" /><span>5</span></label>
+                <label><input name="trigger" type="checkbox" value=35 onclick="typed(event)" /><span>6</span></label>
+                <label><input name="trigger" type="checkbox" value=36 onclick="typed(event)" /><span>7</span></label>
+                <label><input name="trigger" type="checkbox" value=37 onclick="typed(event)" /><span>8</span></label>
+                <label><input name="trigger" type="checkbox" value=38 onclick="typed(event)" /><span>9</span></label>
+                <label><input name="trigger" type="checkbox" value=39 onclick="typed(event)" /><span>0</span></label>
+                <label><input name="trigger" type="checkbox" value=45 onclick="typed(event)" /><span>-</span></label>
+                <label><input name="trigger" type="checkbox" value=46 onclick="typed(event)" /><span>^</span></label>
+                <label><input name="trigger" type="checkbox" value=137 onclick="typed(event)" /><span>¥</span></label>
+                <label><input name="trigger" type="checkbox" value=42 onclick="typed(event)" /><span value="Back">Back</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=43 onclick="typed(event)" /><span value="Tab">Tab</span></label>
+                <label><input name="trigger" type="checkbox" value=20 onclick="typed(event)" /><span>Q</span></label>
+                <label><input name="trigger" type="checkbox" value=26 onclick="typed(event)" /><span>W</span></label>
+                <label><input name="trigger" type="checkbox" value=8 onclick="typed(event)" /><span>E</span></label>
+                <label><input name="trigger" type="checkbox" value=21 onclick="typed(event)" /><span>R</span></label>
+                <label><input name="trigger" type="checkbox" value=23 onclick="typed(event)" /><span>T</span></label>
+                <label><input name="trigger" type="checkbox" value=28 onclick="typed(event)" /><span>Y</span></label>
+                <label><input name="trigger" type="checkbox" value=24 onclick="typed(event)" /><span>U</span></label>
+                <label><input name="trigger" type="checkbox" value=12 onclick="typed(event)" /><span>I</span></label>
+                <label><input name="trigger" type="checkbox" value=18 onclick="typed(event)" /><span>O</span></label>
+                <label><input name="trigger" type="checkbox" value=19 onclick="typed(event)" /><span>P</span></label>
+                <label><input name="trigger" type="checkbox" value=47 onclick="typed(event)" /><span>@</span></label>
+                <label><input name="trigger" type="checkbox" value=48 onclick="typed(event)" /><span>[</span></label>
+                <label><input name="trigger" type="checkbox" value=40 onclick="typed(event)" /><span value="Enter">Enter</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=57 onclick="typed(event)" /><span value="Caps">Caps</span></label>
+                <label><input name="trigger" type="checkbox" value=4 onclick="typed(event)" /><span>A</span></label>
+                <label><input name="trigger" type="checkbox" value=22 onclick="typed(event)" /><span>S</span></label>
+                <label><input name="trigger" type="checkbox" value=7 onclick="typed(event)" /><span>D</span></label>
+                <label><input name="trigger" type="checkbox" value=9 onclick="typed(event)" /><span>F</span></label>
+                <label><input name="trigger" type="checkbox" value=10 onclick="typed(event)" /><span>G</span></label>
+                <label><input name="trigger" type="checkbox" value=11 onclick="typed(event)" /><span>H</span></label>
+                <label><input name="trigger" type="checkbox" value=13 onclick="typed(event)" /><span>J</span></label>
+                <label><input name="trigger" type="checkbox" value=14 onclick="typed(event)" /><span>K</span></label>
+                <label><input name="trigger" type="checkbox" value=15 onclick="typed(event)" /><span>L</span></label>
+                <label><input name="trigger" type="checkbox" value=51 onclick="typed(event)" /><span>;</span></label>
+                <label><input name="trigger" type="checkbox" value=52 onclick="typed(event)" /><span>:</span></label>
+                <label><input name="trigger" type="checkbox" value=50 onclick="typed(event)" /><span>]</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="modtrigger" type="checkbox" value=225 onclick="typed(event)" /><span value="Shift">Shift</span></label>
+                <label><input name="trigger" type="checkbox" value=29 onclick="typed(event)" /><span>Z</span></label>
+                <label><input name="trigger" type="checkbox" value=27 onclick="typed(event)" /><span>X</span></label>
+                <label><input name="trigger" type="checkbox" value=6 onclick="typed(event)" /><span>C</span></label>
+                <label><input name="trigger" type="checkbox" value=25 onclick="typed(event)" /><span>V</span></label>
+                <label><input name="trigger" type="checkbox" value=5 onclick="typed(event)" /><span>B</span></label>
+                <label><input name="trigger" type="checkbox" value=17 onclick="typed(event)" /><span>N</span></label>
+                <label><input name="trigger" type="checkbox" value=16 onclick="typed(event)" /><span>M</span></label>
+                <label><input name="trigger" type="checkbox" value=54 onclick="typed(event)" /><span>,</span></label>
+                <label><input name="trigger" type="checkbox" value=55 onclick="typed(event)" /><span>.</span></label>
+                <label><input name="trigger" type="checkbox" value=56 onclick="typed(event)" /><span>/</span></label>
+                <label><input name="trigger" type="checkbox" value=135 onclick="typed(event)" /><span>_</span></label>
+                <label><input name="modtrigger" type="checkbox" value=229 onclick="typed(event)" /><span value="Shift">Shift</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="modtrigger" type="checkbox" value=224 onclick="typed(event)" /><span value="Ctrl">Ctrl</span></label>
+                <label><input name="modtrigger" type="checkbox" value=227 onclick="typed(event)" /><span value="GUI">GUI</span></label>
+                <label><input name="modtrigger" type="checkbox" value=226 onclick="typed(event)" /><span value="Alt/Opt">Alt/Opt</span></label>
+                <label><input name="trigger" type="checkbox" value=139 onclick="typed(event)" /><span value="無変換">無変換</span></label>
+                <label><input name="trigger" type="checkbox" value=44 onclick="typed(event)" /><span value="SPACE">SPACE</span></label>
+                <label><input name="trigger" type="checkbox" value=138 onclick="typed(event)" /><span value="変換">変換</span></label>
+                <label><input name="trigger" type="checkbox" value=136 onclick="typed(event)" /><span value="ローマ字">ローマ字</span></label>
+                <label><input name="modtrigger" type="checkbox" value=230 onclick="typed(event)" /><span value="Alt/Opt">Alt/Opt</span></label>
+                <label><input name="modtrigger" type="checkbox" value=231 onclick="typed(event)" /><span value="GUI">GUI</span></label>
+                <label><input name="modtrigger" type="checkbox" value=228 onclick="typed(event)" /><span value="Ctrl">Ctrl</span></label>
+              </div>
+            </div>
+          </div>
+          <input type="radio" name="tab_name" id="tab2">
+          <label class="tab_class" for="tab2">US</label>
+          <div class="content_class">
+            <div class="keybord-wrapper">
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=41 onclick="typed(event)" /><span id="fkeys">Esc</span></label>
+                <label><input name="trigger" type="checkbox" value=58 onclick="typed(event)" /><span id="fkeys">F1</span></label>
+                <label><input name="trigger" type="checkbox" value=59 onclick="typed(event)" /><span id="fkeys">F2</span></label>
+                <label><input name="trigger" type="checkbox" value=60 onclick="typed(event)" /><span id="fkeys">F3</span></label>
+                <label><input name="trigger" type="checkbox" value=61 onclick="typed(event)" /><span id="fkeys">F4</span></label>
+                <label><input name="trigger" type="checkbox" value=62 onclick="typed(event)" /><span id="fkeys">F5</span></label>
+                <label><input name="trigger" type="checkbox" value=63 onclick="typed(event)" /><span id="fkeys">F6</span></label>
+                <label><input name="trigger" type="checkbox" value=64 onclick="typed(event)" /><span id="fkeys">F7</span></label>
+                <label><input name="trigger" type="checkbox" value=65 onclick="typed(event)" /><span id="fkeys">F8</span></label>
+                <label><input name="trigger" type="checkbox" value=66 onclick="typed(event)" /><span id="fkeys">F9</span></label>
+                <label><input name="trigger" type="checkbox" value=67 onclick="typed(event)" /><span id="fkeys">F10</span></label>
+                <label><input name="trigger" type="checkbox" value=68 onclick="typed(event)" /><span id="fkeys">F11</span></label>
+                <label><input name="trigger" type="checkbox" value=69 onclick="typed(event)" /><span id="fkeys">F12</span></label>
+              </div>
+              <div id="separator">
+                <br />
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=53 onclick="typed(event)" /><span value="半角/">`</span></label>
+                <label><input name="trigger" type="checkbox" value=30 onclick="typed(event)" /><span>1</span></label>
+                <label><input name="trigger" type="checkbox" value=31 onclick="typed(event)" /><span>2</span></label>
+                <label><input name="trigger" type="checkbox" value=32 onclick="typed(event)" /><span>3</span></label>
+                <label><input name="trigger" type="checkbox" value=33 onclick="typed(event)" /><span>4</span></label>
+                <label><input name="trigger" type="checkbox" value=34 onclick="typed(event)" /><span>5</span></label>
+                <label><input name="trigger" type="checkbox" value=35 onclick="typed(event)" /><span>6</span></label>
+                <label><input name="trigger" type="checkbox" value=36 onclick="typed(event)" /><span>7</span></label>
+                <label><input name="trigger" type="checkbox" value=37 onclick="typed(event)" /><span>8</span></label>
+                <label><input name="trigger" type="checkbox" value=38 onclick="typed(event)" /><span>9</span></label>
+                <label><input name="trigger" type="checkbox" value=39 onclick="typed(event)" /><span>0</span></label>
+                <label><input name="trigger" type="checkbox" value=45 onclick="typed(event)" /><span>-</span></label>
+                <label><input name="trigger" type="checkbox" value=46 onclick="typed(event)" /><span>=</span></label>
+                <label><input name="trigger" type="checkbox" value=42 onclick="typed(event)" /><span value="Back">Back</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=43 onclick="typed(event)" /><span value="Tab">Tab</span></label>
+                <label><input name="trigger" type="checkbox" value=20 onclick="typed(event)" /><span>Q</span></label>
+                <label><input name="trigger" type="checkbox" value=26 onclick="typed(event)" /><span>W</span></label>
+                <label><input name="trigger" type="checkbox" value=8 onclick="typed(event)" /><span>E</span></label>
+                <label><input name="trigger" type="checkbox" value=21 onclick="typed(event)" /><span>R</span></label>
+                <label><input name="trigger" type="checkbox" value=23 onclick="typed(event)" /><span>T</span></label>
+                <label><input name="trigger" type="checkbox" value=28 onclick="typed(event)" /><span>Y</span></label>
+                <label><input name="trigger" type="checkbox" value=24 onclick="typed(event)" /><span>U</span></label>
+                <label><input name="trigger" type="checkbox" value=12 onclick="typed(event)" /><span>I</span></label>
+                <label><input name="trigger" type="checkbox" value=18 onclick="typed(event)" /><span>O</span></label>
+                <label><input name="trigger" type="checkbox" value=19 onclick="typed(event)" /><span>P</span></label>
+                <label><input name="trigger" type="checkbox" value=47 onclick="typed(event)" /><span>[</span></label>
+                <label><input name="trigger" type="checkbox" value=48 onclick="typed(event)" /><span>]</span></label>
+                <label><input name="trigger" type="checkbox" value=40 onclick="typed(event)" /><span value="Enter">Enter</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="trigger" type="checkbox" value=57 onclick="typed(event)" /><span value="Caps">Caps</span></label>
+                <label><input name="trigger" type="checkbox" value=4 onclick="typed(event)" /><span>A</span></label>
+                <label><input name="trigger" type="checkbox" value=22 onclick="typed(event)" /><span>S</span></label>
+                <label><input name="trigger" type="checkbox" value=7 onclick="typed(event)" /><span>D</span></label>
+                <label><input name="trigger" type="checkbox" value=9 onclick="typed(event)" /><span>F</span></label>
+                <label><input name="trigger" type="checkbox" value=10 onclick="typed(event)" /><span>G</span></label>
+                <label><input name="trigger" type="checkbox" value=11 onclick="typed(event)" /><span>H</span></label>
+                <label><input name="trigger" type="checkbox" value=13 onclick="typed(event)" /><span>J</span></label>
+                <label><input name="trigger" type="checkbox" value=14 onclick="typed(event)" /><span>K</span></label>
+                <label><input name="trigger" type="checkbox" value=15 onclick="typed(event)" /><span>L</span></label>
+                <label><input name="trigger" type="checkbox" value=51 onclick="typed(event)" /><span>;</span></label>
+                <label><input name="trigger" type="checkbox" value=52 onclick="typed(event)" /><span>'</span></label>
+                <label><input name="trigger" type="checkbox" value=50 onclick="typed(event)" /><span>\</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="modtrigger" type="checkbox" value=225 onclick="typed(event)" /><span value="Shift">Shift</span></label>
+                <label><input name="trigger" type="checkbox" value=29 onclick="typed(event)" /><span>Z</span></label>
+                <label><input name="trigger" type="checkbox" value=27 onclick="typed(event)" /><span>X</span></label>
+                <label><input name="trigger" type="checkbox" value=6 onclick="typed(event)" /><span>C</span></label>
+                <label><input name="trigger" type="checkbox" value=25 onclick="typed(event)" /><span>V</span></label>
+                <label><input name="trigger" type="checkbox" value=5 onclick="typed(event)" /><span>B</span></label>
+                <label><input name="trigger" type="checkbox" value=17 onclick="typed(event)" /><span>N</span></label>
+                <label><input name="trigger" type="checkbox" value=16 onclick="typed(event)" /><span>M</span></label>
+                <label><input name="trigger" type="checkbox" value=54 onclick="typed(event)" /><span>,</span></label>
+                <label><input name="trigger" type="checkbox" value=55 onclick="typed(event)" /><span>.</span></label>
+                <label><input name="trigger" type="checkbox" value=56 onclick="typed(event)" /><span>/</span></label>
+                <label><input name="modtrigger" type="checkbox" value=229 onclick="typed(event)" /><span value="Shift">Shift</span></label>
+              </div>
+              <div class="keys">
+                <label><input name="modtrigger" type="checkbox" value=224 onclick="typed(event)" /><span value="Ctrl">Ctrl</span></label>
+                <label><input name="modtrigger" type="checkbox" value=227 onclick="typed(event)" /><span value="GUI">GUI</span></label>
+                <label><input name="modtrigger" type="checkbox" value=226 onclick="typed(event)" /><span value="Alt/Opt">Alt/Opt</span></label>
+                <label><input name="trigger" type="checkbox" value=44 onclick="typed(event)" /><span value="SPACE">SPACE</span></label>
+                <label><input name="modtrigger" type="checkbox" value=230 onclick="typed(event)" /><span value="Alt/Opt">Alt/Opt</span></label>
+                <label><input name="modtrigger" type="checkbox" value=231 onclick="typed(event)" /><span value="GUI">GUI</span></label>
+                <label><input name="modtrigger" type="checkbox" value=228 onclick="typed(event)" /><span value="Ctrl">Ctrl</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div id="second">
+          <div class="keybord-wrapper" id="Pad">
+            <div class="keys">
+              <label><input name="contrigger" type="checkbox" value=226 onclick="typed(event)" /><span>Mute</span></label>
+              <label><input name="contrigger" type="checkbox" value=234 onclick="typed(event)" /><span>Vol.Dn</span></label>
+              <label><input name="contrigger" type="checkbox" value=233 onclick="typed(event)" /><span>Vol.Up</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="contrigger" type="checkbox" value=182 onclick="typed(event)" /><span>Prev</span></label>
+              <label><input name="contrigger" type="checkbox" value=205 onclick="typed(event)" /><span>Play</span></label>
+              <label><input name="contrigger" type="checkbox" value=181 onclick="typed(event)" /><span>Next</span></label>
+            </div>
+            <div id="separator">
+              <br>
+            </div>
+            <div class="keys">
+              <label><input name="contrigger" type="checkbox" value=112 onclick="typed(event)" /><span>Brig.Dn</span></label>
+              <label><input name="contrigger" type="checkbox" value=111 onclick="typed(event)" /><span>Brig.Up</span></label>
+            </div>
+            <div id="separator">
+              <br>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=0 onclick="typed(event)" /><span>Blank</span></label>
+            </div>
+          </div>
+
+          <div class="keybord-wrapper" id="Pad">
+
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=70 onclick="typed(event)" /><span id="fkeys">PrtSc</span></label>
+              <label><input name="trigger" type="checkbox" value=71 onclick="typed(event)" /><span id="fkeys">ScrLk</span></label>
+              <label><input name="trigger" type="checkbox" value=72 onclick="typed(event)" /><span id="fkeys">Pause</span></label>
+            </div>
+            <div id="separator">
+              <br>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=73 onclick="typed(event)" /><span>Insert</span></label>
+              <label><input name="trigger" type="checkbox" value=74 onclick="typed(event)" /><span>Home</span></label>
+              <label><input name="trigger" type="checkbox" value=75 onclick="typed(event)" /><span>PgUp</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=76 onclick="typed(event)" /><span>Delete</span></label>
+              <label><input name="trigger" type="checkbox" value=77 onclick="typed(event)" /><span>End</span></label>
+              <label><input name="trigger" type="checkbox" value=78 onclick="typed(event)" /><span>PgDn</span></label>
+            </div>
+            <div id="separator">
+              <br>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=82 onclick="typed(event)" /><span>↑</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=80 onclick="typed(event)" /><span>←</span></label>
+              <label><input name="trigger" type="checkbox" value=81 onclick="typed(event)" /><span>↓</span></label>
+              <label><input name="trigger" type="checkbox" value=79 onclick="typed(event)" /><span>→</span></label>
+            </div>
+          </div>
+
+          <!--
+          <div class="keybord-wrapper" id="Mouse">
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=182 onclick="typed(event)" /><span
+                  class="mousebutton">L</span></label>
+              <label id="scroll"><input name="trigger" type="checkbox" value=205 onclick="typed(event)" /><span>↑</span></label>
+              <label><input name="trigger" type="checkbox" value=181 onclick="typed(event)" /><span
+                  class="mousebutton">R</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=73 onclick="typed(event)" /><span
+                  class="middlebutton">M</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=82 onclick="typed(event)" /><span>↓</span></label>
+            </div>
+            <br class="separator">
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=82 onclick="typed(event)" /><span
+                  class="sidebutton">back</span></label>
+              <label><input name="trigger" type="checkbox" value=82 onclick="typed(event)" /><span
+                  class="sidebutton">forward</span></label>
+            </div>
+          </div>
+          -->
+
+          <div class="keybord-wrapper" id="NumPad">
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=83 onclick="typed(event)" /><span>Num</span></label>
+              <label><input name="trigger" type="checkbox" value=84 onclick="typed(event)" /><span>/</span></label>
+              <label><input name="trigger" type="checkbox" value=85 onclick="typed(event)" /><span>*</span></label>
+              <label><input name="trigger" type="checkbox" value=86 onclick="typed(event)" /><span>-</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=95 onclick="typed(event)" /><span>7</span></label>
+              <label><input name="trigger" type="checkbox" value=96 onclick="typed(event)" /><span>8</span></label>
+              <label><input name="trigger" type="checkbox" value=97 onclick="typed(event)" /><span>9</span></label>
+              <label><input name="trigger" type="checkbox" value=87 onclick="typed(event)" /><span>+</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=92 onclick="typed(event)" /><span>4</span></label>
+              <label><input name="trigger" type="checkbox" value=93 onclick="typed(event)" /><span>5</span></label>
+              <label><input name="trigger" type="checkbox" value=94 onclick="typed(event)" /><span>6</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=89 onclick="typed(event)" /><span>1</span></label>
+              <label><input name="trigger" type="checkbox" value=90 onclick="typed(event)" /><span>2</span></label>
+              <label><input name="trigger" type="checkbox" value=91 onclick="typed(event)" /><span>3</span></label>
+            </div>
+            <div class="keys">
+              <label><input name="trigger" type="checkbox" value=98 onclick="typed(event)" /><span>0</span></label>
+              <label><input name="trigger" type="checkbox" value=99 onclick="typed(event)" /><span>.</span></label>
+              <label><input name="trigger" type="checkbox" value=88 onclick="typed(event)" /><span>Enter</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<footer>
+  <p>© 2023 falxala CyborgRemapper_V1.0</p>
+</footer>
+
+</html>
