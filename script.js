@@ -67,7 +67,7 @@ function typed(e) {
       mod_value |= mod_bit;
     }
   }
-  send_data[6] = mod_value;
+  send_data[0] = mod_value;
 
   //cancel
   if ((key_triggers.length + con_triggers.length) > 1) {
@@ -79,15 +79,15 @@ function typed(e) {
   for (let checked_data of key_triggers) {
     if (count > 0)
       break;
-    send_data[0] = checked_data.value;
+    send_data[1] = checked_data.value;
     count++;
   }
 
   for (let checked_data of con_triggers) {
     if (count > 0)
       break;
-    send_data[0] = 255;
-    send_data[1] = checked_data.value;
+    send_data[1] = 255;
+    send_data[2] = checked_data.value;
     count++;
   }
 
@@ -367,9 +367,9 @@ function code2str() {
         all.textContent += "Layer" + line[2] + " Key" + "R" + " => ";
       if (line[4] == 7)
         all.textContent += "Layer" + line[2] + " Key" + "L" + " => ";
-      var code = parseInt(line.slice(7, 11), 16);
-      var mod = parseInt(line.slice(37, 41), 16);
-      var con = parseInt(line.slice(12, 17), 16);
+      var code = parseInt(line.slice(12, 17), 16);
+      var mod = parseInt(line.slice(7, 11), 16);
+      var con = parseInt(line.slice(17, 21), 16);
 
       if (mod & 0b00000001)
         all.textContent += "LCtrl ";
