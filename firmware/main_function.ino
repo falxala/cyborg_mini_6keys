@@ -48,8 +48,9 @@ void hold_down() {
 
     if (gpio_get(rows[1]) == 0) {
       Brightness += 16;
-      if (Brightness > 255)
-        Brightness = 255;
+      //最高輝度は250とする
+      if (Brightness > 250)
+        Brightness = 250;
       count = 0;
       delay(50);
     }
@@ -101,9 +102,11 @@ void read_keys() {
 
   key = 0b00000000;
 
+  //キーの読み取り
   for (int i = 0; i < rowsCount; i++) {
-    if (!digitalReadFast(rows[i]))
+    if (!digitalReadFast(rows[i])) {
       key |= (0b00000001 << i);
+    }
   };
 
   //6キー同時押し判定
@@ -160,6 +163,14 @@ void read_keys() {
     oldKey = key;
 
     keys[0] = 0;
+    keys[1] = 0;
+    keys[2] = 0;
+    keys[3] = 0;
+    keys[4] = 0;
+    keys[5] = 0;
+
+    //チャタリング防止遅延
+    delayMicroseconds(5000);
   }
 }
 
@@ -290,7 +301,7 @@ void Switch_function(int input) {
     str = "";
   }
 }
-
+long con_diff = 0;
 void sendKeys(uint8_t report_id, uint8_t keycode[6], uint8_t modifier) {
 
 
@@ -317,7 +328,7 @@ void sendKeys(uint8_t report_id, uint8_t keycode[6], uint8_t modifier) {
     case 0xFF:
       usb_hid.sendReport16(RID_CONSUMER_CONTROL, keycode[2]);
       delay(2);
-      usb_hid.sendReport16(RID_CONSUMER_CONTROL, 0);
+      usb_hid.keyboardRelease(RID_CONSUMER_CONTROL);
       break;
 
     default:
@@ -339,7 +350,7 @@ void encf(int rot, int i) {
   //右回り
   if (rot > 0) {
     pickOneKey(layers, 6);
-    sendKeys(RID_KEYBOARD6, keys, layer_keys[layers][6][6]);
+    sendKeys(RID_KEYBOARD6, keys, layer_keys[layers][6][0]);
     delay(2);
     usb_hid.keyboardRelease(RID_KEYBOARD6);
     Serial.print("enc:");
@@ -348,7 +359,7 @@ void encf(int rot, int i) {
   //左回り
   if (rot < 0) {
     pickOneKey(layers, 7);
-    sendKeys(RID_KEYBOARD6, keys, layer_keys[layers][7][6]);
+    sendKeys(RID_KEYBOARD6, keys, layer_keys[layers][7][0]);
     delay(2);
     usb_hid.keyboardRelease(RID_KEYBOARD6);
     Serial.print("enc:");

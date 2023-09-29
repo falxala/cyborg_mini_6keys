@@ -176,12 +176,12 @@ void off_LEDs() {
 }
 
 void pickOneKey(int num, int index) {
-  keys[0] = layer_keys[num][index][0];
   keys[1] = layer_keys[num][index][1];
   keys[2] = layer_keys[num][index][2];
   keys[3] = layer_keys[num][index][3];
   keys[4] = layer_keys[num][index][4];
   keys[5] = layer_keys[num][index][5];
+  keys[6] = layer_keys[num][index][6];
 }
 
 //6文字のHEX文字列をIntに

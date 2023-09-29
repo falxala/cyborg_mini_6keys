@@ -22,27 +22,29 @@
 #define BRIGHTNESS_ADDRESS 1
 #define ENCINVERT_ADDRESS 2
 
-/*
+
 //RotaryEncoder
 #define SIGA1 12
 #define SIGB1 10
 //Push Button
 #define PB1 9
-*/
 
+/*
 #define SIGA1 13
 #define SIGB1 12
 #define PB1 11
+*/
 #define ROW1 0
 #define ROW2 1
 #define ROW3 2
 #define ROW4 3
 #define ROW5 6
-//#define ROW6 7
-#define ROW6 26
+#define ROW6 7
+//#define ROW6 26
 
 //WS2812B
 #define PIN 8
+#define WS_BUILTIN 16
 
 int rows[] = { ROW1, ROW2, ROW3, ROW4, ROW5, ROW6 };
 int columns[] = { 0 };
@@ -54,7 +56,7 @@ int rot2 = 0;
 int counter = 0;
 int layers = 0;
 int count = 0;
-int Brightness = 128;
+int Brightness = 64;
 int layer_num = 0;
 int layer_key_num = 0;
 int offsetAddress = MAINLAYER_START_ADDRESS;
@@ -86,6 +88,9 @@ bool suspend_state = false;
 //WS2812
 Adafruit_NeoPixel strip =
   Adafruit_NeoPixel(6, PIN, NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoPixel builtin_strip =
+  Adafruit_NeoPixel(6, WS_BUILTIN, NEO_GRB + NEO_KHZ800);
 
 // Report ID
 enum {
@@ -150,6 +155,10 @@ void setup() {
   strip.begin();
   strip.show();  // Initialize all pixels to 'off'
 
+  builtin_strip.begin();
+  builtin_strip.setPixelColor(0, 0, 64, 64);
+  builtin_strip.show();
+
   //シリアル通信開始
   Serial.begin(115200);
 
@@ -191,9 +200,9 @@ void init() {
   short len1 = sizeof(layer_keys[0][0]);
   short len2 = sizeof(layer_keys[0]);
   short len3 = sizeof(layer_keys);
-  for (int i = 0; i < (len3 / len2); i++) {
-    for (int j = 0; j < (len2 / len1); j++) {
-      for (int k = 0; k < len1; k++) {
+  for (int i = 0; i < (len3 / len2); i++) {    //layers
+    for (int j = 0; j < (len2 / len1); j++) {  //keys
+      for (int k = 0; k < len1; k++) {         //code
         addres = i * 100 + j * 10 + k;
         value = EEPROM.read(addres + offsetAddress);
         if (value != 255) {
@@ -203,7 +212,10 @@ void init() {
     }
   }
 
-  Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+  //最高輝度には設定しない
+  if (EEPROM.read(BRIGHTNESS_ADDRESS) != 255)
+    Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+
   layerState_led(layers);
 
   if (EEPROM.read(ENCINVERT_ADDRESS) == 1) {
