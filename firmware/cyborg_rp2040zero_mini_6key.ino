@@ -51,7 +51,7 @@ int rot2 = 0;
 int counter = 0;
 int layers = 0;
 int count = 0;
-int Brightness = 128;
+int Brightness = 64;
 int layer_num = 0;
 int layer_key_num = 0;
 int offsetAddress = MAINLAYER_START_ADDRESS;
@@ -113,7 +113,7 @@ uint8_t const desc_hid_report[] = {
 
 Adafruit_USBD_HID usb_hid(desc_hid_report, sizeof(desc_hid_report), HID_ITF_PROTOCOL_KEYBOARD, 2, false);
 
-void(*resetFunc)(void) = 0;
+void (*resetFunc)(void) = 0;
 
 void setup() {
 
@@ -208,8 +208,8 @@ void init() {
       }
     }
   }
-
-  Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+  if (MAXIMUM_BRIGHTNESS < EEPROM.read(BRIGHTNESS_ADDRESS))
+    Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
   layerState_led(layers);
 
   if (EEPROM.read(ENCINVERT_ADDRESS) == 1) {
