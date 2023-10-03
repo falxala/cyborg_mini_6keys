@@ -29,22 +29,17 @@
 //Push Button
 #define PB1 9
 
-/*
-#define SIGA1 13
-#define SIGB1 12
-#define PB1 11
-*/
 #define ROW1 0
 #define ROW2 1
 #define ROW3 2
 #define ROW4 3
 #define ROW5 6
 #define ROW6 7
-//#define ROW6 26
 
 //WS2812B
 #define PIN 8
 #define WS_BUILTIN 16
+#define MAXIMUM_BRIGHTNESS 128
 
 int rows[] = { ROW1, ROW2, ROW3, ROW4, ROW5, ROW6 };
 int columns[] = { 0 };
@@ -56,7 +51,7 @@ int rot2 = 0;
 int counter = 0;
 int layers = 0;
 int count = 0;
-int Brightness = 64;
+int Brightness = 128;
 int layer_num = 0;
 int layer_key_num = 0;
 int offsetAddress = MAINLAYER_START_ADDRESS;
@@ -117,6 +112,8 @@ uint8_t const desc_hid_report[] = {
 };
 
 Adafruit_USBD_HID usb_hid(desc_hid_report, sizeof(desc_hid_report), HID_ITF_PROTOCOL_KEYBOARD, 2, false);
+
+void(*resetFunc)(void) = 0;
 
 void setup() {
 
@@ -212,10 +209,7 @@ void init() {
     }
   }
 
-  //最高輝度には設定しない
-  if (EEPROM.read(BRIGHTNESS_ADDRESS) != 255)
-    Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
-
+  Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
   layerState_led(layers);
 
   if (EEPROM.read(ENCINVERT_ADDRESS) == 1) {

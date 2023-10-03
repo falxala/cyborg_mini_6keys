@@ -48,9 +48,8 @@ void hold_down() {
 
     if (gpio_get(rows[1]) == 0) {
       Brightness += 16;
-      //最高輝度は250とする
-      if (Brightness > 250)
-        Brightness = 250;
+      if (Brightness > MAXIMUM_BRIGHTNESS)
+        Brightness = MAXIMUM_BRIGHTNESS;
       count = 0;
       delay(50);
     }
@@ -80,8 +79,8 @@ void hold_down() {
       }
       EEPROM.commit();
       delay(1000);
-      init();
       layers = 0;
+        resetFunc();
     }
 
     watch = millis();
@@ -100,7 +99,7 @@ void read_keys() {
     Serial.println(layers);
   }
 
-  key = 0b00000000;
+  key = 0;
 
   //キーの読み取り
   for (int i = 0; i < rowsCount; i++) {
@@ -246,7 +245,7 @@ void Switch_function(int input) {
         EEPROM.commit();  //永続化
 
         //セット
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 3; i++) {
           address = layer_num * 100 + layer_key_num * 10 + i;
           layer_keys[layer_num][layer_key_num][i] = EEPROM.read(address + offsetAddress);
         }
