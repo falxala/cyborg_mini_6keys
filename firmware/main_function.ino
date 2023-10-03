@@ -78,9 +78,10 @@ void hold_down() {
         EEPROM.write(i, 255);
       }
       EEPROM.commit();
+      off_LEDs();
       delay(1000);
       layers = 0;
-        resetFunc();
+      init();
     }
 
     watch = millis();
