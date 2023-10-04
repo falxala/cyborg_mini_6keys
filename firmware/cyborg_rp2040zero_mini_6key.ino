@@ -60,6 +60,7 @@ uint8_t sigA1 = SIGA1;
 uint8_t sigB1 = SIGB1;
 uint8_t rgb_mask[3] = { 1, 1, 1 };
 uint8_t keys[6] = { 0 };
+uint8_t keyputs[6] = { 0 };
 uint8_t temp_keys[7] = { 0 };
 uint8_t layer_keys[6][10][7] = { 0 };  //layer 6 ,keys 10 ,code 6 + 1 modifier
 char buff[64] = { '\0' };

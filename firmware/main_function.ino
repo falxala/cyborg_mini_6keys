@@ -176,20 +176,26 @@ void read_keys() {
 
 //キー出力
 void outputsKeys(String str) {
+  keyputs[0] = 0x00;
+  keyputs[1] = 0x00;
+  keyputs[2] = 0x00;
+  keyputs[3] = 0x00;
+  keyputs[4] = 0x00;
+  keyputs[5] = 0x00;
   for (int i = 0; i < str.length(); i++) {
     uint8_t mod = 0x00;
 
     //参照渡し
-    keys[0] = en2jp(str[i], &mod);
+    keyputs[0] = en2jp(str[i], &mod);
 
-    usb_hid.keyboardReport(RID_KEYBOARD1, mod, keys);
+    usb_hid.keyboardReport(RID_KEYBOARD1, mod, keyputs);
     delay(5);
     usb_hid.keyboardRelease(RID_KEYBOARD1);
     delay(5);
   }
 
-  keys[0] = HID_KEY_ENTER;
-  usb_hid.keyboardReport(RID_KEYBOARD1, 0x00, keys);
+  keyputs[0] = HID_KEY_ENTER;
+  usb_hid.keyboardReport(RID_KEYBOARD1, 0x00, keyputs);
   delay(5);
   usb_hid.keyboardRelease(RID_KEYBOARD1);
   delay(5);
