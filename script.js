@@ -673,6 +673,13 @@ function code2str() {
     else
         sl = all.textContent.slice(0, all.textContent.length);
 
+    let key_triggers = document.querySelectorAll("input[name=trigger]:checked");
+    let mod_triggers = document.querySelectorAll("input[name=modtrigger]:checked");
+    let con_triggers = document.querySelectorAll("input[name=contrigger]:checked");
+
+    if (key_triggers.length == 0 && mod_triggers.length == 0 && con_triggers.length == 0)
+        sl = "";
+
     switch (key_num) {
         case 0:
             document.getElementById("assign1").textContent = sl;
