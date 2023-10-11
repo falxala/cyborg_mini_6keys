@@ -141,14 +141,14 @@ let keepReading = true;
 let reader;
 let decoder = new TextDecoder()
 let buffer = "";
-const input = document.getElementById('write');
-const input2 = document.getElementById('connect');
+const iwrite = document.getElementById('write');
+const iconnect = document.getElementById('connect');
 async function readUntilClosed() {
     while (port.readable && keepReading) {
         reader = port.readable.getReader();
         try {
-            input.disabled = false;
-            input2.disabled = true;
+            iwrite.disabled = false;
+            iconnect.disabled = true;
 
             while (keepReading) {
                 const { value, done } = await reader.read();
@@ -203,9 +203,9 @@ document.getElementById("write").addEventListener('click', async () => {
     document.getElementById('allocation').textContent = "";
 
     if (pending.length != 0) {
-        keepReading = false;
-        input.disabled = true;
-        await port.close();
+        //keepReading = false;
+        //input.disabled = true;
+        clrearAssign();
     }
 });
 
@@ -303,6 +303,7 @@ function prev() {
     document.querySelector(`#layerNum`).innerHTML = `LAYER ${Layer_num}`;
     clearKeys();
     clrearAssign();
+    set_assign();
 }
 
 function next() {
@@ -313,6 +314,7 @@ function next() {
     document.querySelector(`#layerNum`).innerHTML = `LAYER ${Layer_num}`;
     clearKeys();
     clrearAssign();
+    set_assign();
 }
 
 let radio_btns = document.querySelectorAll(`input[type='radio'][name='Layer']`);
@@ -394,7 +396,16 @@ function readfunction(messeage) {
 
     clearKeys();
     console.log(messeage);
+    set_assign();
 }
+
+let key_assign = [['', '', '', '', '', '', '', ''],
+['', '', '', '', '', '', '', ''],
+['', '', '', '', '', '', '', ''],
+['', '', '', '', '', '', '', ''],
+['', '', '', '', '', '', '', ''],
+['', '', '', '', '', '', '', ''],];
+
 
 function code2str() {
     var all = document.getElementById("allocation");
@@ -404,15 +415,6 @@ function code2str() {
     for (let line of lines) {
         if (line.length > 41) {
 
-            /*
-            if (line[4] < 6){
-                all.textContent += "Layer" + line[2] + " Key" + (parseInt(line[4]) + 1) + " => ";
-            }
-            if (line[4] == 6)
-                all.textContent += "Layer" + line[2] + " Key" + "R" + " => ";
-            if (line[4] == 7)
-                all.textContent += "Layer" + line[2] + " Key" + "L" + " => ";
-            */
             var code = parseInt(line.slice(12, 17), 16);
             var mod = parseInt(line.slice(7, 11), 16);
             var con = parseInt(line.slice(17, 21), 16);
@@ -680,30 +682,17 @@ function code2str() {
     if (key_triggers.length == 0 && mod_triggers.length == 0 && con_triggers.length == 0)
         sl = "";
 
-    switch (key_num) {
-        case 0:
-            document.getElementById("assign1").textContent = sl;
-            break;
-        case 1:
-            document.getElementById("assign2").textContent = sl;
-            break;
-        case 2:
-            document.getElementById("assign3").textContent = sl;
-            break;
-        case 3:
-            document.getElementById("assign4").textContent = sl;
-            break;
-        case 4:
-            document.getElementById("assign5").textContent = sl;
-            break;
-        case 5:
-            document.getElementById("assign6").textContent = sl;
-            break;
-        case 6:
-            document.getElementById("assign7").textContent = sl;
-            break;
-        case 7:
-            document.getElementById("assign8").textContent = sl;
-            break;
-    }
+    key_assign[Layer_num][key_num] = sl.replace(/\r?\n/g, '');
+    set_assign();
+}
+
+function set_assign() {
+    document.getElementById("assign1").textContent = key_assign[Layer_num][0];
+    document.getElementById("assign2").textContent = key_assign[Layer_num][1];
+    document.getElementById("assign3").textContent = key_assign[Layer_num][2];
+    document.getElementById("assign4").textContent = key_assign[Layer_num][3];
+    document.getElementById("assign5").textContent = key_assign[Layer_num][4];
+    document.getElementById("assign6").textContent = key_assign[Layer_num][5];
+    document.getElementById("assign7").textContent = key_assign[Layer_num][6];
+    document.getElementById("assign8").textContent = key_assign[Layer_num][7];
 }
