@@ -214,7 +214,7 @@ document.getElementById("write").addEventListener('click', async () => {
     document.getElementById('allocation').textContent = "";
 
     if (pending.length != 0) {
-        clrearAssign();
+        //clrearAssign();
     }
 });
 
@@ -337,7 +337,7 @@ for (let target of radio_btns) {
 async function readkeys() {
     const writer = port.writable.getWriter();
 
-    const data = new Uint8Array([65, 95, 92, 110]); // hello
+    const data = new Uint8Array([65, 95, 92, 110]);
     await writer.write(data);
     writer.releaseLock();
 }
@@ -611,10 +611,10 @@ function code2str(mod, code, con) {
     if (code == 255) {
         switch (con) {
             case 111:
-                return "Bri.Up ";
+                return "Bri.U ";
 
             case 112:
-                return "Bri.Dn ";
+                return "Bri.D ";
 
             case 181:
                 return "Next ";
@@ -626,10 +626,10 @@ function code2str(mod, code, con) {
                 return "Play ";
 
             case 233:
-                return "Vol.Up ";
+                return "Vol.U ";
 
             case 234:
-                return "Vol.Dn ";
+                return "Vol.D ";
 
             case 226:
                 return "Mute ";
@@ -651,7 +651,7 @@ function line2allocation() {
 
             if (mod)
                 all.textContent += mod2str(mod);
-            if (code || con)
+            if ((code == 0 && mod == 0) || code || con)
                 all.textContent += code2str(mod, code, con)
 
 
