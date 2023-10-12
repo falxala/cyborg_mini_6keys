@@ -20,37 +20,37 @@
                                 <div class="keybord-wrapper">
                                         <div class="keys">
                                                 <label><input id="key1" name="Layerkey1" type="radio" value=1
-                                                                onclick="setKeyNum(event)" checked /><span class="u1h">1
+                                                                onclick="setKeyNum(event)" checked /><span class="u1h">key1
                                                                 <p id="assign1"></p>
                                                         </span></label>
                                                 <div id="separator">
                                                         <br>
                                                 </div>
                                                 <label><input id="key4" name="Layerkey1" type="radio" value=4
-                                                                onclick="setKeyNum(event)" /><span class="u1h">4
+                                                                onclick="setKeyNum(event)" /><span class="u1h">key4
                                                                 <p id="assign4"></p>
                                                         </span></label>
                                         </div>
                                         <div class="keys">
                                                 <label><input id="key2" name="Layerkey1" type="radio" value=2
-                                                                onclick="setKeyNum(event)" /><span class="u1h">2<p
+                                                                onclick="setKeyNum(event)" /><span class="u1h">key2<p
                                                                         id="assign2"></p></span></label>
                                                 <div id="separator">
                                                         <br>
                                                 </div>
                                                 <label><input id="key5" name="Layerkey1" type="radio" value=5
-                                                                onclick="setKeyNum(event)" /><span class="u1h">5<p
+                                                                onclick="setKeyNum(event)" /><span class="u1h">key5<p
                                                                         id="assign5"></p></span></label>
                                         </div>
                                         <div class="keys">
                                                 <label><input id="key3" name="Layerkey1" type="radio" value=3
-                                                                onclick="setKeyNum(event)" /><span class="u1h">3<p
+                                                                onclick="setKeyNum(event)" /><span class="u1h">key3<p
                                                                         id="assign3"></p></span></label>
                                                 <div id="separator">
                                                         <br>
                                                 </div>
                                                 <label><input id="key6" name="Layerkey1" type="radio" value=6
-                                                                onclick="setKeyNum(event)" /><span class="u1h">6<p
+                                                                onclick="setKeyNum(event)" /><span class="u1h">key6<p
                                                                         id="assign6"></p></span></label>
                                         </div>
                                         <div class="keys" id="knob">
@@ -74,6 +74,8 @@
                 </summary>
                 <div class="content">
                         <button id="connect" onclick="openSerial(event)">CONNECT</button>
+                        <button id="disconnect" onclick="closeSerial()">DISCONNECT</button>
+                        <button id="read" onclick="readkeys()">READ</button>
                         <button id="write">WRITE</button>
                 </div>
         </details>

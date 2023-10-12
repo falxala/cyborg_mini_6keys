@@ -99,7 +99,7 @@ function typed(e) {
         delete_last_line();
 
     cleanup();
-    code2str();
+    line2allocation();
 }
 
 let Layer_num = 0;
@@ -117,7 +117,14 @@ function setKeyNum(e) {
 
 
 function openSerial(e) {
+    keepReading = true;
     SerialBegin();
+}
+
+async function closeSerial(e) {
+    keepReading = false;
+    reader.cancel();
+    await closedPromise;
 }
 
 var port;
@@ -143,11 +150,13 @@ let decoder = new TextDecoder()
 let buffer = "";
 const iwrite = document.getElementById('write');
 const iconnect = document.getElementById('connect');
+const disconnect = document.getElementById('disconnect');
 async function readUntilClosed() {
     while (port.readable && keepReading) {
         reader = port.readable.getReader();
         try {
             iwrite.disabled = false;
+            disconnect.disabled = false;
             iconnect.disabled = true;
 
             while (keepReading) {
@@ -179,6 +188,8 @@ async function readUntilClosed() {
             reader.releaseLock();
         }
         await port.close();
+        disconnect.disabled = true;
+        iconnect.disabled = false;
     }
 }
 
@@ -203,8 +214,6 @@ document.getElementById("write").addEventListener('click', async () => {
     document.getElementById('allocation').textContent = "";
 
     if (pending.length != 0) {
-        //keepReading = false;
-        //input.disabled = true;
         clrearAssign();
     }
 });
@@ -291,7 +300,7 @@ function delete_last_line() {
         newtext += "\n";
     })
     document.getElementById('pending').textContent = newtext;
-    code2str();
+    line2allocation();
 }
 
 let maxLayer = 5;
@@ -323,6 +332,14 @@ for (let target of radio_btns) {
     target.addEventListener(`change`, function () {
         document.querySelector(`#layerNum`).innerHTML = `LAYER ${target.value}`;
     });
+}
+
+async function readkeys() {
+    const writer = port.writable.getWriter();
+
+    const data = new Uint8Array([65, 95, 92, 110]); // hello
+    await writer.write(data);
+    writer.releaseLock();
 }
 
 function readfunction(messeage) {
@@ -393,21 +410,234 @@ function readfunction(messeage) {
         key_num = 7;
     }
 
+    if (messeage[0] == 'A') {
+        messeage = messeage.slice(1, messeage.length);
+        let split = messeage.split(" ");
+        let num = parseInt(split[0]);
+        let Layer_num = parseInt(num / 10);
+        let keys = num % 10;
+        let mod = parseInt(split[2]);
+        let code = parseInt(split[3]);
+        let con = parseInt(split[4]);
+        key_assign[Layer_num][keys] = mod2str(mod) + code2str(mod, code, con);
+    }
 
     clearKeys();
     console.log(messeage);
     set_assign();
 }
 
-let key_assign = [['', '', '', '', '', '', '', ''],
-['', '', '', '', '', '', '', ''],
-['', '', '', '', '', '', '', ''],
-['', '', '', '', '', '', '', ''],
-['', '', '', '', '', '', '', ''],
-['', '', '', '', '', '', '', ''],];
+let key_assign =
+    [['', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', ''],];
 
+function mod2str(mod) {
+    let str = "";
+    if (mod & 0b00000001)
+        str += "LCtrl ";
+    if (mod & 0b00000010)
+        str += "LShift ";
+    if (mod & 0b00000100)
+        str += "LAlt/Opt ";
+    if (mod & 0b00001000)
+        str += "LGUI ";
+    if (mod & 0b00010000)
+        str += "RCtrl ";
+    if (mod & 0b00100000)
+        str += "RShift ";
+    if (mod & 0b01000000)
+        str += "RAlt/Opt ";
+    if (mod & 0b10000000)
+        str += "RGUI ";
+    return str;
+}
 
-function code2str() {
+function code2str(mod, code, con) {
+    if (4 <= code && code <= 29)
+        return String.fromCharCode(code + 61);
+
+    if (30 <= code && code <= 38)
+        return String.fromCharCode(code + 19);
+
+    if (code == 39)
+        return 0;
+
+    switch (code) {
+        case 0:
+            if (!mod)
+                return "Blank ";
+            break;
+
+        case 40:
+            return "Enter ";
+
+        case 41:
+            return "Esc ";
+
+        case 42:
+            return "Back ";
+
+        case 43:
+            return "Tab ";
+
+        case 44:
+            return "Space ";
+
+        case 45:
+            return "- ";
+
+        case 46:
+            return "^ ";
+
+        case 47:
+            return "@ ";
+
+        case 48:
+            return "[ ";
+
+        case 135:
+            return "_ ";
+
+        case 136:
+            return "カタカナ ";
+
+        case 137:
+            return "¥ ";
+
+        case 138:
+            return "変換 ";
+
+        case 139:
+            return "無変換 ";
+
+        case 50:
+            return "] ";
+
+        case 51:
+            return "; ";
+
+        case 52:
+            return ": ";
+
+        case 53:
+            return "半角/ ";
+
+        case 54:
+            return ", ";
+
+        case 55:
+            return ". ";
+
+        case 56:
+            return "/ ";
+
+        case 57:
+            return "Caps ";
+
+        case 70:
+            return "PrtSc ";
+
+        case 71:
+            return "ScrLk ";
+
+        case 72:
+            return "Pause ";
+
+        case 73:
+            return "Ins ";
+
+        case 74:
+            return "Home ";
+
+        case 75:
+            return "PgUp ";
+
+        case 76:
+            return "Delete ";
+
+        case 77:
+            return "End ";
+
+        case 78:
+            return "PgDn ";
+
+        case 79:
+            return "Right ";
+
+        case 80:
+            return "Left ";
+
+        case 81:
+            return "Down ";
+
+        case 82:
+            return "Up ";
+
+        case 83:
+            return "Num ";
+
+        case 84:
+            return "Pad/ ";
+
+        case 85:
+            return "Pad* ";
+
+        case 86:
+            return "Pad- ";
+
+        case 87:
+            return "Pad+ ";
+
+        case 88:
+            return "PadEnter ";
+    }
+
+    if (58 <= code && code <= 69)
+        return "F" + (code - 57);
+
+    if (89 <= code && code <= 97)
+        return "Pad" + String.fromCharCode(code - 40);
+
+    if (code == 98)
+        return "Pad" + 0;
+
+    if (code == 99)
+        return "Pad.";
+
+    if (code == 255) {
+        switch (con) {
+            case 111:
+                return "Bri.Up ";
+
+            case 112:
+                return "Bri.Dn ";
+
+            case 181:
+                return "Next ";
+
+            case 182:
+                return "Prev ";
+
+            case 205:
+                return "Play ";
+
+            case 233:
+                return "Vol.Up ";
+
+            case 234:
+                return "Vol.Dn ";
+
+            case 226:
+                return "Mute ";
+        }
+    }
+}
+
+function line2allocation() {
     var all = document.getElementById("allocation");
     var lines = document.getElementById('pending').textContent.split('\n');
 
@@ -419,244 +649,11 @@ function code2str() {
             var mod = parseInt(line.slice(7, 11), 16);
             var con = parseInt(line.slice(17, 21), 16);
 
-            if (mod & 0b00000001)
-                all.textContent += "LCtrl ";
-            if (mod & 0b00000010)
-                all.textContent += "LShift ";
-            if (mod & 0b00000100)
-                all.textContent += "LAlt/Opt ";
-            if (mod & 0b00001000)
-                all.textContent += "LGUI ";
-            if (mod & 0b00010000)
-                all.textContent += "RCtrl ";
-            if (mod & 0b00100000)
-                all.textContent += "RShift ";
-            if (mod & 0b01000000)
-                all.textContent += "RAlt/Opt ";
-            if (mod & 0b10000000)
-                all.textContent += "RGUI ";
+            if (mod)
+                all.textContent += mod2str(mod);
+            if (code || con)
+                all.textContent += code2str(mod, code, con)
 
-            if (4 <= code && code <= 29)
-                all.textContent += String.fromCharCode(code + 61);
-
-            if (30 <= code && code <= 38)
-                all.textContent += String.fromCharCode(code + 19);
-
-            if (code == 39)
-                all.textContent += 0;
-
-            switch (code) {
-                case 0:
-                    if (!mod)
-                        all.textContent += "Blank ";
-                    break;
-
-                case 40:
-                    all.textContent += "Enter ";
-                    break;
-
-                case 41:
-                    all.textContent += "Esc ";
-                    break;
-
-                case 42:
-                    all.textContent += "Back ";
-                    break;
-
-                case 43:
-                    all.textContent += "Tab ";
-                    break;
-
-                case 44:
-                    all.textContent += "Space ";
-                    break;
-
-                case 45:
-                    all.textContent += "- ";
-                    break;
-
-                case 46:
-                    all.textContent += "^ ";
-                    break;
-
-                case 47:
-                    all.textContent += "@ ";
-                    break;
-
-                case 48:
-                    all.textContent += "[ ";
-                    break;
-
-                case 135:
-                    all.textContent += "_ ";
-                    break;
-
-                case 136:
-                    all.textContent += "カタカナ ";
-                    break;
-
-                case 137:
-                    all.textContent += "¥ ";
-                    break;
-
-                case 138:
-                    all.textContent += "変換 ";
-                    break;
-
-                case 139:
-                    all.textContent += "無変換 ";
-                    break;
-
-                case 50:
-                    all.textContent += "] ";
-                    break;
-
-                case 51:
-                    all.textContent += "; ";
-                    break;
-
-                case 52:
-                    all.textContent += ": ";
-                    break;
-
-                case 53:
-                    all.textContent += "半角/ ";
-                    break;
-
-                case 54:
-                    all.textContent += ", ";
-                    break;
-
-                case 55:
-                    all.textContent += ". ";
-                    break;
-
-                case 56:
-                    all.textContent += "/ ";
-                    break;
-
-                case 57:
-                    all.textContent += "Caps ";
-                    break;
-
-                case 70:
-                    all.textContent += "PrtSc ";
-                    break;
-
-                case 71:
-                    all.textContent += "ScrLk ";
-                    break;
-
-                case 72:
-                    all.textContent += "Pause ";
-                    break;
-
-                case 73:
-                    all.textContent += "Ins ";
-                    break;
-
-                case 74:
-                    all.textContent += "Home ";
-                    break;
-
-                case 75:
-                    all.textContent += "PgUp ";
-                    break;
-
-                case 76:
-                    all.textContent += "Delete ";
-                    break;
-
-                case 77:
-                    all.textContent += "End ";
-                    break;
-
-                case 78:
-                    all.textContent += "PgDn ";
-                    break;
-
-                case 79:
-                    all.textContent += "Right ";
-                    break;
-
-                case 80:
-                    all.textContent += "Left ";
-                    break;
-
-                case 81:
-                    all.textContent += "Down ";
-                    break;
-
-                case 82:
-                    all.textContent += "Up ";
-                    break;
-
-                case 83:
-                    all.textContent += "Num ";
-                    break;
-
-                case 84:
-                    all.textContent += "Pad/ ";
-                    break;
-
-                case 85:
-                    all.textContent += "Pad* ";
-                    break;
-
-                case 86:
-                    all.textContent += "Pad- ";
-                    break;
-
-                case 87:
-                    all.textContent += "Pad+ ";
-                    break;
-
-                case 88:
-                    all.textContent += "PadEnter ";
-                    break;
-
-            }
-
-            if (58 <= code && code <= 69)
-                all.textContent += "F" + (code - 57);
-
-            if (89 <= code && code <= 97)
-                all.textContent += "Pad" + String.fromCharCode(code - 40);
-
-            if (code == 98)
-                all.textContent += "Pad" + 0;
-
-            if (code == 99)
-                all.textContent += "Pad.";
-
-            if (code == 255) {
-                switch (con) {
-                    case 111:
-                        all.textContent += "Bri.Up ";
-                        break;
-                    case 112:
-                        all.textContent += "Bri.Dn ";
-                        break;
-                    case 181:
-                        all.textContent += "Next ";
-                        break;
-                    case 182:
-                        all.textContent += "Prev ";
-                        break;
-                    case 205:
-                        all.textContent += "Play ";
-                        break;
-                    case 233:
-                        all.textContent += "Vol.Up ";
-                        break;
-                    case 234:
-                        all.textContent += "Vol.Dn ";
-                        break;
-                    case 226:
-                        all.textContent += "Mute ";
-                        break;
-                }
-            }
 
         }
         all.textContent += "\n";
