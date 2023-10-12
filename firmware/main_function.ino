@@ -70,24 +70,28 @@ void hold_down() {
     }
 
     if (count > 100) {
-      strip.setPixelColor(0, 0, 0, 0);
-      strip.show();
-      Serial.println("-----EEPROM RESET-----");
-      //アドレス100番以降を上書き
-      for (int i = 100; i < EEPROM_SIZE; i++) {
-        EEPROM.write(i, 255);
-      }
-      EEPROM.commit();
-      off_LEDs();
-      delay(1000);
-      layers = 0;
-      init();
+      EEPROM_RESET();
     }
 
     watch = millis();
     gpio_put(LED_BUILTIN, 0);
     delay(90);
   }
+}
+
+void EEPROM_RESET() {
+  strip.setPixelColor(0, 0, 0, 0);
+  strip.show();
+  Serial.println("-----EEPROM RESET-----");
+  //アドレス100番以降を上書き
+  for (int i = 100; i < EEPROM_SIZE; i++) {
+    EEPROM.write(i, 255);
+  }
+  EEPROM.commit();
+  off_LEDs();
+  delay(1000);
+  layers = 0;
+  init();
 }
 
 void read_keys() {
@@ -283,6 +287,22 @@ void Switch_function(int input) {
           Serial.print(" ");
         }
         Serial.println("");
+      }
+    }
+
+    //keyassign
+    if (str.substring(0, string_cut(str, '_')) == "A") {
+      for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 8; j++) {
+          Serial.print("A");
+          Serial.print(i * 10 + j);
+          Serial.print(" | ");
+          Serial.print(layer_keys[i][j][0]);
+          Serial.print(" ");
+          Serial.print(layer_keys[i][j][1]);
+          Serial.print(" ");
+          Serial.println(layer_keys[i][j][2]);
+        }
       }
     }
 
