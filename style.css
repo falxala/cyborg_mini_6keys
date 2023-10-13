@@ -94,7 +94,7 @@ input[type="radio"]:before {
 }
 
 .layer input#layer0:checked::before {
-  background: whitesmoke;
+  background: gray;
 }
 
 .layer input#layer1:checked::before {
@@ -448,12 +448,31 @@ details[open] .content {
   width: 230px;
   height: 200px;
   background: #bec4d4;
-  padding: 10px;
+  padding: 8px;
   border-radius: 10px;
   font-weight: bold;
+  user-select: none;
 }
 
 #cheat-sheet p {
   display: flex;
   justify-content: center;
+}
+
+table,
+td {
+  border: 1px solid #333;
+  width: 150px;
+  margin: 0 auto;
+}
+
+thead,
+tfoot {
+  background-color: #333;
+  color: #fff;
+}
+
+#table1 {
+  overflow-y: scroll;
+  height: 170px;
 }
