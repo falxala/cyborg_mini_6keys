@@ -222,7 +222,7 @@ document.getElementById("write").addEventListener('click', async () => {
     document.getElementById('allocation').textContent = "";
 
     if (pending.length != 0) {
-        //clrearAssign();
+        alert("write complete");
     }
 });
 
