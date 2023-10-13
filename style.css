@@ -17,6 +17,13 @@ footer {
   bottom: 0px;
 }
 
+.key-arrangement {
+  font-size: 1.2rem;
+  background: cadetblue;
+  color: white;
+  text-align: center;
+}
+
 .keys label span {
   user-select: none;
   display: block;
@@ -37,11 +44,11 @@ footer {
   font-weight: bold;
 }
 
-.keys label span.mod{
-  background: #332933;
+.keys label span.mod {
+  background: #423042;
 }
 
-.keys label span p{
+.keys label span p {
   font-size: 0.7rem;
   line-height: 0.8rem;
 }
@@ -55,9 +62,65 @@ footer {
   text-wrap: nowrap;
 }
 
+.layer {
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  -webkit-transform: translateY(-50%) translateX(-50%);
+}
+
+.layer input {
+  transform: scale(1.5);
+  width: 20px;
+}
+
+input[type="radio"] {
+  /* フォーム要素のスタイルを初期化 */
+  width: 15px;
+  height: 15px;
+  border: 1px solid black;
+  border-radius: 50%;
+  margin: 3px;
+}
+
+input[type="radio"]:before {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 60%;
+  margin: 20% auto;
+  border-radius: 50%;
+}
+
+.layer input#layer0:checked::before {
+  background: whitesmoke;
+}
+
+.layer input#layer1:checked::before {
+  background: red;
+}
+
+.layer input#layer2:checked::before {
+  background: yellow;
+}
+
+.layer input#layer3:checked::before {
+  background: green;
+}
+
+.layer input#layer4:checked::before {
+  background: blue;
+}
+
+.layer input#layer5:checked::before {
+  background: purple;
+}
+
+
 #frame {
   display: flex;
-  height: 200px;
+  height: 190px;
   width: 1000px;
   position: absolute;
   top: 50%;
@@ -115,8 +178,7 @@ footer {
 #row0 {
   padding: 30px;
   background: #ececec;
-  height: 35vh;
-  min-height: 200px;
+  min-height: 270px;
   position: relative;
 }
 
@@ -216,6 +278,18 @@ footer {
 
 .u1 {
   height: 30px;
+  width: 50px;
+}
+
+.u1e {
+  height: 68px;
+  width: 50px;
+  position: absolute;
+}
+
+.u1p {
+  position: absolute;
+  height: 68px;
   width: 50px;
 }
 

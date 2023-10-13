@@ -148,16 +148,22 @@ let keepReading = true;
 let reader;
 let decoder = new TextDecoder()
 let buffer = "";
-const iwrite = document.getElementById('write');
-const iconnect = document.getElementById('connect');
+const write = document.getElementById('write');
+const connect = document.getElementById('connect');
 const disconnect = document.getElementById('disconnect');
+const read = document.getElementById('read');
+disconnect.disabled = true;
+connect.disabled = false;
+read.disabled = true;
+write.disabled = true;
 async function readUntilClosed() {
     while (port.readable && keepReading) {
         reader = port.readable.getReader();
         try {
-            iwrite.disabled = false;
+            write.disabled = false;
             disconnect.disabled = false;
-            iconnect.disabled = true;
+            read.disabled = false;
+            connect.disabled = true;
 
             while (keepReading) {
                 const { value, done } = await reader.read();
@@ -189,7 +195,9 @@ async function readUntilClosed() {
         }
         await port.close();
         disconnect.disabled = true;
-        iconnect.disabled = false;
+        connect.disabled = false;
+        read.disabled = true;
+        write.disabled = true;
     }
 }
 
