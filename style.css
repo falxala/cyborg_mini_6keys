@@ -102,7 +102,7 @@ input[type="radio"]:before {
 }
 
 .layer input#layer2:checked::before {
-  background: yellow;
+  background: rgb(255, 187, 0);
 }
 
 .layer input#layer3:checked::before {
@@ -114,7 +114,7 @@ input[type="radio"]:before {
 }
 
 .layer input#layer5:checked::before {
-  background: purple;
+  background: rgb(204, 0, 204);
 }
 
 
@@ -401,11 +401,13 @@ details[open] .content {
   border-top: 3px solid #000;
   border-right: 3px solid #000;
   transform: rotate(45deg);
+  user-select: none;
 }
 
 .arrow_right:active::before {
   border-top: 3px solid #eb7d00;
   border-right: 3px solid #eb7d00;
+  user-select: none;
 }
 
 .arrow_left {
@@ -416,6 +418,7 @@ details[open] .content {
   width: 30px;
   border: none;
   background: none;
+  user-select: none;
 }
 
 .arrow_left::before {
@@ -430,9 +433,27 @@ details[open] .content {
   border-top: 3px solid #000;
   border-right: 3px solid #000;
   transform: rotate(225deg);
+  user-select: none;
 }
 
 .arrow_left:active::before {
   border-top: 3px solid #eb7d00;
   border-right: 3px solid #eb7d00;
+  user-select: none;
+}
+
+#cheat-sheet {
+  font-size: 1rem;
+  display: inline-table;
+  width: 230px;
+  height: 200px;
+  background: #bec4d4;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+#cheat-sheet p {
+  display: flex;
+  justify-content: center;
 }
