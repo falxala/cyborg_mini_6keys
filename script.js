@@ -108,6 +108,7 @@ function setLayerNum(e) {
     Layer_num = e.target.value;
     clearKeys();
     clrearAssign();
+    set_assign();
 }
 
 function setKeyNum(e) {
@@ -157,7 +158,7 @@ connect.disabled = false;
 read.disabled = true;
 write.disabled = true;
 async function readUntilClosed() {
-    while (port.readable && keepReading) {
+    while (port.readable) {
         reader = port.readable.getReader();
         try {
             write.disabled = false;
@@ -344,8 +345,14 @@ for (let target of radio_btns) {
 
 async function readkeys() {
     const writer = port.writable.getWriter();
+    const data = new Uint8Array([65, 95, 92, 110, 92, 114]);
+    await writer.write(data);
+    writer.releaseLock();
+}
 
-    const data = new Uint8Array([65, 95, 92, 110]);
+async function send_layer(num) {
+    const writer = port.writable.getWriter();
+    const data = new Uint8Array([76, 95, parseInt(num), 92, 110]);
     await writer.write(data);
     writer.releaseLock();
 }
