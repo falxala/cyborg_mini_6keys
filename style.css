@@ -121,7 +121,7 @@ input[type="radio"]:before {
 #frame {
   display: flex;
   height: 190px;
-  width: 1000px;
+  width: 850px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -194,6 +194,7 @@ input[type="radio"]:before {
   font-size: 0.5rem;
   align-items: flex-start;
   justify-content: center;
+  overflow: hidden;
 }
 
 #row1 {
@@ -213,6 +214,8 @@ input[type="radio"]:before {
   text-align-last: center;
   margin-bottom: 30px;
   margin-top: -30px;
+  white-space: nowrap;
+  padding: 0 30px;
 }
 
 #row2 .keybord-wrapper {

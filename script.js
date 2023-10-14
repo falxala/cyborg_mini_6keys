@@ -457,7 +457,7 @@ function mod2str(mod) {
     if (mod & 0b00000010)
         str += "LShift ";
     if (mod & 0b00000100)
-        str += "LAlt/Opt ";
+        str += "LAlt ";
     if (mod & 0b00001000)
         str += "LGUI ";
     if (mod & 0b00010000)
@@ -465,7 +465,7 @@ function mod2str(mod) {
     if (mod & 0b00100000)
         str += "RShift ";
     if (mod & 0b01000000)
-        str += "RAlt/Opt ";
+        str += "RAlt ";
     if (mod & 0b10000000)
         str += "RGUI ";
     return str;
@@ -485,7 +485,7 @@ function code2str(mod, code, con) {
         case 0:
             if (!mod)
                 return "Blank ";
-            break;
+            return "";
 
         case 40:
             return "Enter ";
@@ -608,7 +608,7 @@ function code2str(mod, code, con) {
             return "Pad+ ";
 
         case 88:
-            return "PadEnter ";
+            return "P-Enter ";
     }
 
     if (58 <= code && code <= 69)
@@ -626,10 +626,10 @@ function code2str(mod, code, con) {
     if (code == 255) {
         switch (con) {
             case 111:
-                return "Bri.U ";
+                return "Bri+ ";
 
             case 112:
-                return "Bri.D ";
+                return "Bri- ";
 
             case 181:
                 return "Next ";
@@ -641,10 +641,10 @@ function code2str(mod, code, con) {
                 return "Play ";
 
             case 233:
-                return "Vol.U ";
+                return "Vol+ ";
 
             case 234:
-                return "Vol.D ";
+                return "Vol- ";
 
             case 226:
                 return "Mute ";
