@@ -96,9 +96,9 @@
         </details>
 
         <div class="key-arrangement">
-                <p>
-                        JIS配列
-                </p>
+                <label> <input type="radio" name="layout" value="JIS" onchange="jis()"
+                                checked /><span>JIS</span></label>
+                <label> <input type="radio" name="layout" value="US" onchange="us()" /><span>US</span></label>
         </div>
 
         <div id="row1">
@@ -138,8 +138,10 @@
                                 <br />
                         </div>
                         <div class="keys">
-                                <label><input name="trigger" type="checkbox" value=53 onclick="typed(event)" /><span
-                                                class="u1" value="半角/">半角/</span></label>
+                                <label class="us"><input name="trigger" type="checkbox" value=53
+                                                onclick="typed(event)" /><span class="u1">`</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=53
+                                                onclick="typed(event)" /><span class="u1">半角/</span></label>
                                 <label><input name="trigger" type="checkbox" value=30 onclick="typed(event)" /><span
                                                 class="u1">1</span></label>
                                 <label><input name="trigger" type="checkbox" value=31 onclick="typed(event)" /><span
@@ -164,8 +166,8 @@
                                                 class="u1">-</span></label>
                                 <label><input name="trigger" type="checkbox" value=46 onclick="typed(event)" /><span
                                                 class="u1">^</span></label>
-                                <label><input name="trigger" type="checkbox" value=137 onclick="typed(event)" /><span
-                                                class="u1">¥</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=137
+                                                onclick="typed(event)" /><span class="u1">¥</span></label>
                                 <label><input name="trigger" type="checkbox" value=42 onclick="typed(event)" /><span
                                                 class="u1" value="Back">Back</span></label>
                         </div>
@@ -192,10 +194,14 @@
                                                 class="u1">O</span></label>
                                 <label><input name="trigger" type="checkbox" value=19 onclick="typed(event)" /><span
                                                 class="u1">P</span></label>
-                                <label><input name="trigger" type="checkbox" value=47 onclick="typed(event)" /><span
-                                                class="u1">@</span></label>
-                                <label><input name="trigger" type="checkbox" value=48 onclick="typed(event)" /><span
-                                                class="u1">[</span></label>
+                                <label class="us"><input name="trigger" type="checkbox" value=47
+                                                onclick="typed(event)" /><span class="u1">[</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=47
+                                                onclick="typed(event)" /><span class="u1">@</span></label>
+                                <label class="us"><input name="trigger" type="checkbox" value=48
+                                                onclick="typed(event)" /><span class="u1">]</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=48
+                                                onclick="typed(event)" /><span class="u1">[</span></label>
                                 <label><input name="trigger" type="checkbox" value=40 onclick="typed(event)" /><span
                                                 class="u1_5" value="Enter">Enter</span></label>
                         </div>
@@ -222,10 +228,14 @@
                                                 class="u1">L</span></label>
                                 <label><input name="trigger" type="checkbox" value=51 onclick="typed(event)" /><span
                                                 class="u1">;</span></label>
-                                <label><input name="trigger" type="checkbox" value=52 onclick="typed(event)" /><span
-                                                class="u1">:</span></label>
-                                <label><input name="trigger" type="checkbox" value=50 onclick="typed(event)" /><span
-                                                class="u1">]</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=52
+                                                onclick="typed(event)" /><span class="u1">:</span></label>
+                                <label class="us"><input name="trigger" type="checkbox" value=52
+                                                onclick="typed(event)" /><span class="u1">'</span></label>
+                                <label class="us"><input name="trigger" type="checkbox" value=50
+                                                onclick="typed(event)" /><span class="u1">\</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=50
+                                                onclick="typed(event)" /><span class="u1">]</span></label>
                         </div>
                         <div class="keys">
                                 <label><input name="modtrigger" type="checkbox" value=225 onclick="typed(event)" /><span
@@ -250,8 +260,8 @@
                                                 class="u1">.</span></label>
                                 <label><input name="trigger" type="checkbox" value=56 onclick="typed(event)" /><span
                                                 class="u1">/</span></label>
-                                <label><input name="trigger" type="checkbox" value=135 onclick="typed(event)" /><span
-                                                class="u1">_</span></label>
+                                <label class="jis"><input name="trigger" type="checkbox" value=135
+                                                onclick="typed(event)" /><span class="u1">_</span></label>
                                 <label><input name="modtrigger" type="checkbox" value=229 onclick="typed(event)" /><span
                                                 class="u1_5 mod" value="Shift">Shift</span></label>
                         </div>

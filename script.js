@@ -708,3 +708,29 @@ function set_assign() {
     document.getElementById("assign7").textContent = key_assign[Layer_num][6];
     document.getElementById("assign8").textContent = key_assign[Layer_num][7];
 }
+
+window.onload = function () {
+    jis();
+}
+
+function us() {
+    let us = document.querySelectorAll("label[class=us]");
+    for (label of us) {
+        label.style.display = "block"
+    }
+    let jis = document.querySelectorAll("label[class=jis]");
+    for (label of jis) {
+        label.style.display = "none"
+    }
+}
+
+function jis() {
+    let jis = document.querySelectorAll("label[class=jis]");
+    for (label of jis) {
+        label.style.display = "block"
+    }
+    let us = document.querySelectorAll("label[class=us]");
+    for (label of us) {
+        label.style.display = "none"
+    }
+}
