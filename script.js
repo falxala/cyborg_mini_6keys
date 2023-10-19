@@ -622,6 +622,8 @@ function code2str(mod, code, con) {
 
     if (code == 99)
         return "Pad.";
+    if (code == 101)
+        return "Menu";
 
     if (code == 255) {
         switch (con) {
