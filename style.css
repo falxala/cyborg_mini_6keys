@@ -122,7 +122,7 @@ input[type="radio"]:before {
   background: rgb(204, 0, 204);
 }
 
-#mask {
+.mask {
   accent-color: #393b41;
 }
 
