@@ -23,7 +23,12 @@ void hold_down() {
   while (gpio_get(PB1) == 0) {
     if (layerChangeFlag == false) {
       layerChangeFlag = true;
-      layers++;
+
+      do {
+        layers++;
+        if (layers > 5)
+          layers = 0;
+      } while (maskLayer(layers) == -1);
     }
     count = count + 1;
 
@@ -87,6 +92,7 @@ void EEPROM_RESET() {
   for (int i = 100; i < EEPROM_SIZE; i++) {
     EEPROM.write(i, 255);
   }
+  EEPROM.write(LAYERMASK_ADDRESS, 255);
   EEPROM.commit();
   off_LEDs();
   delay(1000);
@@ -314,6 +320,15 @@ void Switch_function(int input) {
       layerState_led(layers);
     }
 
+    //レイヤーマスク
+    if (str.substring(0, string_cut(str, '_')) == "MASK") {
+      str = str.substring(1 + string_cut(str, '_'));
+      layermask = str.toInt();
+      EEPROM.write(LAYERMASK_ADDRESS, layermask);
+      EEPROM.commit();
+      Serial.println("layermask:" + str);
+    }
+
     //ロータリーエンコーダ反転
     if (str.substring(0, string_cut(str, '_')) == "E") {
       str = str.substring(1 + string_cut(str, '_'));
@@ -325,8 +340,19 @@ void Switch_function(int input) {
     }
 
     str = "";
+    Serial.flush();
   }
 }
+
+int maskLayer(int layerValue) {
+
+  uint m = layermask & (0b00000001 << layerValue);
+  if (m != 0)
+    return layerValue;
+  else
+    return -1;
+}
+
 long con_diff = 0;
 void sendKeys(uint8_t report_id, uint8_t keycode[6], uint8_t modifier) {
 

@@ -119,7 +119,7 @@ void setDefaultKeys() {
   layer_keys[4][1][1] = HID_KEY_E;
   layer_keys[4][1][0] = 0x00;
 
-  layer_keys[4][2][1] = HID_KEY_P;
+  layer_keys[4][2][1] = HID_KEY_B;
   layer_keys[4][2][0] = 0x00;
 
   layer_keys[4][3][1] = HID_KEY_Z;
@@ -145,7 +145,7 @@ void setDefaultKeys() {
   layer_keys[5][1][1] = HID_KEY_E;
   layer_keys[5][1][0] = 0x00;
 
-  layer_keys[5][2][1] = HID_KEY_P;
+  layer_keys[5][2][1] = HID_KEY_B;
   layer_keys[5][2][0] = 0x00;
 
   layer_keys[5][3][1] = HID_KEY_Z;

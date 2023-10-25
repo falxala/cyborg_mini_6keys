@@ -21,13 +21,14 @@
 #define LAYER_ADDRESS 0
 #define BRIGHTNESS_ADDRESS 1
 #define ENCINVERT_ADDRESS 2
+#define LAYERMASK_ADDRESS 3
 
 
 //RotaryEncoder
 #define SIGA1 12
-#define SIGB1 10
+#define SIGB1 11
 //Push Button
-#define PB1 9
+#define PB1 10
 
 #define ROW1 0
 #define ROW2 1
@@ -37,7 +38,7 @@
 #define ROW6 7
 
 //WS2812B
-#define PIN 8
+#define PIN 9
 #define WS_BUILTIN 16
 #define MAXIMUM_BRIGHTNESS 128
 
@@ -71,6 +72,7 @@ volatile int8_t pos1;  //エンコーダー状態を記憶
 volatile int enc_count1;
 volatile uint8_t key = 0b00000000;
 volatile uint8_t oldKey = 0b00000000;
+uint8_t layermask = 0b11111111;
 
 unsigned long watch = 0;
 
@@ -182,6 +184,7 @@ void setup() {
 }
 
 void init() {
+  layermask = EEPROM.read(LAYERMASK_ADDRESS);
   uint8_t read_layernum = EEPROM.read(LAYER_ADDRESS);
   if (read_layernum < 10)
     layers = read_layernum;
@@ -210,7 +213,10 @@ void init() {
     }
   }
   if (MAXIMUM_BRIGHTNESS < EEPROM.read(BRIGHTNESS_ADDRESS))
-    Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+    Brightness = MAXIMUM_BRIGHTNESS;
+  else
+    EEPROM.read(BRIGHTNESS_ADDRESS);
+
   layerState_led(layers);
 
   if (EEPROM.read(ENCINVERT_ADDRESS) == 1) {
