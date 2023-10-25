@@ -357,6 +357,28 @@ async function send_layer(num) {
     writer.releaseLock();
 }
 
+async function layerMask() {
+    var state = document.querySelectorAll("input[name=LMnum]");
+    bit = 0b00000000;
+    if (state[0].checked)
+        bit |= 0b00000001;
+    if (state[1].checked)
+        bit |= 0b00000010;
+    if (state[2].checked)
+        bit |= 0b00000100;
+    if (state[3].checked)
+        bit |= 0b00001000;
+    if (state[4].checked)
+        bit |= 0b00010000;
+    if (state[5].checked)
+        bit |= 0b00100000;
+
+    const textEncoder = new TextEncoder();
+    const writer = port.writable.getWriter();
+    await writer.write(textEncoder.encode("MASK_" + bit.toString()));
+    writer.releaseLock();
+}
+
 function readfunction(messeage) {
 
     switch (parseInt(messeage.replace('lyr:', ''))) {

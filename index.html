@@ -67,18 +67,25 @@
                                 <P id="layerNum">LAYER 0</P>
                         </div>
                         <div class="layer">
-                                <label><input type="radio" name="Layer" value=0 checked onclick="setLayerNum(event)"
+                                <label> <input type="checkbox" id="mask" name="LMnum" value="0" checked />
+                                        <input type="radio" name="Layer" value=0 checked onclick="setLayerNum(event)"
                                                 id="layer0"><span></span></label>
-                                <label><input type="radio" name="Layer" value=1 onclick="setLayerNum(event)"
+                                <label><input type="checkbox" id="mask" name="LMnum" value="1" checked />
+                                        <input type="radio" name="Layer" value=1 onclick="setLayerNum(event)"
                                                 id="layer1" /><span></span></label>
-                                <label><input type="radio" name="Layer" value=2 onclick="setLayerNum(event)"
+                                <label><input type="checkbox" id="mask" name="LMnum" value="2" checked />
+                                        <input type="radio" name="Layer" value=2 onclick="setLayerNum(event)"
                                                 id="layer2" /><span></span></label>
-                                <label><input type="radio" name="Layer" value=3 onclick="setLayerNum(event)"
+                                <label><input type="checkbox" id="mask" name="LMnum" value="3" checked />
+                                        <input type="radio" name="Layer" value=3 onclick="setLayerNum(event)"
                                                 id="layer3" /><span></span></label>
-                                <label><input type="radio" name="Layer" value=4 onclick="setLayerNum(event)"
+                                <label><input type="checkbox" id="mask" name="LMnum" value="4" checked />
+                                        <input type="radio" name="Layer" value=4 onclick="setLayerNum(event)"
                                                 id="layer4" /><span></span></label>
-                                <label><input type="radio" name="Layer" value=5 onclick="setLayerNum(event)"
+                                <label><input type="checkbox" id="mask" name="LMnum" value="5" checked />
+                                        <input type="radio" name="Layer" value=5 onclick="setLayerNum(event)"
                                                 id="layer5" /><span></span></label>
+                                <button id="apply" onclick="layerMask()">apply</button>
                         </div>
                 </div>
         </div>

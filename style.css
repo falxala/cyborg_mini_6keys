@@ -64,8 +64,9 @@ footer {
 
 .layer {
   position: absolute;
-  top: 110%;
-  left: 50%;
+  display: grid;
+  top: 50%;
+  left: 90%;
   transform: translateY(-50%) translateX(-50%);
   -webkit-transform: translateY(-50%) translateX(-50%);
 }
@@ -117,6 +118,14 @@ input[type="radio"]:before {
   background: rgb(204, 0, 204);
 }
 
+#mask {
+  accent-color: #393b41;
+}
+
+#apply {
+  font-size: 15px;
+  font-variant-caps: all-petite-caps;
+}
 
 #frame {
   display: flex;
