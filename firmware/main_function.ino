@@ -324,9 +324,12 @@ void Switch_function(int input) {
     if (str.substring(0, string_cut(str, '_')) == "MASK") {
       str = str.substring(1 + string_cut(str, '_'));
       layermask = str.toInt();
+      if (layermask == 0)
+        layermask = 255;
       EEPROM.write(LAYERMASK_ADDRESS, layermask);
       EEPROM.commit();
-      Serial.println("layermask:" + str);
+      Serial.print("layermask:");
+      Serial.println(layermask);
     }
 
     //ロータリーエンコーダ反転

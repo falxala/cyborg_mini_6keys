@@ -184,7 +184,9 @@ void setup() {
 }
 
 void init() {
-  layermask = EEPROM.read(LAYERMASK_ADDRESS);
+  if (EEPROM.read(LAYERMASK_ADDRESS) != 0)
+    layermask = EEPROM.read(LAYERMASK_ADDRESS);
+
   uint8_t read_layernum = EEPROM.read(LAYER_ADDRESS);
   if (read_layernum < 10)
     layers = read_layernum;
