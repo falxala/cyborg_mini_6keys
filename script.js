@@ -1,6 +1,7 @@
 const typedKey = document.querySelector(".typedKey");
 
 window.onload = function () {
+    jis();
     try {
         navigator.serial.getPorts().then((ports) => {
             // ページが読み込まれた時、`ports` を用いて利用可能なポートのリストを初期化します。
@@ -731,10 +732,6 @@ function set_assign() {
     document.getElementById("assign6").textContent = key_assign[Layer_num][5];
     document.getElementById("assign7").textContent = key_assign[Layer_num][6];
     document.getElementById("assign8").textContent = key_assign[Layer_num][7];
-}
-
-window.onload = function () {
-    jis();
 }
 
 function us() {

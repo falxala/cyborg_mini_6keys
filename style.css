@@ -69,6 +69,10 @@ footer {
   left: 90%;
   transform: translateY(-50%) translateX(-50%);
   -webkit-transform: translateY(-50%) translateX(-50%);
+  justify-items: center;
+  border: solid;
+  border-color: silver;
+  padding: 5px;
 }
 
 .layer input {
@@ -125,6 +129,7 @@ input[type="radio"]:before {
 #apply {
   font-size: 15px;
   font-variant-caps: all-petite-caps;
+  width: 50px;
 }
 
 #frame {
