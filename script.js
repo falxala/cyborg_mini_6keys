@@ -375,9 +375,13 @@ async function layerMask() {
         bit |= 0b00100000;
 
     const textEncoder = new TextEncoder();
-    const writer = port.writable.getWriter();
-    await writer.write(textEncoder.encode("MASK_" + bit.toString()));
-    writer.releaseLock();
+    try {
+        const writer = port.writable.getWriter();
+        await writer.write(textEncoder.encode("MASK_" + bit.toString()));
+        writer.releaseLock();
+    } catch {
+        alert("Please connect");
+    }
 }
 
 function readfunction(messeage) {
