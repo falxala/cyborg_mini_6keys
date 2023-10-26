@@ -4,9 +4,14 @@
   box-sizing: border-box;
 }
 
+html{
+  min-width: 900px;
+}
+
 body {
   display: inline;
   background: #333;
+  overflow-x: hidden;
 }
 
 footer {
@@ -135,7 +140,7 @@ input[type="radio"]:before {
 #frame {
   display: flex;
   height: 190px;
-  width: 850px;
+  width: 900px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -201,7 +206,7 @@ input[type="radio"]:before {
   border-radius: 10px;
   background: #303030;
   margin: 0 auto;
-  transform: scale(1.25);
+  transform: scale(1.35);
 }
 
 #row0 .keys label span {
@@ -338,6 +343,11 @@ input[type="radio"]:before {
 .u4 {
   height: 30px;
   width: 200px;
+}
+
+.u6 {
+  height: 30px;
+  width: 300px;
 }
 
 #menu {
