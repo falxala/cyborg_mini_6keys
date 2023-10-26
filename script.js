@@ -1,6 +1,6 @@
 const typedKey = document.querySelector(".typedKey");
 
-window.onload = function () {
+window.onload = async function () {
     jis();
     try {
         navigator.serial.getPorts().then((ports) => {
@@ -10,7 +10,18 @@ window.onload = function () {
     } catch {
         alert("not support browser");
     }
+    await sleep(500);
+    const spinner = document.getElementById('init');
+    spinner.classList.add('loaded');
 };
+
+function sleep(msec) {
+    return new Promise(function (resolve) {
+
+        setTimeout(function () { resolve() }, msec);
+
+    })
+}
 
 function clearKeys(e) {
     let key_triggers = document.querySelectorAll("input[name=trigger]:checked");

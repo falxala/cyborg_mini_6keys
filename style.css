@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-html{
+html {
   min-width: 900px;
 }
 
@@ -20,6 +20,41 @@ footer {
   width: 100vw;
   position: fixed;
   bottom: 0px;
+}
+
+#init {
+  height: 100vh;
+  width: 100vw;
+  background: whitesmoke;
+  transition: all 1s;
+  position: fixed;
+  top: 0;
+}
+
+.spinner {
+  width: 100px;
+  height: 100px;
+  margin: 200px auto;
+  background-color: #000000;
+  border-radius: 100%;
+  animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+/* ローディングアニメーション */
+@keyframes sk-scaleout {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+.loaded {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .key-arrangement {
