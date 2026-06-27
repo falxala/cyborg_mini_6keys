@@ -54,10 +54,13 @@ byte 3..31  response payload
 | `0x06` | `RemapperHeartbeat` | none | none |
 | `0x07` | `KeyEvent` | not supported | `layer, keyIndex, pressed` |
 | `0x08` | `DiagnosticReport` | `0x43, 0x59, 0x42, 0x38` | `0x52, 0x50, 0x54, version, echoed request bytes[4]` |
+| `0x09` | `DiagnosticStorage` | none | `ok, layerCount, keyCount` |
 
 `KeyEvent` is an asynchronous device-to-Web input report. The firmware emits it when a physical key is pressed while the remapper heartbeat is active, so the UI can select the matching key tile.
 
 `DiagnosticReport` is a synchronous send/receive self-test for Diagnostics. The Web UI sends a fixed nonce and verifies that the firmware returns the `RPT` signature plus the same nonce.
+
+`DiagnosticStorage` writes a test pattern across the keymap storage area, reads it back, verifies it, and restores the original keymap. It is intended for production inspection of the same flash-backed storage used by normal remapping.
 
 ## Key Assignment Payload
 

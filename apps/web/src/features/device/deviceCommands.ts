@@ -34,6 +34,11 @@ export type DiagnosticReportResult = {
   version: number;
 };
 
+export type DiagnosticStorageResult = {
+  layerCount: number;
+  keyCount: number;
+};
+
 const DIAGNOSTIC_REPORT_NONCE = [0x43, 0x59, 0x42, 0x38] as const;
 
 export async function getDeviceState(transport: WebHidTransport): Promise<DeviceState> {
@@ -133,6 +138,20 @@ export async function runDiagnosticReportTest(transport: WebHidTransport): Promi
   return {
     signature: "RPT",
     version: response.payload[3] ?? 0,
+  };
+}
+
+export async function runDiagnosticStorageTest(transport: WebHidTransport): Promise<DiagnosticStorageResult> {
+  const response = await sendCommand(transport, ConfigCommand.DiagnosticStorage);
+  if (response.status === ConfigStatus.UnknownCommand || response.status === ConfigStatus.Unsupported) {
+    throw new Error(t.device.diagnosticStorageUnsupported);
+  }
+
+  assertConfigOk(response);
+
+  return {
+    layerCount: response.payload[1] ?? 0,
+    keyCount: response.payload[2] ?? 0,
   };
 }
 

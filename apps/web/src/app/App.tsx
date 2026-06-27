@@ -10,6 +10,7 @@ import {
   getDeviceState,
   readDeviceKeymap,
   runDiagnosticReportTest,
+  runDiagnosticStorageTest,
   sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
@@ -495,6 +496,8 @@ export function DiagnosticsApp() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const [reportTestStatus, setReportTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
   const [reportTestDetail, setReportTestDetail] = useState("-");
+  const [storageTestStatus, setStorageTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
+  const [storageTestDetail, setStorageTestDetail] = useState("-");
   const [testedKeys, setTestedKeys] = useState<boolean[]>(() =>
     Array.from({ length: HARDWARE_CONFIG.keyCount }, () => false),
   );
@@ -507,6 +510,8 @@ export function DiagnosticsApp() {
     setLastKey(null);
     setReportTestStatus("idle");
     setReportTestDetail("-");
+    setStorageTestStatus("idle");
+    setStorageTestDetail("-");
     setStatus(t.connection.initialStatus);
   });
 
@@ -537,6 +542,7 @@ export function DiagnosticsApp() {
       setTestedKeys(Array.from({ length: state.keyCount }, () => false));
       setLastKey(null);
       await runReportTest();
+      await runStorageTest();
       setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
@@ -559,6 +565,25 @@ export function DiagnosticsApp() {
     } catch (error) {
       setReportTestStatus("failed");
       setReportTestDetail(error instanceof Error ? error.message : t.diagnostics.reportTestFailed);
+    }
+  }
+
+  async function runStorageTest() {
+    if (!transport.connected) {
+      setStorageTestStatus("failed");
+      setStorageTestDetail(t.connection.deviceNotConnected);
+      return;
+    }
+
+    try {
+      setStorageTestStatus("running");
+      setStorageTestDetail(t.diagnostics.storageTesting);
+      const result = await runDiagnosticStorageTest(transport);
+      setStorageTestStatus("passed");
+      setStorageTestDetail(t.diagnostics.storageTestPassed(result.layerCount, result.keyCount));
+    } catch (error) {
+      setStorageTestStatus("failed");
+      setStorageTestDetail(error instanceof Error ? error.message : t.diagnostics.storageTestFailed);
     }
   }
 
@@ -612,6 +637,9 @@ export function DiagnosticsApp() {
             <button type="button" className="ghost-button" onClick={() => void runReportTest()} disabled={!connected}>
               {t.diagnostics.runReportTest}
             </button>
+            <button type="button" className="ghost-button" onClick={() => void runStorageTest()} disabled={!connected}>
+              {t.diagnostics.runStorageTest}
+            </button>
           </div>
 
           <div className="diagnostics-summary">
@@ -658,6 +686,14 @@ export function DiagnosticsApp() {
             <div>
               <dt>{t.diagnostics.reportDetail}</dt>
               <dd>{reportTestDetail}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.storageWriteRead}</dt>
+              <dd>{storageTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.storageDetail}</dt>
+              <dd>{storageTestDetail}</dd>
             </div>
             <div>
               <dt>{t.diagnostics.reportKeys}</dt>

@@ -87,6 +87,7 @@ Webの `diagnostics.html` は販売前/出荷前チェック用です。
 
 - WebHID接続状態
 - 診断用 `DiagnosticReport` の送受信確認
+- キーマップ保存領域を使った `DiagnosticStorage` の書込/読込/復元確認
 - 物理キー8個の押下確認
 - `KeyEvent` 受信確認
 - firmwareが返す report key count
