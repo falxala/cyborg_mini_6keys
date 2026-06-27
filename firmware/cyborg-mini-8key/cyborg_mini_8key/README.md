@@ -55,15 +55,15 @@ scripts/arduino-cli.sh compile \
 
 ## README Drive
 
-通常起動では、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。
+既定では、READMEドライブは表示しません。
+
+Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。
 
 含まれるファイルは以下のみです。
 
 - `README.TXT`
 - `REMAPPER.URL`
 
-ドライブを完全に無効化したい場合は `config.h` の `README_DRIVE_ENABLED` を `false` にします。
-
-一時的に隠したい場合は、Key 8 を押しながらUSB接続してください。その起動中だけREADMEドライブを出しません。
+常時表示したい場合は `config.h` の `README_DRIVE_ENABLED` を `true` にします。
 
 実機フラッシュとWebHID経由の実機通信確認は次工程です。

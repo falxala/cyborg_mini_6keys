@@ -23,7 +23,7 @@ constexpr char README_TEXT[] =
   "https://falxala.github.io/cyborg_mini_6keys/\r\n"
   "\r\n"
   "This read-only drive contains only a shortcut and this README.\r\n"
-  "To hide this drive for one boot, hold Key 8 while plugging in USB.\r\n";
+  "To show this drive for one boot, hold Key 5 while plugging in USB.\r\n";
 
 constexpr char URL_TEXT[] =
   "[InternetShortcut]\r\n"
@@ -32,16 +32,16 @@ constexpr char URL_TEXT[] =
 Adafruit_USBD_MSC readmeMsc;
 
 bool readmeDriveEnabledAtBoot() {
-  if (!Config::README_DRIVE_ENABLED) {
-    return false;
-  }
-
-  if (Config::README_DRIVE_DISABLE_KEY_INDEX >= Config::KEY_COUNT) {
+  if (Config::README_DRIVE_ENABLED) {
     return true;
   }
 
-  const uint8_t pin = Config::KEY_PINS[Config::README_DRIVE_DISABLE_KEY_INDEX];
-  return digitalRead(pin) != LOW;
+  if (Config::README_DRIVE_ENABLE_KEY_INDEX >= Config::KEY_COUNT) {
+    return false;
+  }
+
+  const uint8_t pin = Config::KEY_PINS[Config::README_DRIVE_ENABLE_KEY_INDEX];
+  return digitalRead(pin) == LOW;
 }
 
 void putLe16(uint8_t* buffer, uint16_t offset, uint16_t value) {
