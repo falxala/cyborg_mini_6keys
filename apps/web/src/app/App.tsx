@@ -41,6 +41,8 @@ export function App() {
   const selectedAssignment = keymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const connected = deviceState !== null && transport.connected;
+  const systemRows = navigationRows.slice(0, 1);
+  const navigationBodyRows = navigationRows.slice(1);
 
   useEffect(() => {
     setDraftAssignment(selectedAssignment);
@@ -387,8 +389,18 @@ export function App() {
               </div>
             </div>
 
+            <div className="keyboard-cluster system-cluster">
+              {systemRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="picker-row compact">
+                  {row.map((option, optionIndex) =>
+                    renderPickerOption(option, `sys-${rowIndex}-${optionIndex}`),
+                  )}
+                </div>
+              ))}
+            </div>
+
             <div className="keyboard-cluster navigation-cluster">
-              {navigationRows.map((row, rowIndex) => (
+              {navigationBodyRows.map((row, rowIndex) => (
                 <div key={rowIndex} className="picker-row compact">
                   {row.map((option, optionIndex) =>
                     renderPickerOption(option, `nav-${rowIndex}-${optionIndex}`),
