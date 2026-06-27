@@ -7,6 +7,7 @@
 #include "key_assignment.h"
 #include "keymap.h"
 #include "keymap_storage.h"
+#include "readme_drive.h"
 
 bool remapperConnected();
 
@@ -240,6 +241,8 @@ void beginHidDevice() {
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   TinyUSB_Device_Init(0);
 #endif
+
+  beginReadmeDrive();
 
   usbHid.setReportCallback(nullptr, setReportCallback);
   usbHid.begin();

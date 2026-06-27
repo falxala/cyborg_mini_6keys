@@ -14,6 +14,7 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 | `key_assignment.*` | キー割り当て型 |
 | `hid_device.*` | USB HID keyboard / consumer / config report |
 | `hid_reports.h` | HID report ID と設定コマンド |
+| `readme_drive.*` | Read-only USB MSC README / URL shortcut drive |
 | `status_led.*` | 本体LED表示 |
 
 設定用HID report仕様は `../../../docs/hid-report.md` を参照します。
@@ -26,6 +27,7 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 - `VIRTUAL_GROUND_PINS`
 - `STATUS_LED_KIND`
 - `STATUS_LED_PIN`
+- `README_DRIVE_ENABLED`
 
 ## Build
 
@@ -48,6 +50,20 @@ scripts/arduino-cli.sh compile \
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
+- Read-only README drive with `README.TXT` and `REMAPPER.URL`
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
+
+## README Drive
+
+通常起動では、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。
+
+含まれるファイルは以下のみです。
+
+- `README.TXT`
+- `REMAPPER.URL`
+
+ドライブを完全に無効化したい場合は `config.h` の `README_DRIVE_ENABLED` を `false` にします。
+
+一時的に隠したい場合は、Key 8 を押しながらUSB接続してください。その起動中だけREADMEドライブを出しません。
 
 実機フラッシュとWebHID経由の実機通信確認は次工程です。
