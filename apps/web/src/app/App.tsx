@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   getDeviceState,
   readDeviceKeymap,
@@ -10,6 +10,20 @@ import { WebHidTransport } from "../features/device/webHidTransport";
 import { HARDWARE_CONFIG } from "../features/hardware/hardwareConfig";
 import { createInitialKeymap } from "../features/keymap/defaultKeymap";
 import {
+  blankOption,
+  consumerOptions,
+  keyboardRows,
+  keyOptionLabel,
+  navigationRows,
+  numpadRows,
+  type ConsumerKeyOption,
+  type KeyboardLayoutMode,
+  type KeyPickerOption,
+} from "../features/keymap/keyPickerOptions";
+import {
+  createBlankAssignment,
+  createConsumerAssignment,
+  createKeyboardAssignment,
   formatHex,
   normalizeAssignment,
   type KeyAssignment,
@@ -23,6 +37,7 @@ export function App() {
   const [status, setStatus] = useState("未接続");
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const [keymap, setKeymap] = useState(createInitialKeymap);
+  const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
   const selectedAssignment = keymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const connected = deviceState !== null && transport.connected;
@@ -112,6 +127,75 @@ export function App() {
 
   function updateDraftModifier(modifier: number) {
     setDraftAssignment((current) => normalizeAssignment({ ...current, modifier }));
+  }
+
+  function applyPickerOption(option: KeyPickerOption) {
+    if (option.kind === "spacer") {
+      return;
+    }
+
+    if (option.kind === "blank") {
+      setDraftAssignment(createBlankAssignment());
+      return;
+    }
+
+    if (option.kind === "modifier") {
+      setDraftAssignment((current) => {
+        const modifier = current.kind === "keyboard" ? current.modifier : 0;
+        const usage = current.kind === "keyboard" ? current.usage : 0;
+        const keycodes = current.kind === "keyboard" ? current.keycodes : [0, 0, 0, 0, 0, 0];
+
+        return createKeyboardAssignment(usage, modifier ^ option.modifier, keycodes);
+      });
+      return;
+    }
+
+    setDraftAssignment((current) => {
+      const modifier = current.kind === "keyboard" ? current.modifier : 0;
+      return createKeyboardAssignment(option.code, modifier);
+    });
+  }
+
+  function applyConsumerOption(option: ConsumerKeyOption) {
+    setDraftAssignment(createConsumerAssignment(option.usage));
+  }
+
+  function pickerOptionClassName(option: KeyPickerOption) {
+    if (option.kind === "spacer") {
+      return "picker-spacer";
+    }
+
+    const active =
+      (option.kind === "blank" && draftAssignment.kind === "none") ||
+      (option.kind === "key" &&
+        draftAssignment.kind === "keyboard" &&
+        draftAssignment.usage === option.code) ||
+      (option.kind === "modifier" &&
+        draftAssignment.kind === "keyboard" &&
+        (draftAssignment.modifier & option.modifier) !== 0);
+
+    return active ? "picker-key active" : "picker-key";
+  }
+
+  function renderPickerOption(option: KeyPickerOption, key: string) {
+    const width = option.kind === "spacer" ? option.width : option.width ?? 1;
+    const style = { "--key-units": width } as CSSProperties;
+
+    if (option.kind === "spacer") {
+      return <span key={key} className="picker-spacer" style={style} />;
+    }
+
+    return (
+      <button
+        key={key}
+        type="button"
+        className={pickerOptionClassName(option)}
+        style={style}
+        onClick={() => applyPickerOption(option)}
+      >
+        {keyOptionLabel(option, keyboardLayout)}
+      </button>
+    );
   }
 
   return (
@@ -259,6 +343,80 @@ export function App() {
             Save
           </button>
         </aside>
+
+        <section className="panel picker-panel">
+          <div className="panel-heading">
+            <h2>Keyboard</h2>
+            <div className="layout-tabs" aria-label="Keyboard layout selector">
+              <button
+                type="button"
+                className={keyboardLayout === "jis" ? "active" : ""}
+                onClick={() => setKeyboardLayout("jis")}
+              >
+                JIS
+              </button>
+              <button
+                type="button"
+                className={keyboardLayout === "us" ? "active" : ""}
+                onClick={() => setKeyboardLayout("us")}
+              >
+                US
+              </button>
+            </div>
+          </div>
+
+          <div className="keyboard-picker">
+            <div className="keyboard-main">
+              {keyboardRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="picker-row">
+                  {row.map((option, optionIndex) =>
+                    renderPickerOption(option, `main-${rowIndex}-${optionIndex}`),
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="keyboard-side">
+              <div className="keyboard-cluster">
+                {navigationRows.map((row, rowIndex) => (
+                  <div key={rowIndex} className="picker-row compact">
+                    {row.map((option, optionIndex) =>
+                      renderPickerOption(option, `nav-${rowIndex}-${optionIndex}`),
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="keyboard-cluster">
+                {numpadRows.map((row, rowIndex) => (
+                  <div key={rowIndex} className="picker-row compact">
+                    {row.map((option, optionIndex) =>
+                      renderPickerOption(option, `num-${rowIndex}-${optionIndex}`),
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="consumer-grid">
+                {consumerOptions.map((option) => (
+                  <button
+                    key={option.usage}
+                    type="button"
+                    className={
+                      draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
+                        ? "picker-key active"
+                        : "picker-key"
+                    }
+                    onClick={() => applyConsumerOption(option)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+                {renderPickerOption(blankOption, "blank")}
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   );
