@@ -23,6 +23,10 @@ Adafruit_USBD_HID usbHid(
 uint32_t lastRemapperHeartbeatMs = 0;
 bool consumerReleasePending = false;
 uint32_t consumerReleaseDueUs = 0;
+bool wakeKeyChangePending = false;
+uint8_t wakeOldMask = 0;
+uint8_t wakeNewMask = 0;
+uint8_t wakeLayer = 0;
 
 constexpr uint8_t CONFIG_RESPONSE_READY_RETRIES = 20;
 constexpr uint16_t CONFIG_RESPONSE_RETRY_DELAY_US = 100;
@@ -247,6 +251,28 @@ void sendConsumerTap(uint16_t usage) {
   consumerReleasePending = true;
 }
 
+void queueWakeKeyChange(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
+  if (!wakeKeyChangePending) {
+    wakeOldMask = oldMask;
+  }
+
+  wakeNewMask = newMask;
+  wakeLayer = layer;
+  wakeKeyChangePending = true;
+}
+
+void flushWakeKeyChange() {
+  if (!wakeKeyChangePending || TinyUSBDevice.suspended() || !usbHid.ready()) {
+    return;
+  }
+
+  const uint8_t oldMask = wakeOldMask;
+  const uint8_t newMask = wakeNewMask;
+  const uint8_t layer = wakeLayer;
+  wakeKeyChangePending = false;
+  sendKeyChanges(oldMask, newMask, layer);
+}
+
 }  // namespace
 
 void beginHidDevice() {
@@ -265,11 +291,9 @@ bool hidDeviceMounted() {
 }
 
 void updateHidDevice() {
-  if (!consumerReleasePending) {
-    return;
-  }
+  flushWakeKeyChange();
 
-  if (static_cast<uint32_t>(micros() - consumerReleaseDueUs) < 0x80000000UL) {
+  if (consumerReleasePending && static_cast<uint32_t>(micros() - consumerReleaseDueUs) < 0x80000000UL) {
     usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
     consumerReleasePending = false;
   }
@@ -290,6 +314,7 @@ bool remapperConnected() {
 
 void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
   if (TinyUSBDevice.suspended()) {
+    queueWakeKeyChange(oldMask, newMask, layer);
     TinyUSBDevice.remoteWakeup();
     return;
   }
