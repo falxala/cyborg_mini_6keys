@@ -161,6 +161,16 @@ void handleSetKey(const uint8_t* buffer, uint16_t size) {
   sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::Ok, payload, sizeof(payload));
 }
 
+void handleEnterBootloader() {
+#if defined(ARDUINO_ARCH_RP2040)
+  sendConfigResponse(ConfigCommand::EnterBootloader, ConfigStatus::Ok, nullptr, 0);
+  delay(100);
+  rp2040.rebootToBootloader();
+#else
+  sendConfigResponse(ConfigCommand::EnterBootloader, ConfigStatus::Unsupported, nullptr, 0);
+#endif
+}
+
 void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t const* buffer, uint16_t size) {
   if (reportId != RID_CONFIG || (reportType != HID_REPORT_TYPE_OUTPUT && reportType != HID_REPORT_TYPE_FEATURE)) {
     return;
@@ -184,6 +194,9 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       break;
     case ConfigCommand::SetKey:
       handleSetKey(buffer, size);
+      break;
+    case ConfigCommand::EnterBootloader:
+      handleEnterBootloader();
       break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);

@@ -9,6 +9,7 @@ React + TypeScript + Vite で作り直す新しいWebHID版リマッパーです
 - 新ハードウェアの8キー構成を前提にする
 - Web Serial API は使わない
 - 固定長の設定用HID report仕様は `../../docs/hid-report.md` を参照する
+- UF2ファームウェア更新は WebHID のブートローダ移行と File System Access API の書き込みを使う
 
 ## 主なディレクトリ
 
@@ -17,6 +18,7 @@ src/
 ├── app/
 ├── features/
 │   ├── device/
+│   ├── firmware/
 │   ├── hardware/
 │   └── keymap/
 └── shared/
@@ -31,4 +33,5 @@ pnpm install
 pnpm dev
 pnpm typecheck
 pnpm build
+pnpm firmware:web
 ```

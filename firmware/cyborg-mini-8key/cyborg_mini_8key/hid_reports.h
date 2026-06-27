@@ -21,6 +21,7 @@ enum class ConfigCommand : uint8_t {
   SetLayer = 0x02,
   GetKey = 0x03,
   SetKey = 0x04,
+  EnterBootloader = 0x05,
 };
 
 enum class ConfigStatus : uint8_t {
@@ -28,5 +29,6 @@ enum class ConfigStatus : uint8_t {
   InvalidLength = 0x01,
   OutOfRange = 0x02,
   StorageError = 0x03,
+  Unsupported = 0x04,
   UnknownCommand = 0xFF,
 };

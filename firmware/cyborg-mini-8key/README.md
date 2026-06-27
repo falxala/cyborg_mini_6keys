@@ -12,6 +12,7 @@ Arduinoスケッチ本体は `cyborg_mini_8key/` にあります。
 - 外付けRGB LED / OLED は使わない
 - 表示は本体LEDのみ
 - 設定通信はSerialではなくUSB HID / WebHID用reportへ置き換える
+- WebHIDからUF2ブートローダへ入る更新用reportを持つ
 
 ## キースキャン
 

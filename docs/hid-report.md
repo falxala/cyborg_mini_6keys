@@ -39,6 +39,7 @@ byte 3..31  response payload
 | `0x01` | `InvalidLength` | Request payload is too short |
 | `0x02` | `OutOfRange` | Layer or key index is invalid |
 | `0x03` | `StorageError` | Device could not persist the updated assignment |
+| `0x04` | `Unsupported` | Command is not supported on this MCU/firmware build |
 | `0xff` | `UnknownCommand` | Command is not supported |
 
 ## Commands
@@ -49,6 +50,7 @@ byte 3..31  response payload
 | `0x02` | `SetLayer` | `layer` | `layer` |
 | `0x03` | `GetKey` | `layer, keyIndex` | key assignment payload |
 | `0x04` | `SetKey` | key assignment payload | `layer, keyIndex` |
+| `0x05` | `EnterBootloader` | none | none, then reboot to UF2 bootloader |
 
 ## Key Assignment Payload
 

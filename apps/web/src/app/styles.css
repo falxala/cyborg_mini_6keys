@@ -101,6 +101,7 @@ select {
 .connection button,
 .layer-tabs button,
 .layout-tabs button,
+.firmware-actions button,
 .key-tile,
 .editor-panel button,
 .picker-key {
@@ -291,6 +292,45 @@ select {
   border-color: #223047;
   color: #ffffff;
   padding: 9px 12px;
+}
+
+.firmware-panel {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.firmware-panel > div:first-child {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.firmware-panel h2 {
+  margin: 0;
+}
+
+.firmware-panel span {
+  color: #4d5965;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.firmware-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.firmware-actions button {
+  min-height: 32px;
+  padding: 6px 10px;
 }
 
 .picker-panel {
@@ -507,5 +547,14 @@ select {
 
   .editor-panel {
     grid-template-columns: 1fr;
+  }
+
+  .firmware-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .firmware-actions {
+    justify-content: flex-start;
   }
 }

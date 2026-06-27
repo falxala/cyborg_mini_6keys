@@ -7,6 +7,7 @@ export enum ConfigCommand {
   SetLayer = 0x02,
   GetKey = 0x03,
   SetKey = 0x04,
+  EnterBootloader = 0x05,
 }
 
 export enum ConfigStatus {
@@ -14,6 +15,7 @@ export enum ConfigStatus {
   InvalidLength = 0x01,
   OutOfRange = 0x02,
   StorageError = 0x03,
+  Unsupported = 0x04,
   UnknownCommand = 0xff,
 }
 

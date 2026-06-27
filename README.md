@@ -74,6 +74,7 @@ pnpm install
 pnpm dev
 pnpm typecheck
 pnpm build
+pnpm firmware:web
 ```
 
 ## 8-Key Firmware
@@ -100,11 +101,14 @@ scripts/arduino-cli.sh core update-index
 scripts/arduino-cli.sh core install rp2040:rp2040
 scripts/arduino-cli.sh lib install "Adafruit TinyUSB Library"
 scripts/compile-firmware.sh
+scripts/build-web-firmware.sh
 ```
 
 `scripts/compile-firmware.sh` は既定で `rp2040:rp2040:waveshare_rp2040_zero` と `usbstack=tinyusb` を使います。別ターゲットで確認する場合は `FQBN=rp2040:rp2040:rpipico scripts/compile-firmware.sh` のように上書きします。
 
-現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。キーマップは EEPROM エミュレーションに永続化します。実機フラッシュ、WebHID経由の実機通信確認は次工程です。
+`scripts/build-web-firmware.sh` は同じ設定でコンパイルし、Web アプリから配信する `apps/web/public/firmware/cyborg-mini-8key.uf2` を生成します。
+
+現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。キーマップは EEPROM エミュレーションに永続化します。WebHID から UF2 ブートローダへ入る command と、Web 画面から UF2 をダウンロードまたは BOOTSEL ドライブへ書き込む更新UIを用意しています。実機での WebHID 通信、ブートローダ移行、UF2 書き込みの確認は次工程です。
 
 ## 現行 Web ツール
 

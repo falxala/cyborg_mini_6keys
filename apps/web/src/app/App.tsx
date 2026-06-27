@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
+  enterDeviceBootloader,
   getDeviceState,
   readDeviceKeymap,
   setDeviceLayer,
@@ -7,6 +8,11 @@ import {
   type DeviceState,
 } from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
+import {
+  canInstallUf2FromBrowser,
+  downloadFirmwareUf2,
+  installFirmwareUf2,
+} from "../features/firmware/firmwareUpdater";
 import { HARDWARE_CONFIG } from "../features/hardware/hardwareConfig";
 import { createInitialKeymap } from "../features/keymap/defaultKeymap";
 import {
@@ -35,12 +41,14 @@ export function App() {
   const [activeLayer, setActiveLayer] = useState(0);
   const [selectedKey, setSelectedKey] = useState(0);
   const [status, setStatus] = useState("未接続");
+  const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const [keymap, setKeymap] = useState(createInitialKeymap);
   const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
   const selectedAssignment = keymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const connected = deviceState !== null && transport.connected;
+  const firmwareInstallSupported = canInstallUf2FromBrowser();
   const systemRows = navigationRows.slice(0, 1);
   const navigationBodyRows = navigationRows.slice(1);
 
@@ -110,6 +118,44 @@ export function App() {
       setStatus(`Layer ${activeLayer} K${selectedKey + 1} を保存しました`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "保存に失敗しました");
+    }
+  }
+
+  async function enterBootloaderMode() {
+    if (!connected) {
+      setFirmwareStatus("HIDデバイスが接続されていません");
+      return;
+    }
+
+    try {
+      setFirmwareStatus("BOOTSELへ切替中");
+      await enterDeviceBootloader(transport);
+      await transport.close().catch(() => undefined);
+      setDeviceState(null);
+      setStatus("BOOTSEL mode");
+      setFirmwareStatus("BOOTSEL drive ready");
+    } catch (error) {
+      setFirmwareStatus(error instanceof Error ? error.message : "BOOTSEL切替に失敗しました");
+    }
+  }
+
+  async function installBundledFirmware() {
+    try {
+      setFirmwareStatus("UF2書き込み中");
+      const result = await installFirmwareUf2();
+      setFirmwareStatus(`${result.fileName} written (${Math.ceil(result.size / 1024)} KB)`);
+    } catch (error) {
+      setFirmwareStatus(error instanceof Error ? error.message : "UF2書き込みに失敗しました");
+    }
+  }
+
+  async function downloadBundledFirmware() {
+    try {
+      setFirmwareStatus("UF2ダウンロード中");
+      await downloadFirmwareUf2();
+      setFirmwareStatus("UF2 downloaded");
+    } catch (error) {
+      setFirmwareStatus(error instanceof Error ? error.message : "UF2ダウンロードに失敗しました");
     }
   }
 
@@ -346,6 +392,28 @@ export function App() {
             Save
           </button>
         </aside>
+
+        <section className="panel firmware-panel">
+          <div>
+            <h2>Firmware</h2>
+            <span>{firmwareStatus}</span>
+          </div>
+          <div className="firmware-actions">
+            <button type="button" onClick={() => void enterBootloaderMode()} disabled={!connected}>
+              BOOTSEL
+            </button>
+            <button
+              type="button"
+              onClick={() => void installBundledFirmware()}
+              disabled={!firmwareInstallSupported}
+            >
+              Install UF2
+            </button>
+            <button type="button" onClick={() => void downloadBundledFirmware()}>
+              Download UF2
+            </button>
+          </div>
+        </section>
 
         <section className="panel picker-panel">
           <div className="panel-heading">

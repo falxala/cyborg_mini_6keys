@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+set -eu
+
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+FQBN="${FQBN:-rp2040:rp2040:waveshare_rp2040_zero}"
+BUILD_DIR="${BUILD_DIR:-$ROOT_DIR/.arduino/build/cyborg-mini-8key}"
+EXPORT_DIR="${EXPORT_DIR:-$ROOT_DIR/.arduino/export/cyborg-mini-8key}"
+PUBLIC_DIR="$ROOT_DIR/apps/web/public/firmware"
+SKETCH_DIR="$ROOT_DIR/firmware/cyborg-mini-8key/cyborg_mini_8key"
+
+mkdir -p "$BUILD_DIR" "$EXPORT_DIR" "$PUBLIC_DIR"
+
+"$ROOT_DIR/scripts/arduino-cli.sh" compile \
+  --fqbn "$FQBN" \
+  --board-options usbstack=tinyusb \
+  --build-path "$BUILD_DIR" \
+  --output-dir "$EXPORT_DIR" \
+  "$SKETCH_DIR"
+
+cp "$EXPORT_DIR/cyborg_mini_8key.ino.uf2" "$PUBLIC_DIR/cyborg-mini-8key.uf2"

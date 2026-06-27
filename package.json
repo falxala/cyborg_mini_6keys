@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "pnpm --filter @cyborg-mini/web dev",
     "build": "pnpm --filter @cyborg-mini/web build",
+    "firmware:build": "scripts/compile-firmware.sh",
+    "firmware:web": "scripts/build-web-firmware.sh",
     "preview": "pnpm --filter @cyborg-mini/web preview",
     "typecheck": "pnpm --filter @cyborg-mini/web typecheck"
   }

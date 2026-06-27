@@ -68,6 +68,11 @@ export class WebHidTransport {
     });
   }
 
+  async sendConfigReport(report: Uint8Array) {
+    const device = this.requireOpenDevice();
+    await device.sendReport(CONFIG_REPORT_ID, toArrayBuffer(report));
+  }
+
   private getHidApi() {
     const hid = (navigator as HidNavigator).hid;
 

@@ -92,6 +92,10 @@ export async function setDeviceKey(
   assertConfigOk(response);
 }
 
+export async function enterDeviceBootloader(transport: WebHidTransport) {
+  await transport.sendConfigReport(createConfigReport(ConfigCommand.EnterBootloader));
+}
+
 async function sendCommand(
   transport: WebHidTransport,
   command: ConfigCommand,
