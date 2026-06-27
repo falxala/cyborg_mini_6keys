@@ -7,6 +7,9 @@
 #include "key_assignment.h"
 #include "keymap.h"
 #include "keymap_storage.h"
+#include "readme_drive.h"
+
+bool remapperConnected();
 
 namespace {
 
@@ -18,16 +21,31 @@ Adafruit_USBD_HID usbHid(
   false
 );
 uint32_t lastRemapperHeartbeatMs = 0;
+bool consumerReleasePending = false;
+uint32_t consumerReleaseDueUs = 0;
+bool wakeKeyChangePending = false;
+uint8_t wakeOldMask = 0;
+uint8_t wakeNewMask = 0;
+uint8_t wakeLayer = 0;
 
 uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
 }
 
-void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_t* payload, uint8_t length) {
-  if (!usbHid.ready()) {
-    return;
+bool sendConfigReportWhenReady(const uint8_t* report, uint8_t length) {
+  for (uint8_t attempt = 0; attempt < Config::CONFIG_RESPONSE_READY_RETRIES; attempt++) {
+    if (usbHid.ready()) {
+      usbHid.sendReport(RID_CONFIG, report, length);
+      return true;
+    }
+
+    delayMicroseconds(Config::CONFIG_RESPONSE_RETRY_DELAY_US);
   }
 
+  return false;
+}
+
+void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_t* payload, uint8_t length) {
   uint8_t report[Config::CONFIG_REPORT_SIZE] = { 0 };
   report[0] = static_cast<uint8_t>(command);
   report[1] = static_cast<uint8_t>(status);
@@ -40,7 +58,7 @@ void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_
     report[3 + i] = payload[i];
   }
 
-  usbHid.sendReport(RID_CONFIG, report, sizeof(report));
+  sendConfigReportWhenReady(report, sizeof(report));
 }
 
 void handleGetState() {
@@ -153,6 +171,34 @@ void handleRemapperHeartbeat() {
   lastRemapperHeartbeatMs = millis();
 }
 
+void handleDiagnosticReport(const uint8_t* buffer, uint16_t size) {
+  if (size < 5) {
+    sendConfigResponse(ConfigCommand::DiagnosticReport, ConfigStatus::InvalidLength, nullptr, 0);
+    return;
+  }
+
+  const uint8_t payload[] = {
+    0x52, 0x50, 0x54, 0x01,
+    buffer[1], buffer[2], buffer[3], buffer[4],
+  };
+
+  sendConfigResponse(ConfigCommand::DiagnosticReport, ConfigStatus::Ok, payload, sizeof(payload));
+}
+
+void sendKeyEvent(uint8_t layer, uint8_t keyIndex, bool pressed) {
+  if (!remapperConnected()) {
+    return;
+  }
+
+  const uint8_t payload[] = {
+    layer,
+    keyIndex,
+    static_cast<uint8_t>(pressed ? 1 : 0),
+  };
+
+  sendConfigResponse(ConfigCommand::KeyEvent, ConfigStatus::Ok, payload, sizeof(payload));
+}
+
 void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t const* buffer, uint16_t size) {
   if (reportId != RID_CONFIG || (reportType != HID_REPORT_TYPE_OUTPUT && reportType != HID_REPORT_TYPE_FEATURE)) {
     return;
@@ -183,6 +229,12 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
     case ConfigCommand::RemapperHeartbeat:
       handleRemapperHeartbeat();
       break;
+    case ConfigCommand::KeyEvent:
+      sendConfigResponse(command, ConfigStatus::Unsupported, nullptr, 0);
+      break;
+    case ConfigCommand::DiagnosticReport:
+      handleDiagnosticReport(buffer, size);
+      break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);
       break;
@@ -203,9 +255,36 @@ void releaseKeyboardReport(uint8_t reportId) {
 }
 
 void sendConsumerTap(uint16_t usage) {
+  if (consumerReleasePending) {
+    usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+    consumerReleasePending = false;
+  }
+
   usbHid.sendReport16(RID_CONSUMER_CONTROL, usage);
-  delay(2);
-  usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+  consumerReleaseDueUs = micros() + 2000;
+  consumerReleasePending = true;
+}
+
+void queueWakeKeyChange(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
+  if (!wakeKeyChangePending) {
+    wakeOldMask = oldMask;
+  }
+
+  wakeNewMask = newMask;
+  wakeLayer = layer;
+  wakeKeyChangePending = true;
+}
+
+void flushWakeKeyChange() {
+  if (!wakeKeyChangePending || TinyUSBDevice.suspended() || !usbHid.ready()) {
+    return;
+  }
+
+  const uint8_t oldMask = wakeOldMask;
+  const uint8_t newMask = wakeNewMask;
+  const uint8_t layer = wakeLayer;
+  wakeKeyChangePending = false;
+  sendKeyChanges(oldMask, newMask, layer);
 }
 
 }  // namespace
@@ -215,12 +294,23 @@ void beginHidDevice() {
   TinyUSB_Device_Init(0);
 #endif
 
+  beginReadmeDrive();
+
   usbHid.setReportCallback(nullptr, setReportCallback);
   usbHid.begin();
 }
 
 bool hidDeviceMounted() {
   return TinyUSBDevice.mounted();
+}
+
+void updateHidDevice() {
+  flushWakeKeyChange();
+
+  if (consumerReleasePending && static_cast<uint32_t>(micros() - consumerReleaseDueUs) < 0x80000000UL) {
+    usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+    consumerReleasePending = false;
+  }
 }
 
 bool remapperConnected() {
@@ -238,6 +328,7 @@ bool remapperConnected() {
 
 void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
   if (TinyUSBDevice.suspended()) {
+    queueWakeKeyChange(oldMask, newMask, layer);
     TinyUSBDevice.remoteWakeup();
     return;
   }
@@ -247,6 +338,7 @@ void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
   }
 
   const uint8_t changed = oldMask ^ newMask;
+  const bool remapperActive = remapperConnected();
 
   for (uint8_t keyIndex = 0; keyIndex < Config::KEY_COUNT; keyIndex++) {
     const uint8_t bit = static_cast<uint8_t>(1U << keyIndex);
@@ -258,7 +350,16 @@ void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
     const bool pressed = (newMask & bit) != 0;
     const KeyAssignment& assignment = assignmentFor(layer, keyIndex);
 
+    if (pressed && remapperActive) {
+      sendKeyEvent(layer, keyIndex, pressed);
+    }
+
     if (!pressed) {
+      releaseKeyboardReport(reportId);
+      continue;
+    }
+
+    if (remapperActive) {
       releaseKeyboardReport(reportId);
       continue;
     }

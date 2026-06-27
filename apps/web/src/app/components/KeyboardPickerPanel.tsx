@@ -14,6 +14,7 @@ import {
   type KeyPickerOption,
 } from "../../features/keymap/keyPickerOptions";
 import type { KeyAssignment } from "../../features/keymap/keymapTypes";
+import { t } from "../../shared/i18n";
 
 type KeyboardPickerPanelProps = {
   draftAssignment: KeyAssignment;
@@ -108,10 +109,10 @@ export function KeyboardPickerPanel({
     <section className="panel picker-panel">
       <div className="panel-heading">
         <div className="panel-meta">
-          <span className="panel-kicker">Palette</span>
-          <h2>Keyboard</h2>
+          <span className="panel-kicker">{t.palette.kicker}</span>
+          <h2>{t.palette.title}</h2>
         </div>
-        <div className="layout-tabs" aria-label="Keyboard layout selector">
+        <div className="layout-tabs" aria-label={t.palette.layoutLabel}>
           <button
             type="button"
             className={keyboardLayout === "jis" ? "active" : ""}

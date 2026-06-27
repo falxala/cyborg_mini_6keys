@@ -89,6 +89,10 @@
     grid-template-columns: 1fr;
   }
 
+  .diagnostics-workspace {
+    grid-template-columns: 1fr;
+  }
+
   .hardware-panel,
   .remap-panel,
   .editor-panel,
@@ -125,8 +129,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .editor-actions {
+  .remap-actions {
     justify-content: flex-start;
+    width: 100%;
   }
 }
 
@@ -135,8 +140,20 @@
     align-items: flex-start;
   }
 
+  .home-hero {
+    padding: 20px;
+  }
+
+  .home-brand {
+    flex-direction: column;
+  }
+
   .brand h1 {
     font-size: 26px;
+  }
+
+  .home-brand h1 {
+    font-size: 42px;
   }
 
   .connection {
@@ -171,6 +188,10 @@
   }
 
   .key-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .diagnostic-key-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

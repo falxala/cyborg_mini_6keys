@@ -1,3 +1,5 @@
+import { t } from "../../shared/i18n";
+
 export type KeyboardLayoutMode = "jis" | "us";
 
 export type KeyboardKeyOption = {
@@ -199,7 +201,7 @@ export const modifierOptions: ModifierKeyOption[] = [
 
 export const blankOption: BlankKeyOption = {
   kind: "blank",
-  label: "未割り当て",
+  label: t.keymap.unassigned,
   accent: true,
   width: 2,
 };

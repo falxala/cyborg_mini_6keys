@@ -1,3 +1,5 @@
+import { t } from "../../shared/i18n";
+
 type FirmwarePanelProps = {
   connected: boolean;
   firmwareInstallSupported: boolean;
@@ -18,18 +20,36 @@ export function FirmwarePanel({
   return (
     <div className="firmware-panel">
       <div className="firmware-summary">
-        <h2>Firmware</h2>
+        <h2>{t.firmware.title}</h2>
         <span>{firmwareStatus}</span>
+      </div>
+      <div className="firmware-help">
+        <section>
+          <h3>{t.firmware.normalUpdate}</h3>
+          <ol>
+            {t.firmware.normalSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+        <section>
+          <h3>{t.firmware.recovery}</h3>
+          <ol>
+            {t.firmware.recoverySteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
       </div>
       <div className="firmware-actions">
         <button type="button" className="primary-action" onClick={onEnterBootloader} disabled={!connected}>
-          BOOTSEL
+          {t.firmware.bootsel}
         </button>
         <button type="button" onClick={onInstallFirmware} disabled={!firmwareInstallSupported}>
-          Install UF2
+          {t.firmware.installUf2}
         </button>
         <button type="button" onClick={onDownloadFirmware}>
-          Download UF2
+          {t.firmware.downloadUf2}
         </button>
       </div>
     </div>

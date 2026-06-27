@@ -1,6 +1,9 @@
-import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
+import type { HidConnectionEvent, HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
 import { CYBORG_MINI_USB } from "./usbIdentity";
+import { t } from "../../shared/i18n";
+
+export type ConfigReportListener = (report: Uint8Array) => void;
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -27,14 +30,12 @@ export class WebHidTransport {
       return this.device;
     }
 
-    throw new Error(
-      "Cyborg Mini が見つかりません。接続後にもう一度試すか、ファームウェアを書き込み直してください",
-    );
+    throw new Error(t.device.notFound);
   }
 
   async open() {
     if (!this.device) {
-      throw new Error("接続するHIDデバイスがありません");
+      throw new Error(t.device.missingDevice);
     }
 
     if (!this.device.opened) {
@@ -46,6 +47,7 @@ export class WebHidTransport {
     if (this.device?.opened) {
       await this.device.close();
     }
+    this.device = null;
   }
 
   async requestConfigReport(report: Uint8Array, timeoutMs = 1000) {
@@ -54,17 +56,23 @@ export class WebHidTransport {
     return new Promise<Uint8Array>((resolve, reject) => {
       const timeout = window.setTimeout(() => {
         cleanup();
-        reject(new Error("HIDデバイスからの応答がタイムアウトしました"));
+        reject(new Error(t.device.timeout));
       }, timeoutMs);
 
+      const expectedCommand = report[0];
       const listener = (event: HidInputReportEvent) => {
         if (event.reportId !== CONFIG_REPORT_ID) {
           return;
         }
 
-        cleanup();
         const view = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
-        resolve(Uint8Array.from(view));
+        const raw = Uint8Array.from(view);
+        if (raw[0] !== expectedCommand) {
+          return;
+        }
+
+        cleanup();
+        resolve(raw);
       };
 
       const cleanup = () => {
@@ -85,11 +93,47 @@ export class WebHidTransport {
     await device.sendReport(CONFIG_REPORT_ID, toArrayBuffer(report));
   }
 
+  addConfigReportListener(listener: ConfigReportListener) {
+    const device = this.requireOpenDevice();
+    const inputListener = (event: HidInputReportEvent) => {
+      if (event.reportId !== CONFIG_REPORT_ID) {
+        return;
+      }
+
+      const view = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
+      listener(Uint8Array.from(view));
+    };
+
+    device.addEventListener("inputreport", inputListener);
+
+    return () => {
+      device.removeEventListener("inputreport", inputListener);
+    };
+  }
+
+  addDisconnectListener(listener: () => void) {
+    const hid = this.getHidApi();
+    const disconnectListener = (event: HidConnectionEvent) => {
+      if (event.device !== this.device) {
+        return;
+      }
+
+      this.device = null;
+      listener();
+    };
+
+    hid.addEventListener("disconnect", disconnectListener);
+
+    return () => {
+      hid.removeEventListener("disconnect", disconnectListener);
+    };
+  }
+
   private getHidApi() {
     const hid = (navigator as HidNavigator).hid;
 
     if (!hid) {
-      throw new Error("このブラウザはWebHIDに対応していません");
+      throw new Error(t.device.unsupportedWebHid);
     }
 
     return hid;
@@ -97,7 +141,7 @@ export class WebHidTransport {
 
   private requireOpenDevice() {
     if (!this.device || !this.device.opened) {
-      throw new Error("HIDデバイスが接続されていません");
+      throw new Error(t.device.disconnected);
     }
 
     return this.device;

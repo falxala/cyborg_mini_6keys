@@ -8,11 +8,13 @@ import {
 import {
   assertConfigOk,
   ConfigCommand,
+  ConfigStatus,
   createConfigReport,
   decodeConfigResponse,
   type ConfigResponse,
 } from "./hidProtocol";
 import type { WebHidTransport } from "./webHidTransport";
+import { t } from "../../shared/i18n";
 
 export type DeviceState = {
   activeLayer: number;
@@ -20,6 +22,19 @@ export type DeviceState = {
   keyCount: number;
   virtualGroundCount: number;
 };
+
+export type DeviceKeyEvent = {
+  layer: number;
+  keyIndex: number;
+  pressed: boolean;
+};
+
+export type DiagnosticReportResult = {
+  signature: string;
+  version: number;
+};
+
+const DIAGNOSTIC_REPORT_NONCE = [0x43, 0x59, 0x42, 0x38] as const;
 
 export async function getDeviceState(transport: WebHidTransport): Promise<DeviceState> {
   const response = await sendCommand(transport, ConfigCommand.GetState);
@@ -100,6 +115,46 @@ export async function sendRemapperHeartbeat(transport: WebHidTransport) {
   await transport.sendConfigReport(createConfigReport(ConfigCommand.RemapperHeartbeat));
 }
 
+export async function runDiagnosticReportTest(transport: WebHidTransport): Promise<DiagnosticReportResult> {
+  const response = await sendCommand(transport, ConfigCommand.DiagnosticReport, DIAGNOSTIC_REPORT_NONCE);
+  if (response.status === ConfigStatus.UnknownCommand || response.status === ConfigStatus.Unsupported) {
+    throw new Error(t.device.diagnosticReportUnsupported);
+  }
+
+  assertConfigOk(response);
+
+  const expected = [0x52, 0x50, 0x54, 0x01, ...DIAGNOSTIC_REPORT_NONCE];
+  for (let i = 0; i < expected.length; i++) {
+    if (response.payload[i] !== expected[i]) {
+      throw new Error(t.device.invalidDiagnosticReport);
+    }
+  }
+
+  return {
+    signature: "RPT",
+    version: response.payload[3] ?? 0,
+  };
+}
+
+export function subscribeDeviceKeyEvents(
+  transport: WebHidTransport,
+  handler: (event: DeviceKeyEvent) => void,
+) {
+  return transport.addConfigReportListener((raw) => {
+    const response = decodeConfigResponse(raw);
+    if (response.command !== ConfigCommand.KeyEvent) {
+      return;
+    }
+
+    assertConfigOk(response);
+    handler({
+      layer: response.payload[0] ?? 0,
+      keyIndex: response.payload[1] ?? 0,
+      pressed: (response.payload[2] ?? 0) !== 0,
+    });
+  });
+}
+
 async function sendCommand(
   transport: WebHidTransport,
   command: ConfigCommand,
@@ -109,7 +164,7 @@ async function sendCommand(
   const response = decodeConfigResponse(raw);
 
   if (response.command !== command) {
-    throw new Error(`Unexpected HID response command ${response.command}; expected ${command}`);
+    throw new Error(t.device.unexpectedResponse(response.command, command));
   }
 
   return response;

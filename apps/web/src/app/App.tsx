@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorPanel } from "./components/EditorPanel";
 import { FirmwarePanel } from "./components/FirmwarePanel";
 import { HardwarePanel } from "./components/HardwarePanel";
@@ -9,9 +9,11 @@ import {
   enterDeviceBootloader,
   getDeviceState,
   readDeviceKeymap,
+  runDiagnosticReportTest,
   sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
+  subscribeDeviceKeyEvents,
   type DeviceState,
 } from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
@@ -36,31 +38,18 @@ import {
   type KeyAssignment,
   type KeyAssignmentKind,
 } from "../features/keymap/keymapTypes";
+import { t } from "../shared/i18n";
 
-export function App() {
-  const transport = useMemo(() => new WebHidTransport(), []);
-  const [activeLayer, setActiveLayer] = useState(0);
-  const [selectedKey, setSelectedKey] = useState(0);
-  const [firmwareModalOpen, setFirmwareModalOpen] = useState(false);
-  const [status, setStatus] = useState("未接続");
-  const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
-  const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
-  const [readKeymap, setReadKeymap] = useState(createBlankKeymap);
-  const [writeKeymap, setWriteKeymap] = useState(createBlankKeymap);
-  const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
-  const readAssignment = readKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
-  const selectedAssignment = writeKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
-  const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
-  const [modifierSlots, setModifierSlots] = useState<number[]>(createModifierSlotsFromMask(0));
-  const connected = deviceState !== null && transport.connected;
-  const firmwareInstallSupported = canInstallUf2FromBrowser();
+const homeUrl = `${import.meta.env.BASE_URL}`;
+const remapperUrl = `${import.meta.env.BASE_URL}remapper.html`;
+const diagnosticsUrl = `${import.meta.env.BASE_URL}diagnostics.html`;
+
+function useDeviceSession(transport: WebHidTransport, connected: boolean, onDisconnected: () => void) {
+  const onDisconnectedRef = useRef(onDisconnected);
 
   useEffect(() => {
-    setDraftAssignment(selectedAssignment);
-    setModifierSlots(
-      createModifierSlotsFromMask(selectedAssignment.kind === "keyboard" ? selectedAssignment.modifier : 0),
-    );
-  }, [selectedAssignment]);
+    onDisconnectedRef.current = onDisconnected;
+  });
 
   useEffect(() => {
     if (!connected) {
@@ -86,6 +75,130 @@ export function App() {
     };
   }, [connected, transport]);
 
+  useEffect(() => {
+    return transport.addDisconnectListener(() => {
+      onDisconnectedRef.current();
+    });
+  }, [transport]);
+
+  return async () => {
+    await transport.close().catch(() => undefined);
+    onDisconnectedRef.current();
+  };
+}
+
+export function App() {
+  return <HomePage />;
+}
+
+export function HomePage() {
+  return (
+    <main className="app-shell home-shell">
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="brand home-brand">
+          <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
+          <div className="brand-copy">
+            <span className="eyebrow">{t.home.eyebrow}</span>
+            <h1 id="home-title">{t.home.title}</h1>
+            <p>{t.home.description}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="product-grid" aria-label={t.home.productListLabel}>
+        {t.home.products.map((product) => (
+          <article className="product-card" key={product.name}>
+            <div className="product-card-copy">
+              <span className="eyebrow">{product.status}</span>
+              <h2>{product.name}</h2>
+              <p>{product.description}</p>
+            </div>
+            <dl className="product-specs">
+              <div>
+                <dt>{t.home.keys}</dt>
+                <dd>{HARDWARE_CONFIG.keyCount}</dd>
+              </div>
+              <div>
+                <dt>{t.home.layers}</dt>
+                <dd>{HARDWARE_CONFIG.layerCount}</dd>
+              </div>
+              <div>
+                <dt>{t.home.connection}</dt>
+                <dd>{t.home.connectionValue}</dd>
+              </div>
+            </dl>
+            <div className="product-actions">
+              <a className="product-action" href={remapperUrl}>
+                {t.home.openRemapper}
+              </a>
+              <a className="product-action secondary" href={diagnosticsUrl}>
+                {t.home.openDiagnostics}
+              </a>
+            </div>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+type RemapperAppProps = {
+  homeHref?: string;
+};
+
+export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
+  const transport = useMemo(() => new WebHidTransport(), []);
+  const [activeLayer, setActiveLayer] = useState(0);
+  const [selectedKey, setSelectedKey] = useState(0);
+  const [firmwareModalOpen, setFirmwareModalOpen] = useState(false);
+  const [status, setStatus] = useState<string>(t.connection.initialStatus);
+  const [firmwareStatus, setFirmwareStatus] = useState<string>(t.firmware.initialStatus);
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
+  const [readKeymap, setReadKeymap] = useState(createBlankKeymap);
+  const [writeKeymap, setWriteKeymap] = useState(createBlankKeymap);
+  const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
+  const readAssignment = readKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
+  const selectedAssignment = writeKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
+  const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
+  const [modifierSlots, setModifierSlots] = useState<number[]>(createModifierSlotsFromMask(0));
+  const connected = deviceState !== null && transport.connected;
+  const deviceLayerCount = deviceState?.layerCount ?? 0;
+  const deviceKeyCount = deviceState?.keyCount ?? 0;
+  const firmwareInstallSupported = canInstallUf2FromBrowser();
+  const disconnectDevice = useDeviceSession(transport, connected, () => {
+    setDeviceState(null);
+    setStatus(t.connection.initialStatus);
+  });
+
+  useEffect(() => {
+    setDraftAssignment(selectedAssignment);
+    setModifierSlots(
+      createModifierSlotsFromMask(selectedAssignment.kind === "keyboard" ? selectedAssignment.modifier : 0),
+    );
+  }, [selectedAssignment]);
+
+  useEffect(() => {
+    if (!connected || deviceLayerCount === 0 || deviceKeyCount === 0) {
+      return;
+    }
+
+    return subscribeDeviceKeyEvents(transport, (event) => {
+      if (!event.pressed) {
+        return;
+      }
+
+      if (event.layer >= deviceLayerCount || event.keyIndex >= deviceKeyCount) {
+        return;
+      }
+
+      setActiveLayer(event.layer);
+      setSelectedKey(event.keyIndex);
+      setDeviceState((current) =>
+        current && current.activeLayer !== event.layer ? { ...current, activeLayer: event.layer } : current,
+      );
+    });
+  }, [connected, deviceKeyCount, deviceLayerCount, transport]);
+
   async function connectDevice() {
     try {
       const device = await transport.requestDevice();
@@ -102,9 +215,9 @@ export function App() {
       setReadKeymap(loadedKeymap);
       setWriteKeymap(loadedKeymap);
       setActiveLayer(state.activeLayer);
-      setStatus(`${device.productName || "HID device"} に接続`);
+      setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "接続に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
     }
   }
 
@@ -121,37 +234,37 @@ export function App() {
         current ? { ...current, activeLayer: layerIndex } : current,
       );
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "レイヤー変更に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.connection.layerChangeFailed);
     }
   }
 
   async function readAllAssignments() {
     if (!connected || !deviceState) {
-      setStatus("HIDデバイスが接続されていません");
+      setStatus(t.connection.deviceNotConnected);
       return;
     }
 
     try {
-      setStatus("キーマップ読み込み中");
+      setStatus(t.keymap.reading);
       const loadedKeymap = await readDeviceKeymap(transport, deviceState.layerCount, deviceState.keyCount);
       setReadKeymap(loadedKeymap);
       setWriteKeymap(loadedKeymap);
-      setStatus("キーマップを読み込みました");
+      setStatus(t.keymap.readComplete);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "読み込みに失敗しました");
+      setStatus(error instanceof Error ? error.message : t.keymap.readFailed);
     }
   }
 
   async function saveSelectedAssignment() {
     if (!connected) {
-      setStatus("HIDデバイスが接続されていません");
+      setStatus(t.connection.deviceNotConnected);
       return;
     }
 
     const normalized = normalizeAssignment(draftAssignment);
 
     if (sameAssignment(readAssignment, normalized)) {
-      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} は変更なしのため書き込みをスキップしました`);
+      setStatus(t.keymap.saveSkipped(activeLayer, selectedKey + 1));
       return;
     }
 
@@ -159,47 +272,47 @@ export function App() {
       await setDeviceKey(transport, activeLayer, selectedKey, normalized);
       setReadKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
       setWriteKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
-      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} を保存しました`);
+      setStatus(t.keymap.saved(activeLayer, selectedKey + 1));
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "保存に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.keymap.saveFailed);
     }
   }
 
   async function enterBootloaderMode() {
     if (!connected) {
-      setFirmwareStatus("HIDデバイスが接続されていません");
+      setFirmwareStatus(t.connection.deviceNotConnected);
       return;
     }
 
     try {
-      setFirmwareStatus("BOOTSELへ切替中");
+      setFirmwareStatus(t.firmware.enteringBootloader);
       await enterDeviceBootloader(transport);
       await transport.close().catch(() => undefined);
       setDeviceState(null);
-      setStatus("BOOTSEL mode");
-      setFirmwareStatus("BOOTSEL drive ready");
+      setStatus(t.firmware.bootMode);
+      setFirmwareStatus(t.firmware.bootDriveReady);
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "BOOTSEL切替に失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.enterBootloaderFailed);
     }
   }
 
   async function installBundledFirmware() {
     try {
-      setFirmwareStatus("UF2書き込み中");
+      setFirmwareStatus(t.firmware.writing);
       const result = await installFirmwareUf2();
-      setFirmwareStatus(`${result.fileName} written (${Math.ceil(result.size / 1024)} KB)`);
+      setFirmwareStatus(t.firmware.written(result.fileName, Math.ceil(result.size / 1024)));
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "UF2書き込みに失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.writeFailed);
     }
   }
 
   async function downloadBundledFirmware() {
     try {
-      setFirmwareStatus("UF2ダウンロード中");
+      setFirmwareStatus(t.firmware.downloading);
       await downloadFirmwareUf2();
-      setFirmwareStatus("UF2 downloaded");
+      setFirmwareStatus(t.firmware.downloaded);
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "UF2ダウンロードに失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.downloadFailed);
     }
   }
 
@@ -278,48 +391,48 @@ export function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand">
+        <a className="brand brand-link" href={homeHref} aria-label={t.home.backHome}>
           <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
           <div className="brand-copy">
-            <span className="eyebrow">Cyborg Project</span>
-            <h1>Mini Remapper</h1>
-            <p>WebHID keymap editor for the 8-key RP2040 board</p>
+            <span className="eyebrow">{t.app.eyebrow}</span>
+            <h1>{t.app.title}</h1>
+            <p>{t.app.description}</p>
           </div>
-        </div>
+        </a>
         <div className="connection">
           <div className="connection-meta">
             <span className={connected ? "status-badge online" : "status-badge offline"}>
-              {connected ? "Connected" : "Idle"}
+              {connected ? t.connection.connected : t.connection.idle}
             </span>
             <span className="connection-text">{status}</span>
           </div>
           <div className="connection-actions">
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
-              Updater
+              {t.connection.updater}
             </button>
-            <button type="button" onClick={connectDevice}>
-              {connected ? "Reconnect" : "Connect"}
+            <button type="button" onClick={connected ? disconnectDevice : connectDevice}>
+              {connected ? t.connection.disconnect : t.connection.connect}
             </button>
           </div>
         </div>
       </header>
 
-      <section className="workspace" aria-label="Remapper workspace">
+      <section className="workspace" aria-label={t.app.workspaceLabel}>
         <HardwarePanel deviceState={deviceState} />
         <RemapPanel
           activeLayer={activeLayer}
           selectedKey={selectedKey}
+          connected={connected}
           layerCount={writeKeymap.length}
           layerAssignments={writeKeymap[activeLayer]}
+          onRead={() => void readAllAssignments()}
+          onSave={() => void saveSelectedAssignment()}
           onSelectLayer={(layerIndex) => void selectLayer(layerIndex)}
           onSelectKey={setSelectedKey}
         />
         <EditorPanel
           selectedKey={selectedKey}
-          connected={connected}
           draftAssignment={draftAssignment}
-          onRead={() => void readAllAssignments()}
-          onSave={() => void saveSelectedAssignment()}
           onUpdateKind={updateDraftKind}
           onUpdateUsage={updateDraftUsage}
           modifierSlots={modifierSlots}
@@ -349,16 +462,16 @@ export function App() {
           >
             <div className="modal-header">
               <div className="panel-meta">
-                <span className="panel-kicker">Updater</span>
-                <h2 id="firmware-modal-title">Firmware</h2>
+                <span className="panel-kicker">{t.firmware.updater}</span>
+                <h2 id="firmware-modal-title">{t.firmware.title}</h2>
               </div>
               <button
                 type="button"
                 className="ghost-button"
                 onClick={() => setFirmwareModalOpen(false)}
-                aria-label="Close firmware updater"
+                aria-label={t.firmware.closeLabel}
               >
-                Close
+                {t.firmware.close}
               </button>
             </div>
             <FirmwarePanel
@@ -372,6 +485,187 @@ export function App() {
           </div>
         </div>
       ) : null}
+    </main>
+  );
+}
+
+export function DiagnosticsApp() {
+  const transport = useMemo(() => new WebHidTransport(), []);
+  const [status, setStatus] = useState<string>(t.connection.initialStatus);
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
+  const [reportTestStatus, setReportTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
+  const [reportTestDetail, setReportTestDetail] = useState("-");
+  const [testedKeys, setTestedKeys] = useState<boolean[]>(() =>
+    Array.from({ length: HARDWARE_CONFIG.keyCount }, () => false),
+  );
+  const [lastKey, setLastKey] = useState<number | null>(null);
+  const connected = deviceState !== null && transport.connected;
+  const testedCount = testedKeys.filter(Boolean).length;
+  const allKeysPassed = testedCount === testedKeys.length;
+  const disconnectDevice = useDeviceSession(transport, connected, () => {
+    setDeviceState(null);
+    setLastKey(null);
+    setReportTestStatus("idle");
+    setReportTestDetail("-");
+    setStatus(t.connection.initialStatus);
+  });
+
+  useEffect(() => {
+    if (!connected || !deviceState) {
+      return;
+    }
+
+    return subscribeDeviceKeyEvents(transport, (event) => {
+      if (!event.pressed || event.keyIndex >= deviceState.keyCount) {
+        return;
+      }
+
+      setLastKey(event.keyIndex);
+      setTestedKeys((current) =>
+        current.map((tested, index) => (index === event.keyIndex ? true : tested)),
+      );
+    });
+  }, [connected, deviceState, transport]);
+
+  async function connectDevice() {
+    try {
+      const device = await transport.requestDevice();
+      await transport.open();
+      await sendRemapperHeartbeat(transport);
+      const state = await getDeviceState(transport);
+      setDeviceState(state);
+      setTestedKeys(Array.from({ length: state.keyCount }, () => false));
+      setLastKey(null);
+      await runReportTest();
+      setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
+    }
+  }
+
+  async function runReportTest() {
+    if (!transport.connected) {
+      setReportTestStatus("failed");
+      setReportTestDetail(t.connection.deviceNotConnected);
+      return;
+    }
+
+    try {
+      setReportTestStatus("running");
+      setReportTestDetail(t.diagnostics.reportTesting);
+      const result = await runDiagnosticReportTest(transport);
+      setReportTestStatus("passed");
+      setReportTestDetail(t.diagnostics.reportTestPassed(result.signature, result.version));
+    } catch (error) {
+      setReportTestStatus("failed");
+      setReportTestDetail(error instanceof Error ? error.message : t.diagnostics.reportTestFailed);
+    }
+  }
+
+  function resetDiagnostics() {
+    setTestedKeys(Array.from({ length: deviceState?.keyCount ?? HARDWARE_CONFIG.keyCount }, () => false));
+    setLastKey(null);
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="topbar">
+        <div className="brand">
+          <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
+          <div className="brand-copy">
+            <span className="eyebrow">{t.diagnostics.kicker}</span>
+            <h1>{t.diagnostics.title}</h1>
+            <p>{t.diagnostics.description}</p>
+          </div>
+        </div>
+        <div className="connection">
+          <div className="connection-meta">
+            <span className={connected ? "status-badge online" : "status-badge offline"}>
+              {connected ? t.connection.connected : t.connection.idle}
+            </span>
+            <span className="connection-text">{status}</span>
+          </div>
+          <div className="connection-actions">
+            <a className="ghost-button nav-button" href={homeUrl}>
+              {t.home.backHome}
+            </a>
+            <a className="ghost-button nav-button" href={remapperUrl}>
+              {t.home.openRemapper}
+            </a>
+            <button type="button" onClick={connected ? disconnectDevice : connectDevice}>
+              {connected ? t.connection.disconnect : t.connection.connect}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section className="diagnostics-workspace" aria-label={t.diagnostics.title}>
+        <section className="panel diagnostics-panel">
+          <div className="panel-heading">
+            <div className="panel-meta">
+              <span className="panel-kicker">{t.diagnostics.keyCheckKicker}</span>
+              <h2>{t.diagnostics.keyCheckTitle}</h2>
+            </div>
+            <button type="button" className="ghost-button" onClick={resetDiagnostics}>
+              {t.diagnostics.reset}
+            </button>
+            <button type="button" className="ghost-button" onClick={() => void runReportTest()} disabled={!connected}>
+              {t.diagnostics.runReportTest}
+            </button>
+          </div>
+
+          <div className="diagnostics-summary">
+            <strong>{allKeysPassed ? t.diagnostics.pass : t.diagnostics.waiting}</strong>
+            <span>{t.diagnostics.progress(testedCount, testedKeys.length)}</span>
+            <span>{lastKey === null ? t.diagnostics.noLastKey : t.diagnostics.lastKey(lastKey + 1)}</span>
+          </div>
+
+          <div className="diagnostic-key-grid">
+            {testedKeys.map((tested, index) => (
+              <div
+                className={tested ? "diagnostic-key passed" : "diagnostic-key"}
+                key={index}
+              >
+                <span>{t.keymap.key(index + 1)}</span>
+                <strong>{tested ? t.diagnostics.checked : t.diagnostics.unchecked}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <aside className="panel diagnostics-panel">
+          <div className="panel-meta">
+            <span className="panel-kicker">{t.diagnostics.functionCheckKicker}</span>
+            <h2>{t.diagnostics.functionCheckTitle}</h2>
+          </div>
+          <dl className="diagnostics-list">
+            <div>
+              <dt>{t.diagnostics.webHid}</dt>
+              <dd>{typeof navigator !== "undefined" && "hid" in navigator ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.deviceConnection}</dt>
+              <dd>{connected ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.keyEvent}</dt>
+              <dd>{testedCount > 0 ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportSend}</dt>
+              <dd>{reportTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportDetail}</dt>
+              <dd>{reportTestDetail}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportKeys}</dt>
+              <dd>{deviceState?.keyCount ?? "-"}</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
     </main>
   );
 }

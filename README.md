@@ -55,8 +55,10 @@ apps/web/src/
 ├── app/
 ├── features/
 │   ├── device/
+│   ├── firmware/
 │   ├── hardware/
 │   └── keymap/
+├── pages/
 └── shared/
 ```
 
@@ -64,8 +66,18 @@ apps/web/src/
 
 - `app/`: Reactアプリの画面構成
 - `features/device/`: WebHID接続、送受信
+- `features/firmware/`: UF2取得、ダウンロード、BOOTSELドライブ書き込み
 - `features/hardware/`: 8キー新ハードウェア定義
 - `features/keymap/`: レイヤー別キーマップ型と初期状態
+- `pages/`: `remapper.html` / `diagnostics.html` の個別エントリ
+
+Webは複数ページ構成です。
+
+| Page | Path | Purpose |
+| --- | --- | --- |
+| Home | `/` | 製品ページと各ツールへの入口 |
+| Remapper | `/remapper.html` | WebHIDキーマップ編集、読み取り、保存、ファームウェア更新 |
+| Diagnostics | `/diagnostics.html` | 販売前/出荷前のキー押下チェックと基本機能チェック |
 
 開発コマンド:
 
@@ -88,11 +100,12 @@ pnpm firmware:web
 - `keymap.*`: 6レイヤー x 8キーのRAM上キーマップ
 - `keymap_storage.*`: EEPROMエミュレーション上の固定長キーマップ保存
 - `hid_device.*`: 通常HID keyboard / consumer出力とWebHID向けvendor-defined report
+- `readme_drive.*`: Read-only USB MSC drive with `README.TXT` and `REMAPPER.URL`
 - `status_led.*`: 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 
 設定用HID report仕様は `docs/hid-report.md` にまとめています。
 
-USB identity は以下に固定します。WebHID の接続候補もこの VID/PID で絞り込みます。
+USB identity はビルド時の `USB_VID` / `USB_PID` で上書きできます。firmware build script の既定値は以下です。
 
 | Field | Value |
 | --- | --- |
@@ -101,7 +114,7 @@ USB identity は以下に固定します。WebHID の接続候補もこの VID/P
 | Manufacturer | `Cyborg Project` |
 | Product | `Cyborg Mini 8 Keys` |
 
-この VID/PID は開発用です。配布や販売を行う場合は、正式に割り当てた VID/PID に差し替えます。ビルド時は `USB_VID`, `USB_PID`, `USB_MANUFACTURER`, `USB_PRODUCT` で上書きできます。
+この VID/PID は開発用です。配布や販売を行う場合は、正式に割り当てた VID/PID に差し替えます。WebHID 側の接続候補は `apps/web/src/features/device/usbIdentity.ts` で管理します。
 
 `config.h` のピン番号は仮値です。実際のPCBピンが確定したら、`hardware/cyborg-mini-8key/pinout.md` と合わせて更新します。
 
@@ -119,7 +132,11 @@ scripts/build-web-firmware.sh
 
 `scripts/build-web-firmware.sh` は同じ設定でコンパイルし、Web アプリから配信する `apps/web/public/firmware/cyborg-mini-8key.uf2` を生成します。
 
-現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。キーマップは EEPROM エミュレーションに永続化します。WebHID から UF2 ブートローダへ入る command と、Web 画面から UF2 をダウンロードまたは BOOTSEL ドライブへ書き込む更新UIを用意しています。実機での WebHID 通信、ブートローダ移行、UF2 書き込みの確認は次工程です。
+現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。キーマップは EEPROM エミュレーションに永続化します。WebHID から UF2 ブートローダへ入る command と、Web 画面から UF2 をダウンロードまたは BOOTSEL ドライブへ書き込む更新UIを用意しています。
+
+READMEドライブは通常非表示です。Key 5 を押しながらUSB接続した時だけ、Read-only USBメモリとして `README.TXT` と `REMAPPER.URL` を表示します。常時表示したい場合は `config.h` の `README_DRIVE_ENABLED` を `true` にします。
+
+Diagnostics ページでは、Remapper heartbeat 中の `KeyEvent` を使って物理キーの押下を確認します。この状態では通常のキーボード/Consumer送信は抑止されるため、検査中にPCへキー入力が流れません。
 
 ## 現行 Web ツール
 
