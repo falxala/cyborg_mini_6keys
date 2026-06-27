@@ -131,8 +131,9 @@ select {
   grid-row: 1;
   display: flex;
   flex-direction: column;
-  height: clamp(292px, 24vw, 304px);
-  padding-bottom: 12px;
+  gap: 6px;
+  height: clamp(252px, 20vw, 264px);
+  padding: 10px 12px 10px;
 }
 
 .editor-panel {
@@ -199,7 +200,7 @@ select {
   display: flex;
   gap: 10px;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .remap-strip .layer-tabs,
@@ -229,9 +230,9 @@ select {
 
 .layer-tabs button,
 .layout-tabs button {
-  height: 30px;
+  height: 28px;
   min-width: 32px;
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .layer-tabs button.active,
@@ -248,7 +249,7 @@ select {
 
 .key-grid {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   grid-template-columns: repeat(8, minmax(0, 1fr));
   align-self: stretch;
   align-content: start;
@@ -259,18 +260,18 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 46px;
-  padding: 6px 8px;
+  min-height: 42px;
+  padding: 5px 6px;
   text-align: left;
 }
 
 .key-tile span {
   color: #65707c;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .key-tile strong {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .key-tile.active {
