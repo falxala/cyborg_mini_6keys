@@ -648,6 +648,8 @@ export function DiagnosticsApp() {
             <span>{lastKey === null ? t.diagnostics.noLastKey : t.diagnostics.lastKey(lastKey + 1)}</span>
           </div>
 
+          <p className="diagnostics-warning">{t.diagnostics.storageWriteWarning}</p>
+
           <div className="diagnostic-key-grid">
             {testedKeys.map((tested, index) => (
               <div

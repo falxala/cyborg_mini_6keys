@@ -58,6 +58,7 @@ export const ja = {
     storageTesting: "Testing storage",
     storageTestPassed: (layers: number, keys: number) => `${layers} layers x ${keys} keys restored`,
     storageTestFailed: "Storage test failed",
+    storageWriteWarning: "Storage test は実際のFlash保存領域へ書き込みます。出荷検査など必要な時だけ実行してください。",
     ok: "OK",
     ng: "NG",
   },

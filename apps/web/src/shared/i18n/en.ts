@@ -60,6 +60,7 @@ export const en: typeof ja = {
     storageTesting: "Testing storage",
     storageTestPassed: (layers, keys) => `${layers} layers x ${keys} keys restored`,
     storageTestFailed: "Storage test failed",
+    storageWriteWarning: "Storage test writes to the actual flash-backed keymap area. Run it only when needed, such as production inspection.",
     ok: "OK",
     ng: "NG",
   },
