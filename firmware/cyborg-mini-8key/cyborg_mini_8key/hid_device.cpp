@@ -266,6 +266,7 @@ void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
   }
 
   const uint8_t changed = oldMask ^ newMask;
+  const bool remapperActive = remapperConnected();
 
   for (uint8_t keyIndex = 0; keyIndex < Config::KEY_COUNT; keyIndex++) {
     const uint8_t bit = static_cast<uint8_t>(1U << keyIndex);
@@ -277,11 +278,16 @@ void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
     const bool pressed = (newMask & bit) != 0;
     const KeyAssignment& assignment = assignmentFor(layer, keyIndex);
 
-    if (pressed) {
+    if (pressed && remapperActive) {
       sendKeyEvent(layer, keyIndex, pressed);
     }
 
     if (!pressed) {
+      releaseKeyboardReport(reportId);
+      continue;
+    }
+
+    if (remapperActive) {
       releaseKeyboardReport(reportId);
       continue;
     }
