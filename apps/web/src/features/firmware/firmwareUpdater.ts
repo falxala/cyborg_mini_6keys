@@ -1,3 +1,5 @@
+import { t } from "../../shared/i18n";
+
 export const FIRMWARE_UF2_NAME = "cyborg-mini-8key.uf2";
 export const FIRMWARE_UF2_URL = `${import.meta.env.BASE_URL}firmware/${FIRMWARE_UF2_NAME}`;
 
@@ -46,7 +48,7 @@ export async function installFirmwareUf2(): Promise<FirmwareInstallResult> {
   const picker = directoryPicker();
 
   if (!picker) {
-    throw new Error("このブラウザはUF2の直接書き込みに対応していません");
+    throw new Error(t.firmware.browserUnsupported);
   }
 
   const directory = await picker({ mode: "readwrite" });
@@ -68,7 +70,7 @@ async function fetchFirmwareUf2() {
   const response = await fetch(FIRMWARE_UF2_URL, { cache: "no-store" });
 
   if (!response.ok) {
-    throw new Error(`UF2ファイルを取得できませんでした: ${response.status}`);
+    throw new Error(t.firmware.fetchFailed(response.status));
   }
 
   return response.blob();
@@ -78,7 +80,7 @@ async function ensureUf2BootDrive(directory: Uf2DirectoryHandle) {
   try {
     await directory.getFileHandle("INFO_UF2.TXT");
   } catch {
-    throw new Error("UF2ブートローダのドライブを選択してください");
+    throw new Error(t.firmware.selectBootDrive);
   }
 }
 

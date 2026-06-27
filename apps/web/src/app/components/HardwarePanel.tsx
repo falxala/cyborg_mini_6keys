@@ -1,6 +1,7 @@
 import type { DeviceState } from "../../features/device/deviceCommands";
 import { CYBORG_MINI_USB, formatUsbId } from "../../features/device/usbIdentity";
 import { HARDWARE_CONFIG } from "../../features/hardware/hardwareConfig";
+import { t } from "../../shared/i18n";
 
 type HardwarePanelProps = {
   deviceState: DeviceState | null;
@@ -10,39 +11,39 @@ export function HardwarePanel({ deviceState }: HardwarePanelProps) {
   return (
     <aside className="panel hardware-panel">
       <div className="panel-meta">
-        <span className="panel-kicker">Board Profile</span>
-        <h2>Hardware</h2>
+        <span className="panel-kicker">{t.hardware.kicker}</span>
+        <h2>{t.hardware.title}</h2>
       </div>
       <dl>
         <div>
-          <dt>Keys</dt>
+          <dt>{t.hardware.keys}</dt>
           <dd>{HARDWARE_CONFIG.keyCount}</dd>
         </div>
         <div>
-          <dt>Virtual GND</dt>
+          <dt>{t.hardware.virtualGround}</dt>
           <dd>{HARDWARE_CONFIG.virtualGroundCount}</dd>
         </div>
         <div>
-          <dt>Device layer</dt>
+          <dt>{t.hardware.deviceLayer}</dt>
           <dd>{deviceState?.activeLayer ?? "-"}</dd>
         </div>
         <div>
-          <dt>Report keys</dt>
+          <dt>{t.hardware.reportKeys}</dt>
           <dd>{deviceState?.keyCount ?? "-"}</dd>
         </div>
         <div>
-          <dt>USB ID</dt>
+          <dt>{t.hardware.usbId}</dt>
           <dd>
             {formatUsbId(CYBORG_MINI_USB.vendorId)}:{formatUsbId(CYBORG_MINI_USB.productId)}
           </dd>
         </div>
         <div>
-          <dt>External RGB</dt>
-          <dd>None</dd>
+          <dt>{t.hardware.externalRgb}</dt>
+          <dd>{t.hardware.none}</dd>
         </div>
         <div>
-          <dt>OLED</dt>
-          <dd>None</dd>
+          <dt>{t.hardware.oled}</dt>
+          <dd>{t.hardware.none}</dd>
         </div>
       </dl>
     </aside>

@@ -1,6 +1,7 @@
 import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
 import { CYBORG_MINI_USB } from "./usbIdentity";
+import { t } from "../../shared/i18n";
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -27,14 +28,12 @@ export class WebHidTransport {
       return this.device;
     }
 
-    throw new Error(
-      "Cyborg Mini が見つかりません。接続後にもう一度試すか、ファームウェアを書き込み直してください",
-    );
+    throw new Error(t.device.notFound);
   }
 
   async open() {
     if (!this.device) {
-      throw new Error("接続するHIDデバイスがありません");
+      throw new Error(t.device.missingDevice);
     }
 
     if (!this.device.opened) {
@@ -54,7 +53,7 @@ export class WebHidTransport {
     return new Promise<Uint8Array>((resolve, reject) => {
       const timeout = window.setTimeout(() => {
         cleanup();
-        reject(new Error("HIDデバイスからの応答がタイムアウトしました"));
+        reject(new Error(t.device.timeout));
       }, timeoutMs);
 
       const listener = (event: HidInputReportEvent) => {
@@ -89,7 +88,7 @@ export class WebHidTransport {
     const hid = (navigator as HidNavigator).hid;
 
     if (!hid) {
-      throw new Error("このブラウザはWebHIDに対応していません");
+      throw new Error(t.device.unsupportedWebHid);
     }
 
     return hid;
@@ -97,7 +96,7 @@ export class WebHidTransport {
 
   private requireOpenDevice() {
     if (!this.device || !this.device.opened) {
-      throw new Error("HIDデバイスが接続されていません");
+      throw new Error(t.device.disconnected);
     }
 
     return this.device;

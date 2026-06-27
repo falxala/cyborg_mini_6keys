@@ -36,14 +36,15 @@ import {
   type KeyAssignment,
   type KeyAssignmentKind,
 } from "../features/keymap/keymapTypes";
+import { t } from "../shared/i18n";
 
 export function App() {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [activeLayer, setActiveLayer] = useState(0);
   const [selectedKey, setSelectedKey] = useState(0);
   const [firmwareModalOpen, setFirmwareModalOpen] = useState(false);
-  const [status, setStatus] = useState("未接続");
-  const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
+  const [status, setStatus] = useState<string>(t.connection.initialStatus);
+  const [firmwareStatus, setFirmwareStatus] = useState<string>(t.firmware.initialStatus);
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const [readKeymap, setReadKeymap] = useState(createBlankKeymap);
   const [writeKeymap, setWriteKeymap] = useState(createBlankKeymap);
@@ -102,9 +103,9 @@ export function App() {
       setReadKeymap(loadedKeymap);
       setWriteKeymap(loadedKeymap);
       setActiveLayer(state.activeLayer);
-      setStatus(`${device.productName || "HID device"} に接続`);
+      setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "接続に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
     }
   }
 
@@ -121,37 +122,37 @@ export function App() {
         current ? { ...current, activeLayer: layerIndex } : current,
       );
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "レイヤー変更に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.connection.layerChangeFailed);
     }
   }
 
   async function readAllAssignments() {
     if (!connected || !deviceState) {
-      setStatus("HIDデバイスが接続されていません");
+      setStatus(t.connection.deviceNotConnected);
       return;
     }
 
     try {
-      setStatus("キーマップ読み込み中");
+      setStatus(t.keymap.reading);
       const loadedKeymap = await readDeviceKeymap(transport, deviceState.layerCount, deviceState.keyCount);
       setReadKeymap(loadedKeymap);
       setWriteKeymap(loadedKeymap);
-      setStatus("キーマップを読み込みました");
+      setStatus(t.keymap.readComplete);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "読み込みに失敗しました");
+      setStatus(error instanceof Error ? error.message : t.keymap.readFailed);
     }
   }
 
   async function saveSelectedAssignment() {
     if (!connected) {
-      setStatus("HIDデバイスが接続されていません");
+      setStatus(t.connection.deviceNotConnected);
       return;
     }
 
     const normalized = normalizeAssignment(draftAssignment);
 
     if (sameAssignment(readAssignment, normalized)) {
-      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} は変更なしのため書き込みをスキップしました`);
+      setStatus(t.keymap.saveSkipped(activeLayer, selectedKey + 1));
       return;
     }
 
@@ -159,47 +160,47 @@ export function App() {
       await setDeviceKey(transport, activeLayer, selectedKey, normalized);
       setReadKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
       setWriteKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
-      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} を保存しました`);
+      setStatus(t.keymap.saved(activeLayer, selectedKey + 1));
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "保存に失敗しました");
+      setStatus(error instanceof Error ? error.message : t.keymap.saveFailed);
     }
   }
 
   async function enterBootloaderMode() {
     if (!connected) {
-      setFirmwareStatus("HIDデバイスが接続されていません");
+      setFirmwareStatus(t.connection.deviceNotConnected);
       return;
     }
 
     try {
-      setFirmwareStatus("BOOTSELへ切替中");
+      setFirmwareStatus(t.firmware.enteringBootloader);
       await enterDeviceBootloader(transport);
       await transport.close().catch(() => undefined);
       setDeviceState(null);
-      setStatus("BOOTSEL mode");
-      setFirmwareStatus("BOOTSEL drive ready");
+      setStatus(t.firmware.bootMode);
+      setFirmwareStatus(t.firmware.bootDriveReady);
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "BOOTSEL切替に失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.enterBootloaderFailed);
     }
   }
 
   async function installBundledFirmware() {
     try {
-      setFirmwareStatus("UF2書き込み中");
+      setFirmwareStatus(t.firmware.writing);
       const result = await installFirmwareUf2();
-      setFirmwareStatus(`${result.fileName} written (${Math.ceil(result.size / 1024)} KB)`);
+      setFirmwareStatus(t.firmware.written(result.fileName, Math.ceil(result.size / 1024)));
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "UF2書き込みに失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.writeFailed);
     }
   }
 
   async function downloadBundledFirmware() {
     try {
-      setFirmwareStatus("UF2ダウンロード中");
+      setFirmwareStatus(t.firmware.downloading);
       await downloadFirmwareUf2();
-      setFirmwareStatus("UF2 downloaded");
+      setFirmwareStatus(t.firmware.downloaded);
     } catch (error) {
-      setFirmwareStatus(error instanceof Error ? error.message : "UF2ダウンロードに失敗しました");
+      setFirmwareStatus(error instanceof Error ? error.message : t.firmware.downloadFailed);
     }
   }
 
@@ -281,30 +282,30 @@ export function App() {
         <div className="brand">
           <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
           <div className="brand-copy">
-            <span className="eyebrow">Cyborg Project</span>
-            <h1>Mini Remapper</h1>
-            <p>WebHID keymap editor for the 8-key RP2040 board</p>
+            <span className="eyebrow">{t.app.eyebrow}</span>
+            <h1>{t.app.title}</h1>
+            <p>{t.app.description}</p>
           </div>
         </div>
         <div className="connection">
           <div className="connection-meta">
             <span className={connected ? "status-badge online" : "status-badge offline"}>
-              {connected ? "Connected" : "Idle"}
+              {connected ? t.connection.connected : t.connection.idle}
             </span>
             <span className="connection-text">{status}</span>
           </div>
           <div className="connection-actions">
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
-              Updater
+              {t.connection.updater}
             </button>
             <button type="button" onClick={connectDevice}>
-              {connected ? "Reconnect" : "Connect"}
+              {connected ? t.connection.reconnect : t.connection.connect}
             </button>
           </div>
         </div>
       </header>
 
-      <section className="workspace" aria-label="Remapper workspace">
+      <section className="workspace" aria-label={t.app.workspaceLabel}>
         <HardwarePanel deviceState={deviceState} />
         <RemapPanel
           activeLayer={activeLayer}
@@ -349,16 +350,16 @@ export function App() {
           >
             <div className="modal-header">
               <div className="panel-meta">
-                <span className="panel-kicker">Updater</span>
-                <h2 id="firmware-modal-title">Firmware</h2>
+                <span className="panel-kicker">{t.firmware.updater}</span>
+                <h2 id="firmware-modal-title">{t.firmware.title}</h2>
               </div>
               <button
                 type="button"
                 className="ghost-button"
                 onClick={() => setFirmwareModalOpen(false)}
-                aria-label="Close firmware updater"
+                aria-label={t.firmware.closeLabel}
               >
-                Close
+                {t.firmware.close}
               </button>
             </div>
             <FirmwarePanel

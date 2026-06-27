@@ -13,6 +13,7 @@ import {
   type ConfigResponse,
 } from "./hidProtocol";
 import type { WebHidTransport } from "./webHidTransport";
+import { t } from "../../shared/i18n";
 
 export type DeviceState = {
   activeLayer: number;
@@ -109,7 +110,7 @@ async function sendCommand(
   const response = decodeConfigResponse(raw);
 
   if (response.command !== command) {
-    throw new Error(`Unexpected HID response command ${response.command}; expected ${command}`);
+    throw new Error(t.device.unexpectedResponse(response.command, command));
   }
 
   return response;

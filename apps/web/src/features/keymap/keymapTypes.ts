@@ -1,3 +1,5 @@
+import { t } from "../../shared/i18n";
+
 export type KeyAssignmentKind = "none" | "keyboard" | "consumer";
 
 export type KeyAssignment = {
@@ -39,7 +41,7 @@ export function normalizeAssignment(
       modifier: 0,
       usage: 0,
       keycodes: createEmptyKeycodes(),
-      label: "未割り当て",
+      label: t.keymap.unassigned,
     };
   }
 
