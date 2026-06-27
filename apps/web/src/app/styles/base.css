@@ -46,17 +46,22 @@ body {
 
 button,
 input,
-select {
+select,
+a.nav-button,
+a.product-action {
   font: inherit;
 }
 
-button {
+button,
+a.nav-button,
+a.product-action {
   appearance: none;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 253, 250, 0.88);
   color: inherit;
   cursor: pointer;
+  text-decoration: none;
   transition:
     transform 120ms ease,
     border-color 120ms ease,
@@ -64,7 +69,9 @@ button {
     box-shadow 120ms ease;
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+a.nav-button:hover,
+a.product-action:hover {
   border-color: rgba(13, 122, 114, 0.42);
   box-shadow: 0 8px 16px rgba(22, 40, 40, 0.08);
   transform: translateY(-1px);
@@ -196,6 +203,9 @@ select {
 }
 
 .product-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 0 18px;
   border-color: rgba(13, 122, 114, 0.28);
@@ -203,6 +213,19 @@ select {
   color: #f6f9f8;
   font-weight: 800;
   box-shadow: 0 10px 20px rgba(8, 84, 79, 0.2);
+}
+
+.product-action.secondary {
+  border-color: rgba(78, 61, 38, 0.16);
+  background: rgba(255, 252, 247, 0.86);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .topbar {
@@ -372,7 +395,13 @@ select {
   box-shadow: 0 10px 20px rgba(8, 84, 79, 0.2);
 }
 
-button.ghost-button {
+button.ghost-button,
+a.ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
   border-color: rgba(78, 61, 38, 0.16);
   background: rgba(255, 252, 247, 0.86);
   color: var(--text);

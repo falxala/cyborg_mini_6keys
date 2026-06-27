@@ -39,21 +39,15 @@ import {
 } from "../features/keymap/keymapTypes";
 import { t } from "../shared/i18n";
 
+const homeUrl = `${import.meta.env.BASE_URL}`;
+const remapperUrl = `${import.meta.env.BASE_URL}remapper.html`;
+const diagnosticsUrl = `${import.meta.env.BASE_URL}diagnostics.html`;
+
 export function App() {
-  const [page, setPage] = useState<"home" | "remapper">("home");
-
-  if (page === "home") {
-    return <ProductHome onOpenRemapper={() => setPage("remapper")} />;
-  }
-
-  return <RemapperApp onBackHome={() => setPage("home")} />;
+  return <HomePage />;
 }
 
-type ProductHomeProps = {
-  onOpenRemapper: () => void;
-};
-
-function ProductHome({ onOpenRemapper }: ProductHomeProps) {
+export function HomePage() {
   return (
     <main className="app-shell home-shell">
       <section className="home-hero" aria-labelledby="home-title">
@@ -89,9 +83,14 @@ function ProductHome({ onOpenRemapper }: ProductHomeProps) {
                 <dd>{t.home.connectionValue}</dd>
               </div>
             </dl>
-            <button type="button" className="product-action" onClick={onOpenRemapper}>
-              {t.home.openRemapper}
-            </button>
+            <div className="product-actions">
+              <a className="product-action" href={remapperUrl}>
+                {t.home.openRemapper}
+              </a>
+              <a className="product-action secondary" href={diagnosticsUrl}>
+                {t.home.openDiagnostics}
+              </a>
+            </div>
           </article>
         ))}
       </section>
@@ -100,10 +99,10 @@ function ProductHome({ onOpenRemapper }: ProductHomeProps) {
 }
 
 type RemapperAppProps = {
-  onBackHome: () => void;
+  homeHref?: string;
 };
 
-function RemapperApp({ onBackHome }: RemapperAppProps) {
+export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [activeLayer, setActiveLayer] = useState(0);
   const [selectedKey, setSelectedKey] = useState(0);
@@ -384,9 +383,12 @@ function RemapperApp({ onBackHome }: RemapperAppProps) {
             <span className="connection-text">{status}</span>
           </div>
           <div className="connection-actions">
-            <button type="button" className="ghost-button" onClick={onBackHome}>
+            <a className="ghost-button nav-button" href={homeHref}>
               {t.home.backHome}
-            </button>
+            </a>
+            <a className="ghost-button nav-button" href={diagnosticsUrl}>
+              {t.diagnostics.nav}
+            </a>
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
               {t.connection.updater}
             </button>
@@ -465,6 +467,171 @@ function RemapperApp({ onBackHome }: RemapperAppProps) {
           </div>
         </div>
       ) : null}
+    </main>
+  );
+}
+
+export function DiagnosticsApp() {
+  const transport = useMemo(() => new WebHidTransport(), []);
+  const [status, setStatus] = useState<string>(t.connection.initialStatus);
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
+  const [testedKeys, setTestedKeys] = useState<boolean[]>(() =>
+    Array.from({ length: HARDWARE_CONFIG.keyCount }, () => false),
+  );
+  const [lastKey, setLastKey] = useState<number | null>(null);
+  const connected = deviceState !== null && transport.connected;
+  const testedCount = testedKeys.filter(Boolean).length;
+  const allKeysPassed = testedCount === testedKeys.length;
+
+  useEffect(() => {
+    if (!connected) {
+      return;
+    }
+
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        await sendRemapperHeartbeat(transport);
+      } catch {
+        if (!cancelled) {
+          window.clearInterval(interval);
+        }
+      }
+    };
+    const interval = window.setInterval(() => void ping(), 1000);
+    void ping();
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [connected, transport]);
+
+  useEffect(() => {
+    if (!connected || !deviceState) {
+      return;
+    }
+
+    return subscribeDeviceKeyEvents(transport, (event) => {
+      if (!event.pressed || event.keyIndex >= deviceState.keyCount) {
+        return;
+      }
+
+      setLastKey(event.keyIndex);
+      setTestedKeys((current) =>
+        current.map((tested, index) => (index === event.keyIndex ? true : tested)),
+      );
+    });
+  }, [connected, deviceState, transport]);
+
+  async function connectDevice() {
+    try {
+      const device = await transport.requestDevice();
+      await transport.open();
+      await sendRemapperHeartbeat(transport);
+      const state = await getDeviceState(transport);
+      setDeviceState(state);
+      setTestedKeys(Array.from({ length: state.keyCount }, () => false));
+      setLastKey(null);
+      setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
+    }
+  }
+
+  function resetDiagnostics() {
+    setTestedKeys(Array.from({ length: deviceState?.keyCount ?? HARDWARE_CONFIG.keyCount }, () => false));
+    setLastKey(null);
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="topbar">
+        <div className="brand">
+          <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
+          <div className="brand-copy">
+            <span className="eyebrow">{t.diagnostics.kicker}</span>
+            <h1>{t.diagnostics.title}</h1>
+            <p>{t.diagnostics.description}</p>
+          </div>
+        </div>
+        <div className="connection">
+          <div className="connection-meta">
+            <span className={connected ? "status-badge online" : "status-badge offline"}>
+              {connected ? t.connection.connected : t.connection.idle}
+            </span>
+            <span className="connection-text">{status}</span>
+          </div>
+          <div className="connection-actions">
+            <a className="ghost-button nav-button" href={homeUrl}>
+              {t.home.backHome}
+            </a>
+            <a className="ghost-button nav-button" href={remapperUrl}>
+              {t.home.openRemapper}
+            </a>
+            <button type="button" onClick={connectDevice}>
+              {connected ? t.connection.reconnect : t.connection.connect}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section className="diagnostics-workspace" aria-label={t.diagnostics.title}>
+        <section className="panel diagnostics-panel">
+          <div className="panel-heading">
+            <div className="panel-meta">
+              <span className="panel-kicker">{t.diagnostics.keyCheckKicker}</span>
+              <h2>{t.diagnostics.keyCheckTitle}</h2>
+            </div>
+            <button type="button" className="ghost-button" onClick={resetDiagnostics}>
+              {t.diagnostics.reset}
+            </button>
+          </div>
+
+          <div className="diagnostics-summary">
+            <strong>{allKeysPassed ? t.diagnostics.pass : t.diagnostics.waiting}</strong>
+            <span>{t.diagnostics.progress(testedCount, testedKeys.length)}</span>
+            <span>{lastKey === null ? t.diagnostics.noLastKey : t.diagnostics.lastKey(lastKey + 1)}</span>
+          </div>
+
+          <div className="diagnostic-key-grid">
+            {testedKeys.map((tested, index) => (
+              <div
+                className={tested ? "diagnostic-key passed" : "diagnostic-key"}
+                key={index}
+              >
+                <span>{t.keymap.key(index + 1)}</span>
+                <strong>{tested ? t.diagnostics.checked : t.diagnostics.unchecked}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <aside className="panel diagnostics-panel">
+          <div className="panel-meta">
+            <span className="panel-kicker">{t.diagnostics.functionCheckKicker}</span>
+            <h2>{t.diagnostics.functionCheckTitle}</h2>
+          </div>
+          <dl className="diagnostics-list">
+            <div>
+              <dt>{t.diagnostics.webHid}</dt>
+              <dd>{typeof navigator !== "undefined" && "hid" in navigator ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.deviceConnection}</dt>
+              <dd>{connected ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.keyEvent}</dt>
+              <dd>{testedCount > 0 ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportKeys}</dt>
+              <dd>{deviceState?.keyCount ?? "-"}</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
     </main>
   );
 }
