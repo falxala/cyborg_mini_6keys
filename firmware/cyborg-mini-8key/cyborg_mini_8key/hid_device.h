@@ -1,0 +1,7 @@
+#pragma once
+
+#include <Arduino.h>
+
+void beginHidDevice();
+bool hidDeviceMounted();
+void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer);

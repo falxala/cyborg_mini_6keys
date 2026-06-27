@@ -10,4 +10,8 @@
 - 外付けRGB LED / OLED は廃止
 - LED表示は本体LEDのみ
 
+## Documents
+
+- `pinout.md`: ピン割り当てドラフト
+
 旧6キー版のケース、PCB、ボトムプレート資料は `legacy/hardware/cyborg-mini-6key/` にあります。
