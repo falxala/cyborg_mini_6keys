@@ -26,23 +26,23 @@ enum class StatusLedKind : uint8_t {
   NeoPixel,
 };
 
-#if defined(LED_BUILTIN)
+#if defined(PIN_NEOPIXEL)
+constexpr StatusLedKind STATUS_LED_KIND = StatusLedKind::NeoPixel;
+constexpr uint8_t STATUS_LED_PIN = PIN_NEOPIXEL;
+#elif defined(LED_BUILTIN)
 constexpr StatusLedKind STATUS_LED_KIND = StatusLedKind::Digital;
 constexpr uint8_t STATUS_LED_PIN = LED_BUILTIN;
 #elif defined(PIN_LED)
 constexpr StatusLedKind STATUS_LED_KIND = StatusLedKind::Digital;
 constexpr uint8_t STATUS_LED_PIN = PIN_LED;
-#elif defined(PIN_NEOPIXEL)
-constexpr StatusLedKind STATUS_LED_KIND = StatusLedKind::NeoPixel;
-constexpr uint8_t STATUS_LED_PIN = PIN_NEOPIXEL;
 #else
 constexpr StatusLedKind STATUS_LED_KIND = StatusLedKind::None;
 constexpr uint8_t STATUS_LED_PIN = 255;
 #endif
 
-constexpr uint8_t STATUS_LED_BRIGHTNESS = 16;
+constexpr uint8_t STATUS_LED_BRIGHTNESS = 255;
 
 constexpr uint16_t DEBOUNCE_US = 5000;
-constexpr uint16_t STATUS_HEARTBEAT_MS = 1000;
+constexpr uint16_t STATUS_HEARTBEAT_MS = 80;
 
 }  // namespace Config

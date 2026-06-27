@@ -8,7 +8,24 @@ namespace {
 
 uint32_t lastToggleMs = 0;
 bool heartbeatState = false;
+uint8_t colorWheelPosition = 0;
 Adafruit_NeoPixel statusPixel(1, Config::STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
+
+uint32_t colorWheel(uint8_t position) {
+  position = 255 - position;
+
+  if (position < 85) {
+    return statusPixel.Color(255 - position * 3, 0, position * 3);
+  }
+
+  if (position < 170) {
+    position -= 85;
+    return statusPixel.Color(0, position * 3, 255 - position * 3);
+  }
+
+  position -= 170;
+  return statusPixel.Color(position * 3, 255 - position * 3, 0);
+}
 
 }  // namespace
 
@@ -27,7 +44,7 @@ void setStatusLed(bool on) {
   if (Config::STATUS_LED_KIND == Config::StatusLedKind::Digital) {
     digitalWrite(Config::STATUS_LED_PIN, on ? HIGH : LOW);
   } else if (Config::STATUS_LED_KIND == Config::StatusLedKind::NeoPixel) {
-    statusPixel.setPixelColor(0, on ? statusPixel.Color(0, 0, 24) : 0);
+    statusPixel.setPixelColor(0, on ? colorWheel(colorWheelPosition) : 0);
     statusPixel.show();
   }
 }
@@ -46,5 +63,8 @@ void updateStatusHeartbeat(bool mounted) {
 
   lastToggleMs = now;
   heartbeatState = !heartbeatState;
+  if (heartbeatState) {
+    colorWheelPosition += 19;
+  }
   setStatusLed(heartbeatState);
 }

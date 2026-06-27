@@ -10,7 +10,7 @@ Arduinoスケッチ本体は `cyborg_mini_8key/` にあります。
 - ロータリーエンコーダは搭載しない
 - エンコーダ処理は将来拡張用として旧ファームウェアを参照する
 - 外付けRGB LED / OLED は使わない
-- 表示は本体LEDのみ
+- 表示は本体LEDのみ。USB接続中は高輝度の高速点滅で状態を示す
 - 設定通信はSerialではなくUSB HID / WebHID用reportへ置き換える
 - WebHIDからUF2ブートローダへ入る更新用reportを持つ
 
