@@ -132,8 +132,8 @@ select {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  height: clamp(252px, 20vw, 264px);
-  padding: 10px 12px 10px;
+  height: clamp(408px, 34vw, 420px);
+  padding: 10px 12px;
 }
 
 .editor-panel {
@@ -213,10 +213,20 @@ select {
   flex-wrap: wrap;
 }
 
+.remap-panel .remap-strip:first-child,
 .remap-panel .remap-strip:last-child {
-  flex: 1;
+  flex: 0 0 200px;
+  align-items: flex-start;
+}
+
+.remap-panel .remap-strip:last-child {
   align-items: flex-start;
   margin-bottom: 0;
+}
+
+.remap-panel .remap-strip:first-child .layer-tabs,
+.remap-panel .remap-strip:last-child .key-grid {
+  align-self: stretch;
 }
 
 .panel-heading h2 {
@@ -253,6 +263,7 @@ select {
   grid-template-columns: repeat(8, minmax(0, 1fr));
   align-self: stretch;
   align-content: start;
+  width: 100%;
 }
 
 .key-tile {
@@ -634,6 +645,11 @@ select {
 
   .remap-panel {
     height: auto;
+  }
+
+  .remap-panel .remap-strip:first-child,
+  .remap-panel .remap-strip:last-child {
+    flex: 0 0 auto;
   }
 
   .editor-panel {
