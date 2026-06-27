@@ -4,6 +4,10 @@ export type HidInputReportEvent = Event & {
   readonly data: DataView;
 };
 
+export type HidConnectionEvent = Event & {
+  readonly device: HidDevice;
+};
+
 export type HidDevice = EventTarget & {
   readonly opened: boolean;
   readonly productName: string;
@@ -34,6 +38,14 @@ export type HidApi = {
     }>;
   }): Promise<HidDevice[]>;
   getDevices(): Promise<HidDevice[]>;
+  addEventListener(
+    type: "disconnect",
+    listener: (event: HidConnectionEvent) => void,
+  ): void;
+  removeEventListener(
+    type: "disconnect",
+    listener: (event: HidConnectionEvent) => void,
+  ): void;
 };
 
 export type HidNavigator = Navigator & {

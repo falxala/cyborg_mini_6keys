@@ -1,4 +1,4 @@
-import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
+import type { HidConnectionEvent, HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
 import { CYBORG_MINI_USB } from "./usbIdentity";
 import { t } from "../../shared/i18n";
@@ -47,6 +47,7 @@ export class WebHidTransport {
     if (this.device?.opened) {
       await this.device.close();
     }
+    this.device = null;
   }
 
   async requestConfigReport(report: Uint8Array, timeoutMs = 1000) {
@@ -107,6 +108,24 @@ export class WebHidTransport {
 
     return () => {
       device.removeEventListener("inputreport", inputListener);
+    };
+  }
+
+  addDisconnectListener(listener: () => void) {
+    const hid = this.getHidApi();
+    const disconnectListener = (event: HidConnectionEvent) => {
+      if (event.device !== this.device) {
+        return;
+      }
+
+      this.device = null;
+      listener();
+    };
+
+    hid.addEventListener("disconnect", disconnectListener);
+
+    return () => {
+      hid.removeEventListener("disconnect", disconnectListener);
     };
   }
 

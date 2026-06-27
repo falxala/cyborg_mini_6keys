@@ -154,6 +154,13 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
   }, [connected, transport]);
 
   useEffect(() => {
+    return transport.addDisconnectListener(() => {
+      setDeviceState(null);
+      setStatus(t.connection.initialStatus);
+    });
+  }, [transport]);
+
+  useEffect(() => {
     if (!connected || deviceLayerCount === 0 || deviceKeyCount === 0) {
       return;
     }
@@ -506,6 +513,14 @@ export function DiagnosticsApp() {
       window.clearInterval(interval);
     };
   }, [connected, transport]);
+
+  useEffect(() => {
+    return transport.addDisconnectListener(() => {
+      setDeviceState(null);
+      setLastKey(null);
+      setStatus(t.connection.initialStatus);
+    });
+  }, [transport]);
 
   useEffect(() => {
     if (!connected || !deviceState) {
