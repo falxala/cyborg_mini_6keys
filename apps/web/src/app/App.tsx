@@ -165,6 +165,7 @@ export function App() {
       return "picker-spacer";
     }
 
+    const accent = option.accent ? " layout-accent" : "";
     const active =
       (option.kind === "blank" && draftAssignment.kind === "none") ||
       (option.kind === "key" &&
@@ -174,7 +175,7 @@ export function App() {
         draftAssignment.kind === "keyboard" &&
         (draftAssignment.modifier & option.modifier) !== 0);
 
-    return active ? "picker-key active" : "picker-key";
+    return active ? `picker-key active${accent}` : `picker-key${accent}`;
   }
 
   function renderPickerOption(option: KeyPickerOption, key: string) {
@@ -365,7 +366,7 @@ export function App() {
             </div>
           </div>
 
-          <div className="keyboard-picker">
+          <div className={`keyboard-picker ${keyboardLayout}`}>
             <div className="keyboard-main">
               {keyboardRows.map((row, rowIndex) => (
                 <div key={rowIndex} className="picker-row">
@@ -376,45 +377,53 @@ export function App() {
               ))}
             </div>
 
-            <div className="keyboard-side">
-              <div className="keyboard-cluster">
-                {navigationRows.map((row, rowIndex) => (
-                  <div key={rowIndex} className="picker-row compact">
-                    {row.map((option, optionIndex) =>
-                      renderPickerOption(option, `nav-${rowIndex}-${optionIndex}`),
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="keyboard-cluster">
-                {numpadRows.map((row, rowIndex) => (
-                  <div key={rowIndex} className="picker-row compact">
-                    {row.map((option, optionIndex) =>
-                      renderPickerOption(option, `num-${rowIndex}-${optionIndex}`),
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="consumer-grid">
-                {consumerOptions.map((option) => (
-                  <button
-                    key={option.usage}
-                    type="button"
-                    className={
-                      draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
-                        ? "picker-key active"
-                        : "picker-key"
-                    }
-                    onClick={() => applyConsumerOption(option)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-                {renderPickerOption(blankOption, "blank")}
+            <div className="keyboard-indicator" aria-hidden="true">
+              <span>No others needed...</span>
+              <strong>CYBORG</strong>
+              <div>
+                <i />
+                <i />
+                <i />
               </div>
             </div>
+
+            <div className="keyboard-cluster navigation-cluster">
+              {navigationRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="picker-row compact">
+                  {row.map((option, optionIndex) =>
+                    renderPickerOption(option, `nav-${rowIndex}-${optionIndex}`),
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="keyboard-cluster numpad-cluster">
+              {numpadRows.map((row, rowIndex) => (
+                <div key={rowIndex} className="picker-row compact">
+                  {row.map((option, optionIndex) =>
+                    renderPickerOption(option, `num-${rowIndex}-${optionIndex}`),
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="consumer-strip">
+            {consumerOptions.map((option) => (
+              <button
+                key={option.usage}
+                type="button"
+                className={
+                  draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
+                    ? "picker-key active"
+                    : "picker-key"
+                }
+                onClick={() => applyConsumerOption(option)}
+              >
+                {option.label}
+              </button>
+            ))}
+            {renderPickerOption(blankOption, "blank")}
           </div>
         </section>
       </section>

@@ -6,6 +6,7 @@ export type KeyboardKeyOption = {
   label: string;
   jisLabel?: string;
   usLabel?: string;
+  accent?: boolean;
   width?: number;
 };
 
@@ -13,12 +14,14 @@ export type ModifierKeyOption = {
   kind: "modifier";
   modifier: number;
   label: string;
+  accent?: boolean;
   width?: number;
 };
 
 export type BlankKeyOption = {
   kind: "blank";
   label: string;
+  accent?: boolean;
   width?: number;
 };
 
@@ -58,21 +61,21 @@ export const keyboardRows: KeyPickerOption[][] = [
     key(69, "F12"),
   ],
   [
-    key(53, "`", { jisLabel: "半角/", usLabel: "`" }),
-    key(30, "1"),
-    key(31, "2"),
-    key(32, "3"),
-    key(33, "4"),
-    key(34, "5"),
-    key(35, "6"),
-    key(36, "7"),
-    key(37, "8"),
-    key(38, "9"),
-    key(39, "0"),
-    key(45, "-"),
-    key(46, "=", { jisLabel: "^", usLabel: "=" }),
-    key(137, "Yen", { jisLabel: "Yen", usLabel: "Yen" }),
-    key(42, "Back", { width: 1.5 }),
+    key(53, "E/J", { jisLabel: "E/J", usLabel: "~", accent: true }),
+    key(30, "1!"),
+    key(31, "2", { jisLabel: '2"', usLabel: "2@", accent: true }),
+    key(32, "3#"),
+    key(33, "4$"),
+    key(34, "5%"),
+    key(35, "6", { jisLabel: "6&", usLabel: "6^", accent: true }),
+    key(36, "7", { jisLabel: "7'", usLabel: "7&", accent: true }),
+    key(37, "8", { jisLabel: "8(", usLabel: "8*", accent: true }),
+    key(38, "9", { jisLabel: "9)", usLabel: "9(", accent: true }),
+    key(39, "0", { jisLabel: "0", usLabel: "0)", accent: true }),
+    key(45, "-", { jisLabel: "-=", usLabel: "-_", accent: true }),
+    key(46, "=", { jisLabel: "^~", usLabel: "=+", accent: true }),
+    key(137, "Yen", { jisLabel: "Yen|", usLabel: "Yen|", accent: true }),
+    key(42, "Back", { usLabel: "←", width: 1.5, accent: true }),
   ],
   [
     key(43, "Tab", { width: 1.5 }),
@@ -86,9 +89,9 @@ export const keyboardRows: KeyPickerOption[][] = [
     key(12, "I"),
     key(18, "O"),
     key(19, "P"),
-    key(47, "[", { jisLabel: "@", usLabel: "[" }),
-    key(48, "]", { jisLabel: "[", usLabel: "]" }),
-    key(40, "Enter", { width: 1.75 }),
+    key(47, "[", { jisLabel: "@`", usLabel: "[{", accent: true }),
+    key(48, "]", { jisLabel: "[{", usLabel: "]}", accent: true }),
+    key(40, "Enter", { width: 1.75, accent: true }),
   ],
   [
     key(57, "Caps", { width: 1.75 }),
@@ -101,9 +104,9 @@ export const keyboardRows: KeyPickerOption[][] = [
     key(13, "J"),
     key(14, "K"),
     key(15, "L"),
-    key(51, ";"),
-    key(52, ":", { jisLabel: ":", usLabel: "'" }),
-    key(50, "]", { jisLabel: "]", usLabel: "\\" }),
+    key(51, ";+"),
+    key(52, ":", { jisLabel: ":*", usLabel: "'\"", accent: true }),
+    key(50, "]", { jisLabel: "]}", usLabel: "\\|", accent: true }),
   ],
   [
     mod(0x02, "Shift", 2.25),
@@ -116,19 +119,19 @@ export const keyboardRows: KeyPickerOption[][] = [
     key(16, "M"),
     key(54, ","),
     key(55, "."),
-    key(56, "/"),
-    key(135, "_", { jisLabel: "_", usLabel: "_" }),
-    mod(0x20, "Shift", 2.25),
+    key(56, "/?"),
+    key(135, "_", { jisLabel: "\\_", usLabel: "\\_", accent: true }),
+    mod(0x20, "Shift", 2.25, true),
   ],
   [
     mod(0x01, "Ctrl", 1.25),
     mod(0x08, "Meta", 1.25),
     mod(0x04, "Alt", 1.25),
-    key(139, "無変換", { jisLabel: "無変換", width: 1.25 }),
-    key(44, "Space", { width: 5 }),
-    key(138, "変換", { jisLabel: "変換", width: 1.25 }),
-    key(136, "カナ", { jisLabel: "カナ", width: 1.25 }),
-    mod(0x40, "Alt", 1.25),
+    key(139, "無変換", { jisLabel: "無変換", width: 1.25, accent: true }),
+    key(44, "Space", { width: 5, accent: true }),
+    key(138, "変換", { jisLabel: "変換", width: 1.25, accent: true }),
+    key(136, "Kana", { jisLabel: "Kana", width: 1.25, accent: true }),
+    mod(0x40, "Alt", 1.25, true),
     key(101, "Menu", { width: 1.25 }),
     mod(0x10, "Ctrl", 1.25),
   ],
@@ -164,6 +167,7 @@ export const consumerOptions: ConsumerKeyOption[] = [
 export const blankOption: BlankKeyOption = {
   kind: "blank",
   label: "Blank",
+  accent: true,
   width: 2,
 };
 
@@ -189,8 +193,8 @@ function key(
   return { kind: "key", code, label, ...options };
 }
 
-function mod(modifier: number, label: string, width = 1): ModifierKeyOption {
-  return { kind: "modifier", modifier, label, width };
+function mod(modifier: number, label: string, width = 1, accent = false): ModifierKeyOption {
+  return { kind: "modifier", modifier, label, width, accent };
 }
 
 function gap(width: number): SpacerOption {
