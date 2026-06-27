@@ -131,8 +131,8 @@ select {
   grid-row: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  height: clamp(408px, 34vw, 420px);
+  gap: 4px;
+  height: clamp(296px, 24vw, 304px);
   padding: 10px 12px;
 }
 
@@ -213,13 +213,13 @@ select {
   flex-wrap: wrap;
 }
 
-.remap-panel .remap-strip:first-child,
-.remap-panel .remap-strip:last-child {
-  flex: 0 0 200px;
-  align-items: flex-start;
+.remap-panel .remap-strip:first-child {
+  flex: 0 0 auto;
+  align-items: center;
 }
 
 .remap-panel .remap-strip:last-child {
+  flex: 1;
   align-items: flex-start;
   margin-bottom: 0;
 }
@@ -240,7 +240,7 @@ select {
 
 .layer-tabs button,
 .layout-tabs button {
-  height: 28px;
+  height: 26px;
   min-width: 32px;
   padding: 0 8px;
 }
@@ -259,7 +259,7 @@ select {
 
 .key-grid {
   display: grid;
-  gap: 4px;
+  gap: 3px;
   grid-template-columns: repeat(8, minmax(0, 1fr));
   align-self: stretch;
   align-content: start;
@@ -271,18 +271,18 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 42px;
-  padding: 5px 6px;
+  min-height: 36px;
+  padding: 4px 6px;
   text-align: left;
 }
 
 .key-tile span {
   color: #65707c;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .key-tile strong {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .key-tile.active {
@@ -645,11 +645,6 @@ select {
 
   .remap-panel {
     height: auto;
-  }
-
-  .remap-panel .remap-strip:first-child,
-  .remap-panel .remap-strip:last-child {
-    flex: 0 0 auto;
   }
 
   .editor-panel {
