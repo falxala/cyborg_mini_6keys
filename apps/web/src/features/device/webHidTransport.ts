@@ -1,6 +1,6 @@
 import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
-import { CYBORG_MINI_USB } from "./usbIdentity";
+import { CYBORG_MINI_USB, LEGACY_WAVESHARE_USB } from "./usbIdentity";
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -17,11 +17,17 @@ export class WebHidTransport {
           vendorId: CYBORG_MINI_USB.vendorId,
           productId: CYBORG_MINI_USB.productId,
         },
+        {
+          vendorId: LEGACY_WAVESHARE_USB.vendorId,
+          productId: LEGACY_WAVESHARE_USB.productId,
+        },
       ],
     });
 
     if (devices.length === 0) {
-      throw new Error("HIDデバイスが選択されませんでした");
+      throw new Error(
+        "Cyborg Mini が見つかりません。ファームウェア未更新の場合は UF2 を焼き直してください",
+      );
     }
 
     this.device = devices[0];

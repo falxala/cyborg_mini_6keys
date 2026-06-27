@@ -5,6 +5,11 @@ export const CYBORG_MINI_USB = {
   productName: "Cyborg Mini 8 Keys",
 } as const;
 
+export const LEGACY_WAVESHARE_USB = {
+  vendorId: 0x2e8a,
+  productId: 0x0003,
+} as const;
+
 export function formatUsbId(value: number) {
   return `0x${value.toString(16).padStart(4, "0").toUpperCase()}`;
 }
