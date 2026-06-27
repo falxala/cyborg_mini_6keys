@@ -1,0 +1,11 @@
+{
+  "name": "cyborg-mini-8key-remapper",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "pnpm --filter @cyborg-mini/web dev",
+    "build": "pnpm --filter @cyborg-mini/web build",
+    "preview": "pnpm --filter @cyborg-mini/web preview",
+    "typecheck": "pnpm --filter @cyborg-mini/web typecheck"
+  }
+}
