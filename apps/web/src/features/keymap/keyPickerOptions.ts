@@ -30,11 +30,19 @@ export type SpacerOption = {
   width: number;
 };
 
+export type DecorationOption = {
+  kind: "decoration";
+  decoration: "jis-enter-lower" | "numpad-enter-lower";
+  sourceCode: number;
+  width: number;
+};
+
 export type KeyPickerOption =
   | KeyboardKeyOption
   | ModifierKeyOption
   | BlankKeyOption
-  | SpacerOption;
+  | SpacerOption
+  | DecorationOption;
 
 export type ConsumerKeyOption = {
   usage: number;
@@ -107,6 +115,7 @@ export const keyboardRows: KeyPickerOption[][] = [
     key(51, ";+"),
     key(52, ":", { jisLabel: ":*", usLabel: "'\"", accent: true }),
     key(50, "]", { jisLabel: "]}", usLabel: "\\|", accent: true }),
+    decor("jis-enter-lower", 40, 1.5),
   ],
   [
     mod(0x02, "Shift", 2.25),
@@ -150,7 +159,7 @@ export const numpadRows: KeyPickerOption[][] = [
   [key(95, "7"), key(96, "8"), key(97, "9"), key(87, "+")],
   [key(92, "4"), key(93, "5"), key(94, "6"), gap(1)],
   [key(89, "1"), key(90, "2"), key(91, "3"), key(88, "Enter")],
-  [key(98, "0", { width: 2 }), key(99, "."), gap(1)],
+  [key(98, "0", { width: 2 }), key(99, "."), decor("numpad-enter-lower", 88, 1)],
 ];
 
 export const consumerOptions: ConsumerKeyOption[] = [
@@ -187,6 +196,10 @@ export function keyOptionLabel(option: KeyPickerOption, layout: KeyboardLayoutMo
     return "";
   }
 
+  if (option.kind === "decoration") {
+    return "";
+  }
+
   if (option.kind !== "key") {
     return option.label;
   }
@@ -210,4 +223,8 @@ function mod(modifier: number, label: string, width = 1, accent = false): Modifi
 
 function gap(width: number): SpacerOption {
   return { kind: "spacer", width };
+}
+
+function decor(decoration: DecorationOption["decoration"], sourceCode: number, width: number): DecorationOption {
+  return { kind: "decoration", decoration, sourceCode, width };
 }

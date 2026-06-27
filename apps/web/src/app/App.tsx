@@ -224,7 +224,7 @@ export function App() {
   }
 
   function applyPickerOption(option: KeyPickerOption) {
-    if (option.kind === "spacer") {
+    if (option.kind === "spacer" || option.kind === "decoration") {
       return;
     }
 

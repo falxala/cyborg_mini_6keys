@@ -14,6 +14,11 @@
   --key-unit: 46px;
 }
 
+.keyboard-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
 .consumer-board {
   display: block;
   max-width: 100%;
@@ -27,6 +32,7 @@
 }
 
 .keyboard-picker {
+  min-width: max-content;
   display: grid;
   gap: 14px;
   grid-template-columns: max-content max-content max-content;
@@ -38,7 +44,7 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.46),
     inset 0 -1px 0 rgba(120, 91, 54, 0.18);
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .keyboard-main,
@@ -83,25 +89,31 @@
 }
 
 .picker-key,
-.picker-spacer {
+.picker-spacer,
+.picker-decor {
   flex: 0 0 calc(var(--key-units, 1) * var(--key-unit));
   min-width: 0;
 }
 
 .picker-key {
+  --key-surface: rgba(255, 252, 247, 0.98);
+  --key-edge: rgba(78, 61, 38, 0.2);
+  --key-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -5px 0 rgba(169, 151, 125, 0.24),
+    0 1px 0 rgba(109, 86, 48, 0.14);
+  --key-text: #312b24;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: calc(var(--key-unit) * 0.98);
   padding: 0 8px;
-  border: 1px solid rgba(78, 61, 38, 0.2);
+  position: relative;
+  border: 1px solid var(--key-edge);
   border-radius: 8px;
-  background: rgba(255, 252, 247, 0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -5px 0 rgba(169, 151, 125, 0.24),
-    0 1px 0 rgba(109, 86, 48, 0.14);
-  color: #312b24;
+  background: var(--key-surface);
+  box-shadow: var(--key-shadow);
+  color: var(--key-text);
   font-size: var(--key-font-size);
   font-weight: 700;
   line-height: 1.1;
@@ -117,14 +129,91 @@
   color: var(--accent-strong);
 }
 
-.picker-key.active {
-  border-color: rgba(13, 122, 114, 0.4);
-  background: rgba(224, 242, 238, 0.98);
-  box-shadow:
+.picker-key.active,
+.picker-decor.active {
+  --key-surface: rgba(224, 242, 238, 0.98);
+  --key-edge: rgba(13, 122, 114, 0.4);
+  --key-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     inset 0 -5px 0 rgba(13, 122, 114, 0.2),
     0 1px 0 rgba(8, 84, 79, 0.16);
-  color: var(--accent-strong);
+  --key-text: var(--accent-strong);
+}
+
+.picker-decor {
+  height: calc(var(--key-unit) * 0.98);
+  pointer-events: none;
+}
+
+.picker-decor.jis-enter-lower {
+  visibility: hidden;
+}
+
+.picker-decor.numpad-enter-lower {
+  visibility: hidden;
+}
+
+.enter-key-svg {
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.enter-key-svg svg {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+}
+
+.enter-key-svg .shape-fill {
+  fill: var(--key-surface);
+}
+
+.enter-key-svg .shape-shadow {
+  fill: rgba(169, 151, 125, 0.24);
+}
+
+.enter-key-svg.active .shape-shadow {
+  fill: rgba(13, 122, 114, 0.2);
+}
+
+.enter-key-svg .shape-stroke {
+  fill: none;
+  stroke: var(--key-edge);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.enter-key-svg .shape-label {
+  fill: var(--key-text);
+  font-size: 12px;
+  font-weight: 700;
+  dominant-baseline: middle;
+}
+
+.enter-key-jis {
+  height: calc(var(--key-unit) * 0.98);
+}
+
+.enter-key-jis svg {
+  width: calc(var(--key-unit) * 1.75);
+  height: calc((var(--key-unit) * 2) + var(--key-gap));
+}
+
+.enter-key-numpad {
+  height: calc(var(--key-unit) * 0.98);
+}
+
+.enter-key-numpad svg {
+  width: var(--key-unit);
+  height: calc((var(--key-unit) * 2) + var(--key-gap));
 }
 
 .consumer-strip {
