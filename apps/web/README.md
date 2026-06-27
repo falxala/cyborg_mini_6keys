@@ -12,6 +12,20 @@ React + TypeScript + Vite で作り直す新しいWebHID版リマッパーです
 - WebHID接続候補は `0x239A:0xCAFE` のCyborg Mini 8 Keys のみを使う
 - UF2ファームウェア更新は WebHID のブートローダ移行と File System Access API の書き込みを使う
 
+## Pages
+
+Viteのmulti-page buildで以下を出力します。
+
+| Page | Source | Output |
+| --- | --- | --- |
+| Home | `src/main.tsx` | `index.html` |
+| Remapper | `src/pages/remapper.tsx` | `remapper.html` |
+| Diagnostics | `src/pages/diagnostics.tsx` | `diagnostics.html` |
+
+Homeは製品ページと入口です。RemapperとDiagnosticsは別HTMLとして直接開けます。
+
+Diagnosticsは販売前/出荷前チェック用です。WebHID接続後、物理キーを押すと `KeyEvent` で押下済みが記録されます。Remapper heartbeat中はファームウェア側で通常キー送信が止まるため、検査入力がPCへ流れません。
+
 ## 主なディレクトリ
 
 ```text
@@ -22,6 +36,7 @@ src/
 │   ├── firmware/
 │   ├── hardware/
 │   └── keymap/
+├── pages/
 └── shared/
 ```
 
