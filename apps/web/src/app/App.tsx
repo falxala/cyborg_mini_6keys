@@ -8,6 +8,7 @@ import {
   type DeviceState,
 } from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
+import { CYBORG_MINI_USB, formatUsbId } from "../features/device/usbIdentity";
 import {
   canInstallUf2FromBrowser,
   downloadFirmwareUf2,
@@ -284,6 +285,12 @@ export function App() {
             <div>
               <dt>Report keys</dt>
               <dd>{deviceState?.keyCount ?? "-"}</dd>
+            </div>
+            <div>
+              <dt>USB ID</dt>
+              <dd>
+                {formatUsbId(CYBORG_MINI_USB.vendorId)}:{formatUsbId(CYBORG_MINI_USB.productId)}
+              </dd>
             </div>
             <div>
               <dt>External RGB</dt>

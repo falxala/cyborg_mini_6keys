@@ -1,5 +1,6 @@
 import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
+import { CYBORG_MINI_USB } from "./usbIdentity";
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -10,7 +11,14 @@ export class WebHidTransport {
 
   async requestDevice() {
     const hid = this.getHidApi();
-    const devices = await hid.requestDevice({ filters: [] });
+    const devices = await hid.requestDevice({
+      filters: [
+        {
+          vendorId: CYBORG_MINI_USB.vendorId,
+          productId: CYBORG_MINI_USB.productId,
+        },
+      ],
+    });
 
     if (devices.length === 0) {
       throw new Error("HIDデバイスが選択されませんでした");

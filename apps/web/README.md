@@ -9,6 +9,7 @@ React + TypeScript + Vite で作り直す新しいWebHID版リマッパーです
 - 新ハードウェアの8キー構成を前提にする
 - Web Serial API は使わない
 - 固定長の設定用HID report仕様は `../../docs/hid-report.md` を参照する
+- WebHID接続候補は `0xCAFE:0xC608` のCyborg Miniだけに絞る
 - UF2ファームウェア更新は WebHID のブートローダ移行と File System Access API の書き込みを使う
 
 ## 主なディレクトリ

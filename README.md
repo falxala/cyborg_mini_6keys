@@ -92,6 +92,17 @@ pnpm firmware:web
 
 設定用HID report仕様は `docs/hid-report.md` にまとめています。
 
+USB identity は以下に固定します。WebHID の接続候補もこの VID/PID で絞り込みます。
+
+| Field | Value |
+| --- | --- |
+| Vendor ID | `0xCAFE` |
+| Product ID | `0xC608` |
+| Manufacturer | `Cyborg Project` |
+| Product | `Cyborg Mini 8 Keys` |
+
+この VID/PID は開発用です。配布や販売を行う場合は、正式に割り当てた VID/PID に差し替えます。ビルド時は `USB_VID`, `USB_PID`, `USB_MANUFACTURER`, `USB_PRODUCT` で上書きできます。
+
 `config.h` のピン番号は仮値です。実際のPCBピンが確定したら、`hardware/cyborg-mini-8key/pinout.md` と合わせて更新します。
 
 Arduino CLI はリポジトリ内 wrapper から使います。ローカルの core / library / cache は `.arduino/` 以下に閉じ、`.tools/bin/arduino-cli` の本体はコミットしません。
