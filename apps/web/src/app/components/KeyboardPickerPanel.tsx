@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { KeycapSvg } from "./KeycapSvg";
 import {
   blankOption,
   consumerOptions,
@@ -41,14 +42,6 @@ export function KeyboardPickerPanel({
     }
 
     const accent = option.accent ? " layout-accent" : "";
-    const specialShape =
-      option.kind === "key"
-        ? option.code === 40 && keyboardLayout === "jis"
-          ? " enter-key-svg enter-key-jis"
-          : option.code === 88
-            ? " enter-key-svg enter-key-numpad"
-            : ""
-        : "";
     const active =
       (option.kind === "blank" && draftAssignment.kind === "none") ||
       (option.kind === "key" &&
@@ -58,9 +51,19 @@ export function KeyboardPickerPanel({
         draftAssignment.kind === "keyboard" &&
         (draftAssignment.modifier & option.modifier) !== 0);
 
-    return active
-      ? `picker-key active${accent}${specialShape}`
-      : `picker-key${accent}${specialShape}`;
+    return active ? `picker-key active${accent}` : `picker-key${accent}`;
+  }
+
+  function keyShape(option: KeyPickerOption) {
+    if (option.kind === "key" && option.code === 40 && keyboardLayout === "jis") {
+      return "jis-enter" as const;
+    }
+
+    if (option.kind === "key" && option.code === 88) {
+      return "numpad-enter" as const;
+    }
+
+    return "regular" as const;
   }
 
   function renderPickerOption(option: KeyPickerOption, key: string) {
@@ -81,57 +84,7 @@ export function KeyboardPickerPanel({
 
     const className = pickerOptionClassName(option);
     const label = keyOptionLabel(option, keyboardLayout);
-
-    if (option.kind === "key" && option.code === 40 && keyboardLayout === "jis") {
-      return (
-        <button
-          key={key}
-          type="button"
-          className={className}
-          style={style}
-          onClick={() => onPickerOption(option)}
-        >
-          <svg viewBox="0 0 92 94" aria-hidden="true">
-            <path
-              className="shape-fill"
-              d="M1 1H91V93H49V45H1V1Z"
-            />
-            <path
-              className="shape-shadow"
-              d="M2 40H46V88H88V92H48V44H2V40Z"
-            />
-            <path
-              className="shape-stroke"
-              d="M1 1H91V93H49V45H1V1Z"
-            />
-            <text x="47" y="27" textAnchor="middle" className="shape-label">
-              {label}
-            </text>
-          </svg>
-        </button>
-      );
-    }
-
-    if (option.kind === "key" && option.code === 88) {
-      return (
-        <button
-          key={key}
-          type="button"
-          className={className}
-          style={style}
-          onClick={() => onPickerOption(option)}
-        >
-          <svg viewBox="0 0 44 94" aria-hidden="true">
-            <path className="shape-fill" d="M1 1H43V93H1V1Z" />
-            <path className="shape-shadow" d="M2 88H42V92H2V88Z" />
-            <path className="shape-stroke" d="M1 1H43V93H1V1Z" />
-            <text x="22" y="45" textAnchor="middle" className="shape-label">
-              {label}
-            </text>
-          </svg>
-        </button>
-      );
-    }
+    const shape = keyShape(option);
 
     return (
       <button
@@ -141,7 +94,7 @@ export function KeyboardPickerPanel({
         style={style}
         onClick={() => onPickerOption(option)}
       >
-        {label}
+        <KeycapSvg label={label} units={width} shape={shape} />
       </button>
     );
   }
@@ -184,7 +137,7 @@ export function KeyboardPickerPanel({
               }
               onClick={() => onConsumerOption(option)}
             >
-              {option.label}
+              <KeycapSvg label={option.label} units={2.16} />
             </button>
           ))}
           {renderPickerOption(blankOption, "blank")}
