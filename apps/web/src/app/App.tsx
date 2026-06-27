@@ -9,6 +9,7 @@ import {
   enterDeviceBootloader,
   getDeviceState,
   readDeviceKeymap,
+  runDiagnosticReportTest,
   sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
@@ -492,6 +493,8 @@ export function DiagnosticsApp() {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [status, setStatus] = useState<string>(t.connection.initialStatus);
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
+  const [reportTestStatus, setReportTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
+  const [reportTestDetail, setReportTestDetail] = useState("-");
   const [testedKeys, setTestedKeys] = useState<boolean[]>(() =>
     Array.from({ length: HARDWARE_CONFIG.keyCount }, () => false),
   );
@@ -502,6 +505,8 @@ export function DiagnosticsApp() {
   const disconnectDevice = useDeviceSession(transport, connected, () => {
     setDeviceState(null);
     setLastKey(null);
+    setReportTestStatus("idle");
+    setReportTestDetail("-");
     setStatus(t.connection.initialStatus);
   });
 
@@ -531,9 +536,29 @@ export function DiagnosticsApp() {
       setDeviceState(state);
       setTestedKeys(Array.from({ length: state.keyCount }, () => false));
       setLastKey(null);
+      await runReportTest();
       setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
+    }
+  }
+
+  async function runReportTest() {
+    if (!transport.connected) {
+      setReportTestStatus("failed");
+      setReportTestDetail(t.connection.deviceNotConnected);
+      return;
+    }
+
+    try {
+      setReportTestStatus("running");
+      setReportTestDetail(t.diagnostics.reportTesting);
+      const result = await runDiagnosticReportTest(transport);
+      setReportTestStatus("passed");
+      setReportTestDetail(t.diagnostics.reportTestPassed(result.signature, result.version));
+    } catch (error) {
+      setReportTestStatus("failed");
+      setReportTestDetail(error instanceof Error ? error.message : t.diagnostics.reportTestFailed);
     }
   }
 
@@ -584,6 +609,9 @@ export function DiagnosticsApp() {
             <button type="button" className="ghost-button" onClick={resetDiagnostics}>
               {t.diagnostics.reset}
             </button>
+            <button type="button" className="ghost-button" onClick={() => void runReportTest()} disabled={!connected}>
+              {t.diagnostics.runReportTest}
+            </button>
           </div>
 
           <div className="diagnostics-summary">
@@ -622,6 +650,14 @@ export function DiagnosticsApp() {
             <div>
               <dt>{t.diagnostics.keyEvent}</dt>
               <dd>{testedCount > 0 ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportSend}</dt>
+              <dd>{reportTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.reportDetail}</dt>
+              <dd>{reportTestDetail}</dd>
             </div>
             <div>
               <dt>{t.diagnostics.reportKeys}</dt>

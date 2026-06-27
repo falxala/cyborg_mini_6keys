@@ -28,6 +28,13 @@ export type DeviceKeyEvent = {
   pressed: boolean;
 };
 
+export type DiagnosticReportResult = {
+  signature: string;
+  version: number;
+};
+
+const DIAGNOSTIC_REPORT_NONCE = [0x43, 0x59, 0x42, 0x38] as const;
+
 export async function getDeviceState(transport: WebHidTransport): Promise<DeviceState> {
   const response = await sendCommand(transport, ConfigCommand.GetState);
   assertConfigOk(response);
@@ -105,6 +112,23 @@ export async function enterDeviceBootloader(transport: WebHidTransport) {
 
 export async function sendRemapperHeartbeat(transport: WebHidTransport) {
   await transport.sendConfigReport(createConfigReport(ConfigCommand.RemapperHeartbeat));
+}
+
+export async function runDiagnosticReportTest(transport: WebHidTransport): Promise<DiagnosticReportResult> {
+  const response = await sendCommand(transport, ConfigCommand.DiagnosticReport, DIAGNOSTIC_REPORT_NONCE);
+  assertConfigOk(response);
+
+  const expected = [0x52, 0x50, 0x54, 0x01, ...DIAGNOSTIC_REPORT_NONCE];
+  for (let i = 0; i < expected.length; i++) {
+    if (response.payload[i] !== expected[i]) {
+      throw new Error(t.device.invalidDiagnosticReport);
+    }
+  }
+
+  return {
+    signature: "RPT",
+    version: response.payload[3] ?? 0,
+  };
 }
 
 export function subscribeDeviceKeyEvents(

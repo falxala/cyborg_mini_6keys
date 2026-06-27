@@ -171,6 +171,20 @@ void handleRemapperHeartbeat() {
   lastRemapperHeartbeatMs = millis();
 }
 
+void handleDiagnosticReport(const uint8_t* buffer, uint16_t size) {
+  if (size < 5) {
+    sendConfigResponse(ConfigCommand::DiagnosticReport, ConfigStatus::InvalidLength, nullptr, 0);
+    return;
+  }
+
+  const uint8_t payload[] = {
+    0x52, 0x50, 0x54, 0x01,
+    buffer[1], buffer[2], buffer[3], buffer[4],
+  };
+
+  sendConfigResponse(ConfigCommand::DiagnosticReport, ConfigStatus::Ok, payload, sizeof(payload));
+}
+
 void sendKeyEvent(uint8_t layer, uint8_t keyIndex, bool pressed) {
   if (!remapperConnected()) {
     return;
@@ -217,6 +231,9 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       break;
     case ConfigCommand::KeyEvent:
       sendConfigResponse(command, ConfigStatus::Unsupported, nullptr, 0);
+      break;
+    case ConfigCommand::DiagnosticReport:
+      handleDiagnosticReport(buffer, size);
       break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);

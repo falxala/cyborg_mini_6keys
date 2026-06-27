@@ -53,8 +53,11 @@ byte 3..31  response payload
 | `0x05` | `EnterBootloader` | none | none, then reboot to UF2 bootloader |
 | `0x06` | `RemapperHeartbeat` | none | none |
 | `0x07` | `KeyEvent` | not supported | `layer, keyIndex, pressed` |
+| `0x08` | `DiagnosticReport` | `0x43, 0x59, 0x42, 0x38` | `0x52, 0x50, 0x54, version, echoed request bytes[4]` |
 
 `KeyEvent` is an asynchronous device-to-Web input report. The firmware emits it when a physical key is pressed while the remapper heartbeat is active, so the UI can select the matching key tile.
+
+`DiagnosticReport` is a synchronous send/receive self-test for Diagnostics. The Web UI sends a fixed nonce and verifies that the firmware returns the `RPT` signature plus the same nonce.
 
 ## Key Assignment Payload
 
