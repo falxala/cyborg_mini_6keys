@@ -8,6 +8,7 @@ import {
 import {
   assertConfigOk,
   ConfigCommand,
+  ConfigStatus,
   createConfigReport,
   decodeConfigResponse,
   type ConfigResponse,
@@ -116,6 +117,10 @@ export async function sendRemapperHeartbeat(transport: WebHidTransport) {
 
 export async function runDiagnosticReportTest(transport: WebHidTransport): Promise<DiagnosticReportResult> {
   const response = await sendCommand(transport, ConfigCommand.DiagnosticReport, DIAGNOSTIC_REPORT_NONCE);
+  if (response.status === ConfigStatus.UnknownCommand || response.status === ConfigStatus.Unsupported) {
+    throw new Error(t.device.diagnosticReportUnsupported);
+  }
+
   assertConfigOk(response);
 
   const expected = [0x52, 0x50, 0x54, 0x01, ...DIAGNOSTIC_REPORT_NONCE];

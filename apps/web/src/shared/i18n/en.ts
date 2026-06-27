@@ -157,6 +157,7 @@ export const en: typeof ja = {
     timeout: "Timed out waiting for a HID response",
     unsupportedWebHid: "This browser does not support WebHID",
     disconnected: "No HID device is connected",
+    diagnosticReportUnsupported: "This firmware does not support the diagnostic report. Flash the latest UF2.",
     invalidDiagnosticReport: "Diagnostic report payload did not match",
     unexpectedResponse: (actual, expected) => `Unexpected HID response command ${actual}; expected ${expected}`,
   },

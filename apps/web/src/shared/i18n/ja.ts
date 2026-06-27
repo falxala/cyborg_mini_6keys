@@ -156,6 +156,7 @@ export const ja = {
     timeout: "HIDデバイスからの応答がタイムアウトしました",
     unsupportedWebHid: "このブラウザはWebHIDに対応していません",
     disconnected: "HIDデバイスが接続されていません",
+    diagnosticReportUnsupported: "診断レポート未対応のファームウェアです。最新UF2を書き込んでください",
     invalidDiagnosticReport: "診断レポートの内容が一致しません",
     unexpectedResponse: (actual: number, expected: number) =>
       `Unexpected HID response command ${actual}; expected ${expected}`,
