@@ -51,16 +51,18 @@ byte 3..31  response payload
 | `0x03` | `GetKey` | `layer, keyIndex` | key assignment payload |
 | `0x04` | `SetKey` | key assignment payload | `layer, keyIndex` |
 | `0x05` | `EnterBootloader` | none | none, then reboot to UF2 bootloader |
-| `0x06` | `RemapperHeartbeat` | none | none |
+| `0x06` | `RemapperHeartbeat` | none | no response |
 | `0x07` | `KeyEvent` | not supported | `layer, keyIndex, pressed` |
 | `0x08` | `DiagnosticReport` | `0x43, 0x59, 0x42, 0x38` | `0x52, 0x50, 0x54, version, echoed request bytes[4]` |
 | `0x09` | `DiagnosticStorage` | none | `ok, layerCount, keyCount` |
 
 `KeyEvent` is an asynchronous device-to-Web input report. The firmware emits it when a physical key is pressed while the remapper heartbeat is active, so the UI can select the matching key tile.
 
+`RemapperHeartbeat` is sent periodically by Remapper and Diagnostics. While the heartbeat is active, normal keyboard / consumer output is suppressed by firmware.
+
 `DiagnosticReport` is a synchronous send/receive self-test for Diagnostics. The Web UI sends a fixed nonce and verifies that the firmware returns the `RPT` signature plus the same nonce.
 
-`DiagnosticStorage` writes a test pattern across the keymap storage area, reads it back, verifies it, and restores the original keymap. It is intended for production inspection of the same flash-backed storage used by normal remapping.
+`DiagnosticStorage` writes a test pattern across the keymap storage area, reads it back, verifies it, and restores the original keymap. It is intended for production inspection of the same flash-backed storage used by normal remapping. Run it only when needed because it writes the external SPI Flash through EEPROM emulation.
 
 ## Key Assignment Payload
 

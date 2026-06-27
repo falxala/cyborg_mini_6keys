@@ -1,16 +1,18 @@
-# Web Remapper
+# Web App
 
-React + TypeScript + Vite で作り直す新しいWebHID版リマッパーです。
+React + TypeScript + Vite のWebHID版ツールです。
 
-## 方針
+## Scope
 
-- 既存の静的HTML/JavaScriptは `legacy/web/` を参照する
-- UI、状態管理、WebHID通信、キー定義、表示名変換を分離する
-- 新ハードウェアの8キー構成を前提にする
-- Web Serial API は使わない
-- 固定長の設定用HID report仕様は `../../docs/hid-report.md` を参照する
-- WebHID接続候補は `0x239A:0xCAFE` のCyborg Mini 8 Keys のみを使う
-- UF2ファームウェア更新は WebHID のブートローダ移行と File System Access API の書き込みを使う
+- Home product page
+- Remapper
+- Diagnostics
+- Firmware updater / bundled UF2 download
+- Japanese default text with language files in `src/shared/i18n/`
+
+Web Serial APIは使いません。固定長HID report仕様は `../../docs/hid-report.md` を参照します。
+
+WebHID接続候補は `src/features/device/usbIdentity.ts` で管理します。
 
 ## Pages
 
@@ -24,7 +26,36 @@ Viteのmulti-page buildで以下を出力します。
 
 Homeは製品ページと入口です。RemapperとDiagnosticsは別HTMLとして直接開けます。
 
-Diagnosticsは販売前/出荷前チェック用です。WebHID接続後、物理キーを押すと `KeyEvent` で押下済みが記録されます。Remapper heartbeat中はファームウェア側で通常キー送信が止まるため、検査入力がPCへ流れません。
+## Remapper
+
+Remapperは接続時またはReadボタン押下時だけデバイス内容を読みます。編集後は「書き込む内容」として保持し、Save時に現在の選択キーだけを書き込みます。同一内容の場合は書き込みをスキップします。
+
+接続中はDisconnectボタンでHID接続を閉じます。物理切断イベントも検知してUI状態を未接続へ戻します。
+
+## Diagnostics
+
+Diagnosticsは販売前/出荷前チェック用です。
+
+- WebHID availability
+- Device connection
+- Key press event
+- Diagnostic report send/receive
+- Storage write/read/restore
+- Report key count
+
+WebHID接続後、物理キーを押すと `KeyEvent` で押下済みが記録されます。Remapper heartbeat中はファームウェア側で通常キー送信が止まるため、検査入力はPCへ流れません。
+
+Storage testは実際のFlash-backed keymap保存領域へ書き込みます。出荷検査など必要な時だけ実行してください。
+
+## Firmware Updater
+
+Updaterは以下を提供します。
+
+- WebHID経由でBOOTSELへ移行
+- Bundled UF2のダウンロード
+- File System Access API対応ブラウザでBOOTSEL driveへUF2書き込み
+
+直接書き込みできないブラウザではUF2をダウンロードして、OS上でBOOTSEL driveへコピーします。
 
 ## 主なディレクトリ
 
@@ -51,3 +82,5 @@ pnpm typecheck
 pnpm build
 pnpm firmware:web
 ```
+
+`pnpm firmware:web` は `apps/web/public/firmware/cyborg-mini-8key.uf2` を更新します。

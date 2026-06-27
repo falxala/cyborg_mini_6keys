@@ -21,7 +21,7 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 
 ## Before Flashing
 
-`config.h` のピン番号は仮値です。実際のPCBピンに合わせて以下を更新します。
+`config.h` のピン番号は現行8キー版の配線に合わせています。ハードウェアを変更する場合は、以下と `hardware/cyborg-mini-8key/pinout.md` を同時に更新します。
 
 - `KEY_PINS`
 - `VIRTUAL_GROUND_PINS`
@@ -58,8 +58,6 @@ scripts/arduino-cli.sh compile \
 
 ## Current Scope
 
-このスケッチは新ハードウェア対応の土台です。
-
 - 通常HID keyboard / consumer output
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
@@ -67,6 +65,8 @@ scripts/arduino-cli.sh compile \
 - Key 5 起動時だけ表示する Read-only README drive with `README.TXT` and `REMAPPER.URL`
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 - 通常時のみ押下を低遅延化し、Remapper接続中は通常キー送信を抑止
+- USB suspendからのremote wakeup後にキー状態を再送
+- Diagnostics用のreport送受信検査とkeymap storage write/read/restore検査
 
 ## README Drive
 
@@ -94,4 +94,4 @@ Webの `diagnostics.html` は販売前/出荷前チェック用です。
 
 Diagnostics接続中は Remapper heartbeat が有効になり、通常のkeyboard / consumer outputは止まります。検査中のキー押下はPC入力として送信されず、Web UIの押下チェックだけに使われます。
 
-実機フラッシュとWebHID経由の実機通信確認は次工程です。
+Storage testは実際のFlash-backed keymap保存領域へ書き込みます。出荷検査など必要な時だけ実行してください。テスト後は元のキーマップを復元して保存します。

@@ -1,6 +1,6 @@
 # Cyborg Mini 8-Key Hardware
 
-新ハードウェア資料の置き場です。
+現行8キー版ハードウェア資料です。
 
 ## 前提
 
@@ -9,9 +9,10 @@
 - 仮想GND用GPIOはファームウェア側で `OUTPUT LOW`
 - 外付けRGB LED / OLED は廃止
 - LED表示は本体LEDのみ
+- Key 5を押しながらUSB接続すると、README driveをその起動だけ表示
 
 ## Documents
 
-- `pinout.md`: ピン割り当てドラフト
+- `pinout.md`: 現行ピン割り当て
 
 旧6キー版のケース、PCB、ボトムプレート資料は `legacy/hardware/cyborg-mini-6key/` にあります。
