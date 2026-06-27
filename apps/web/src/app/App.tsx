@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorPanel } from "./components/EditorPanel";
 import { FirmwarePanel } from "./components/FirmwarePanel";
 import { HardwarePanel } from "./components/HardwarePanel";
@@ -42,6 +42,49 @@ import { t } from "../shared/i18n";
 const homeUrl = `${import.meta.env.BASE_URL}`;
 const remapperUrl = `${import.meta.env.BASE_URL}remapper.html`;
 const diagnosticsUrl = `${import.meta.env.BASE_URL}diagnostics.html`;
+
+function useDeviceSession(transport: WebHidTransport, connected: boolean, onDisconnected: () => void) {
+  const onDisconnectedRef = useRef(onDisconnected);
+
+  useEffect(() => {
+    onDisconnectedRef.current = onDisconnected;
+  });
+
+  useEffect(() => {
+    if (!connected) {
+      return;
+    }
+
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        await sendRemapperHeartbeat(transport);
+      } catch {
+        if (!cancelled) {
+          window.clearInterval(interval);
+        }
+      }
+    };
+    const interval = window.setInterval(() => void ping(), 1000);
+    void ping();
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [connected, transport]);
+
+  useEffect(() => {
+    return transport.addDisconnectListener(() => {
+      onDisconnectedRef.current();
+    });
+  }, [transport]);
+
+  return async () => {
+    await transport.close().catch(() => undefined);
+    onDisconnectedRef.current();
+  };
+}
 
 export function App() {
   return <HomePage />;
@@ -121,6 +164,10 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
   const deviceLayerCount = deviceState?.layerCount ?? 0;
   const deviceKeyCount = deviceState?.keyCount ?? 0;
   const firmwareInstallSupported = canInstallUf2FromBrowser();
+  const disconnectDevice = useDeviceSession(transport, connected, () => {
+    setDeviceState(null);
+    setStatus(t.connection.initialStatus);
+  });
 
   useEffect(() => {
     setDraftAssignment(selectedAssignment);
@@ -128,37 +175,6 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
       createModifierSlotsFromMask(selectedAssignment.kind === "keyboard" ? selectedAssignment.modifier : 0),
     );
   }, [selectedAssignment]);
-
-  useEffect(() => {
-    if (!connected) {
-      return;
-    }
-
-    let cancelled = false;
-    const ping = async () => {
-      try {
-        await sendRemapperHeartbeat(transport);
-      } catch {
-        if (!cancelled) {
-          window.clearInterval(interval);
-        }
-      }
-    };
-    const interval = window.setInterval(() => void ping(), 1000);
-    void ping();
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, [connected, transport]);
-
-  useEffect(() => {
-    return transport.addDisconnectListener(() => {
-      setDeviceState(null);
-      setStatus(t.connection.initialStatus);
-    });
-  }, [transport]);
 
   useEffect(() => {
     if (!connected || deviceLayerCount === 0 || deviceKeyCount === 0) {
@@ -202,12 +218,6 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
     }
-  }
-
-  async function disconnectDevice() {
-    await transport.close().catch(() => undefined);
-    setDeviceState(null);
-    setStatus(t.connection.initialStatus);
   }
 
   async function selectLayer(layerIndex: number) {
@@ -489,38 +499,11 @@ export function DiagnosticsApp() {
   const connected = deviceState !== null && transport.connected;
   const testedCount = testedKeys.filter(Boolean).length;
   const allKeysPassed = testedCount === testedKeys.length;
-
-  useEffect(() => {
-    if (!connected) {
-      return;
-    }
-
-    let cancelled = false;
-    const ping = async () => {
-      try {
-        await sendRemapperHeartbeat(transport);
-      } catch {
-        if (!cancelled) {
-          window.clearInterval(interval);
-        }
-      }
-    };
-    const interval = window.setInterval(() => void ping(), 1000);
-    void ping();
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, [connected, transport]);
-
-  useEffect(() => {
-    return transport.addDisconnectListener(() => {
-      setDeviceState(null);
-      setLastKey(null);
-      setStatus(t.connection.initialStatus);
-    });
-  }, [transport]);
+  const disconnectDevice = useDeviceSession(transport, connected, () => {
+    setDeviceState(null);
+    setLastKey(null);
+    setStatus(t.connection.initialStatus);
+  });
 
   useEffect(() => {
     if (!connected || !deviceState) {
@@ -552,13 +535,6 @@ export function DiagnosticsApp() {
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
     }
-  }
-
-  async function disconnectDevice() {
-    await transport.close().catch(() => undefined);
-    setDeviceState(null);
-    setLastKey(null);
-    setStatus(t.connection.initialStatus);
   }
 
   function resetDiagnostics() {
