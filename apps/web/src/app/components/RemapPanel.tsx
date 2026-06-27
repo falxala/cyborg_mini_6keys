@@ -26,7 +26,7 @@ export function RemapPanel({
           <span className="panel-kicker">Keymap</span>
           <h2>Layers</h2>
         </div>
-        <div className="selection-pill">K{selectedKey + 1}</div>
+        <div className="selection-pill">Key {selectedKey + 1}</div>
       </div>
 
       <div className="remap-strip">
@@ -58,7 +58,7 @@ export function RemapPanel({
                 className={isSelected ? "key-tile active" : "key-tile"}
                 onClick={() => onSelectKey(keyIndex)}
               >
-                <span>K{keyIndex + 1}</span>
+                <span>Key {keyIndex + 1}</span>
                 <div className="key-tile-assignments">
                   <AssignmentPreview assignment={assignment} />
                 </div>

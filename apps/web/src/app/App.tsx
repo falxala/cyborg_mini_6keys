@@ -151,7 +151,7 @@ export function App() {
     const normalized = normalizeAssignment(draftAssignment);
 
     if (sameAssignment(readAssignment, normalized)) {
-      setStatus(`Layer ${activeLayer} K${selectedKey + 1} は変更なしのため書き込みをスキップしました`);
+      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} は変更なしのため書き込みをスキップしました`);
       return;
     }
 
@@ -159,7 +159,7 @@ export function App() {
       await setDeviceKey(transport, activeLayer, selectedKey, normalized);
       setReadKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
       setWriteKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
-      setStatus(`Layer ${activeLayer} K${selectedKey + 1} を保存しました`);
+      setStatus(`Layer ${activeLayer} Key ${selectedKey + 1} を保存しました`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "保存に失敗しました");
     }

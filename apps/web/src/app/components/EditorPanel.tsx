@@ -33,7 +33,7 @@ export function EditorPanel({
       <div className="panel-heading compact">
         <div className="panel-meta">
           <span className="panel-kicker">Assignment</span>
-          <h2>K{selectedKey + 1}</h2>
+          <h2>Key {selectedKey + 1}</h2>
         </div>
         <div className="editor-actions">
           <button type="button" onClick={onRead} disabled={!connected}>
