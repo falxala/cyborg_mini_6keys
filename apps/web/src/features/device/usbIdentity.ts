@@ -1,18 +1,8 @@
 export const CYBORG_MINI_USB = {
-  vendorId: 0xcafe,
-  productId: 0xc608,
-  manufacturerName: "Cyborg Project",
-  productName: "Cyborg Mini 8 Keys",
-} as const;
-
-export const LEGACY_WAVESHARE_USB = {
-  vendorId: 0x2e8a,
-  productId: 0x0003,
-} as const;
-
-export const CURRENT_ADAFRUIT_USB = {
   vendorId: 0x239a,
   productId: 0xcafe,
+  manufacturerName: "Cyborg Project",
+  productName: "Cyborg Mini 8 Keys",
 } as const;
 
 export function formatUsbId(value: number) {

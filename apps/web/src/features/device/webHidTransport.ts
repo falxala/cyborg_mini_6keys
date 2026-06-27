@@ -1,6 +1,6 @@
 import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
-import { CURRENT_ADAFRUIT_USB, CYBORG_MINI_USB, LEGACY_WAVESHARE_USB } from "./usbIdentity";
+import { CYBORG_MINI_USB } from "./usbIdentity";
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -11,24 +11,12 @@ export class WebHidTransport {
 
   async requestDevice() {
     const hid = this.getHidApi();
-    console.info("[hid] requesting device with filters", [
-      CYBORG_MINI_USB,
-      LEGACY_WAVESHARE_USB,
-      CURRENT_ADAFRUIT_USB,
-    ]);
+    console.info("[hid] requesting device with filters", [CYBORG_MINI_USB]);
     const devices = await hid.requestDevice({
       filters: [
         {
           vendorId: CYBORG_MINI_USB.vendorId,
           productId: CYBORG_MINI_USB.productId,
-        },
-        {
-          vendorId: LEGACY_WAVESHARE_USB.vendorId,
-          productId: LEGACY_WAVESHARE_USB.productId,
-        },
-        {
-          vendorId: CURRENT_ADAFRUIT_USB.vendorId,
-          productId: CURRENT_ADAFRUIT_USB.productId,
         },
       ],
     });
@@ -39,17 +27,9 @@ export class WebHidTransport {
       return this.device;
     }
 
-    const fallbackDevices = await hid.requestDevice({ filters: [] });
-
-    if (fallbackDevices.length === 0) {
-      throw new Error(
-        "Cyborg Mini が見つかりません。接続後にもう一度試すか、ファームウェアを書き込み直してください",
-      );
-    }
-
-    this.device = fallbackDevices[0];
-    this.logSelectedDevice(this.device);
-    return this.device;
+    throw new Error(
+      "Cyborg Mini が見つかりません。接続後にもう一度試すか、ファームウェアを書き込み直してください",
+    );
   }
 
   async open() {
