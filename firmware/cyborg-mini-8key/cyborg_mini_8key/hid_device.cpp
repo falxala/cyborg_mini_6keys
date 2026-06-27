@@ -40,6 +40,7 @@ uint8_t const descHidReport[] = {
 };
 
 Adafruit_USBD_HID usbHid(descHidReport, sizeof(descHidReport), HID_ITF_PROTOCOL_KEYBOARD, 2, false);
+uint32_t lastRemapperHeartbeatMs = 0;
 
 uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
@@ -171,6 +172,10 @@ void handleEnterBootloader() {
 #endif
 }
 
+void handleRemapperHeartbeat() {
+  lastRemapperHeartbeatMs = millis();
+}
+
 void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t const* buffer, uint16_t size) {
   if (reportId != RID_CONFIG || (reportType != HID_REPORT_TYPE_OUTPUT && reportType != HID_REPORT_TYPE_FEATURE)) {
     return;
@@ -197,6 +202,9 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       break;
     case ConfigCommand::EnterBootloader:
       handleEnterBootloader();
+      break;
+    case ConfigCommand::RemapperHeartbeat:
+      handleRemapperHeartbeat();
       break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);
@@ -236,6 +244,19 @@ void beginHidDevice() {
 
 bool hidDeviceMounted() {
   return TinyUSBDevice.mounted();
+}
+
+bool remapperConnected() {
+  if (lastRemapperHeartbeatMs == 0) {
+    return false;
+  }
+
+  if (millis() - lastRemapperHeartbeatMs > Config::REMAPPER_HEARTBEAT_TIMEOUT_MS) {
+    lastRemapperHeartbeatMs = 0;
+    return false;
+  }
+
+  return true;
 }
 
 void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {

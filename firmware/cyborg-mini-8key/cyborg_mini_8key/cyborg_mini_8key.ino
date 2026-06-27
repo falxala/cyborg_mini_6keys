@@ -15,5 +15,5 @@ void loop() {
     sendKeyChanges(previousKeyMask(), currentKeyMask(), activeLayer());
   }
 
-  updateStatusHeartbeat(hidDeviceMounted());
+  updateStatusHeartbeat(hidDeviceMounted(), remapperConnected());
 }

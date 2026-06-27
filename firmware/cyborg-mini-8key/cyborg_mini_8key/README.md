@@ -48,6 +48,6 @@ scripts/arduino-cli.sh compile \
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
-- 本体LEDのみの状態表示
+- 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 
 実機フラッシュとWebHID経由の実機通信確認は次工程です。

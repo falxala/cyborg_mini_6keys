@@ -88,7 +88,7 @@ pnpm firmware:web
 - `keymap.*`: 6レイヤー x 8キーのRAM上キーマップ
 - `keymap_storage.*`: EEPROMエミュレーション上の固定長キーマップ保存
 - `hid_device.*`: 通常HID keyboard / consumer出力とWebHID向けvendor-defined report
-- `status_led.*`: 本体LEDのみの状態表示
+- `status_led.*`: 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 
 設定用HID report仕様は `docs/hid-report.md` にまとめています。
 

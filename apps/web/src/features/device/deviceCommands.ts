@@ -96,6 +96,10 @@ export async function enterDeviceBootloader(transport: WebHidTransport) {
   await transport.sendConfigReport(createConfigReport(ConfigCommand.EnterBootloader));
 }
 
+export async function sendRemapperHeartbeat(transport: WebHidTransport) {
+  await transport.sendConfigReport(createConfigReport(ConfigCommand.RemapperHeartbeat));
+}
+
 async function sendCommand(
   transport: WebHidTransport,
   command: ConfigCommand,

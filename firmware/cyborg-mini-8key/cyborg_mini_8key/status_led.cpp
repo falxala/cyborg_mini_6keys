@@ -7,8 +7,8 @@
 namespace {
 
 uint32_t lastUpdateMs = 0;
-bool heartbeatState = false;
 uint8_t colorWheelPosition = 0;
+bool idleShown = false;
 Adafruit_NeoPixel statusPixel(1, Config::STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
 
 uint32_t colorWheel(uint8_t position) {
@@ -25,6 +25,22 @@ uint32_t colorWheel(uint8_t position) {
 
   position -= 170;
   return statusPixel.Color(position * 3, 255 - position * 3, 0);
+}
+
+void setKeyboardIdleLed() {
+  if (Config::STATUS_LED_KIND == Config::StatusLedKind::Digital) {
+    digitalWrite(Config::STATUS_LED_PIN, HIGH);
+  } else if (Config::STATUS_LED_KIND == Config::StatusLedKind::NeoPixel) {
+    statusPixel.setPixelColor(
+      0,
+      statusPixel.Color(
+        Config::STATUS_KEYBOARD_WHITE,
+        Config::STATUS_KEYBOARD_WHITE,
+        Config::STATUS_KEYBOARD_WHITE
+      )
+    );
+    statusPixel.show();
+  }
 }
 
 }  // namespace
@@ -49,14 +65,24 @@ void setStatusLed(bool on) {
   }
 }
 
-void updateStatusHeartbeat(bool mounted) {
+void updateStatusHeartbeat(bool mounted, bool remapperConnected) {
   if (!mounted) {
     setStatusLed(false);
-    heartbeatState = false;
+    lastUpdateMs = 0;
+    idleShown = false;
+    return;
+  }
+
+  if (!remapperConnected) {
+    if (!idleShown) {
+      setKeyboardIdleLed();
+      idleShown = true;
+    }
     lastUpdateMs = 0;
     return;
   }
 
+  idleShown = false;
   const uint32_t now = millis();
 
   if (Config::STATUS_LED_KIND == Config::StatusLedKind::NeoPixel) {
@@ -72,12 +98,6 @@ void updateStatusHeartbeat(bool mounted) {
   }
 
   if (Config::STATUS_LED_KIND == Config::StatusLedKind::Digital) {
-    if (lastUpdateMs != 0 && now - lastUpdateMs < Config::STATUS_DIGITAL_HEARTBEAT_MS) {
-      return;
-    }
-
-    lastUpdateMs = now;
-    heartbeatState = !heartbeatState;
-    setStatusLed(heartbeatState);
+    setStatusLed(true);
   }
 }

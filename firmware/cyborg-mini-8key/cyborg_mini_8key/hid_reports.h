@@ -22,6 +22,7 @@ enum class ConfigCommand : uint8_t {
   GetKey = 0x03,
   SetKey = 0x04,
   EnterBootloader = 0x05,
+  RemapperHeartbeat = 0x06,
 };
 
 enum class ConfigStatus : uint8_t {

@@ -8,6 +8,7 @@ export enum ConfigCommand {
   GetKey = 0x03,
   SetKey = 0x04,
   EnterBootloader = 0x05,
+  RemapperHeartbeat = 0x06,
 }
 
 export enum ConfigStatus {

@@ -4,4 +4,4 @@
 
 void beginStatusLed();
 void setStatusLed(bool on);
-void updateStatusHeartbeat(bool mounted);
+void updateStatusHeartbeat(bool mounted, bool remapperConnected);

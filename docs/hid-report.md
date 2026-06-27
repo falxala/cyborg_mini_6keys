@@ -51,6 +51,7 @@ byte 3..31  response payload
 | `0x03` | `GetKey` | `layer, keyIndex` | key assignment payload |
 | `0x04` | `SetKey` | key assignment payload | `layer, keyIndex` |
 | `0x05` | `EnterBootloader` | none | none, then reboot to UF2 bootloader |
+| `0x06` | `RemapperHeartbeat` | none | none |
 
 ## Key Assignment Payload
 

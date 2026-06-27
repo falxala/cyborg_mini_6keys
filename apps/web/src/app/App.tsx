@@ -3,6 +3,7 @@ import {
   enterDeviceBootloader,
   getDeviceState,
   readDeviceKeymap,
+  sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
   type DeviceState,
@@ -57,10 +58,35 @@ export function App() {
     setDraftAssignment(selectedAssignment);
   }, [selectedAssignment]);
 
+  useEffect(() => {
+    if (!connected) {
+      return;
+    }
+
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        await sendRemapperHeartbeat(transport);
+      } catch {
+        if (!cancelled) {
+          window.clearInterval(interval);
+        }
+      }
+    };
+    const interval = window.setInterval(() => void ping(), 1000);
+    void ping();
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [connected, transport]);
+
   async function connectDevice() {
     try {
       const device = await transport.requestDevice();
       await transport.open();
+      await sendRemapperHeartbeat(transport);
       const state = await getDeviceState(transport);
       const loadedKeymap = await readDeviceKeymap(transport, state.layerCount, state.keyCount);
       setDeviceState(state);
