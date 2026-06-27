@@ -24,13 +24,20 @@ export class WebHidTransport {
       ],
     });
 
-    if (devices.length === 0) {
+    if (devices.length > 0) {
+      this.device = devices[0];
+      return this.device;
+    }
+
+    const fallbackDevices = await hid.requestDevice({ filters: [] });
+
+    if (fallbackDevices.length === 0) {
       throw new Error(
-        "Cyborg Mini が見つかりません。ファームウェア未更新の場合は UF2 を焼き直してください",
+        "Cyborg Mini が見つかりません。接続後にもう一度試すか、ファームウェアを書き込み直してください",
       );
     }
 
-    this.device = devices[0];
+    this.device = fallbackDevices[0];
     return this.device;
   }
 
