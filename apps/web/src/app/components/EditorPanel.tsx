@@ -1,5 +1,10 @@
 import { modifierOptions } from "../../features/keymap/keyPickerOptions";
-import { formatHex, type KeyAssignment, type KeyAssignmentKind } from "../../features/keymap/keymapTypes";
+import {
+  formatHex,
+  formatModifier,
+  type KeyAssignment,
+  type KeyAssignmentKind,
+} from "../../features/keymap/keymapTypes";
 
 type EditorPanelProps = {
   selectedKey: number;
@@ -9,7 +14,7 @@ type EditorPanelProps = {
   onSave: () => void;
   onUpdateKind: (kind: KeyAssignmentKind) => void;
   onUpdateUsage: (usage: number) => void;
-  onToggleModifier: (modifier: number) => void;
+  onUpdateModifier: (modifier: number) => void;
 };
 
 export function EditorPanel({
@@ -20,12 +25,31 @@ export function EditorPanel({
   onSave,
   onUpdateKind,
   onUpdateUsage,
-  onToggleModifier,
+  onUpdateModifier,
 }: EditorPanelProps) {
+  const modifierValue = draftAssignment.kind === "keyboard" ? draftAssignment.modifier : 0;
+  const modifierChoices = [{ value: 0, label: "None" }, ...modifierOptions.map((option) => ({
+    value: option.modifier,
+    label: option.label,
+  }))];
+
+  if (
+    modifierValue !== 0 &&
+    !modifierChoices.some((choice) => choice.value === modifierValue)
+  ) {
+    modifierChoices.push({
+      value: modifierValue,
+      label: formatModifier(modifierValue),
+    });
+  }
+
   return (
     <aside className="panel editor-panel">
       <div className="panel-heading compact">
-        <h2>K{selectedKey + 1}</h2>
+        <div className="panel-meta">
+          <span className="panel-kicker">Assignment</span>
+          <h2>K{selectedKey + 1}</h2>
+        </div>
         <div className="editor-actions">
           <button type="button" onClick={onRead} disabled={!connected}>
             Read
@@ -60,22 +84,20 @@ export function EditorPanel({
         />
       </label>
 
-      <div className="modifier-grid" aria-label="Modifier selector">
-        {modifierOptions.map((option) => {
-          const active =
-            draftAssignment.kind === "keyboard" && (draftAssignment.modifier & option.modifier) !== 0;
-          return (
-            <button
-              key={option.modifier}
-              type="button"
-              className={active ? "picker-key active" : "picker-key"}
-              onClick={() => onToggleModifier(option.modifier)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
+      <label>
+        <span>Modifier</span>
+        <select
+          value={modifierValue}
+          disabled={draftAssignment.kind !== "keyboard"}
+          onChange={(event) => onUpdateModifier(Number(event.currentTarget.value))}
+        >
+          {modifierChoices.map((choice) => (
+            <option key={choice.value} value={choice.value}>
+              {choice.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="modifier-summary">
         <span>Modifier</span>

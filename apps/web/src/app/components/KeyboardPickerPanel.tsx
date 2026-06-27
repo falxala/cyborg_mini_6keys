@@ -73,7 +73,10 @@ export function KeyboardPickerPanel({
   return (
     <section className="panel picker-panel">
       <div className="panel-heading">
-        <h2>Keyboard</h2>
+        <div className="panel-meta">
+          <span className="panel-kicker">Palette</span>
+          <h2>Keyboard</h2>
+        </div>
         <div className="layout-tabs" aria-label="Keyboard layout selector">
           <button
             type="button"
@@ -122,8 +125,8 @@ export function KeyboardPickerPanel({
         </div>
 
         <div className="keyboard-indicator" aria-hidden="true">
-          <span>No others needed...</span>
-          <strong>CYBORG</strong>
+          <span>HID CONFIG</span>
+          <strong>CYBORG MINI 8</strong>
           <div>
             <i />
             <i />

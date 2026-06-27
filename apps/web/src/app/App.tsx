@@ -40,6 +40,7 @@ export function App() {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [activeLayer, setActiveLayer] = useState(0);
   const [selectedKey, setSelectedKey] = useState(0);
+  const [firmwareModalOpen, setFirmwareModalOpen] = useState(false);
   const [status, setStatus] = useState("未接続");
   const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
@@ -201,6 +202,14 @@ export function App() {
     );
   }
 
+  function updateDraftModifier(modifier: number) {
+    setDraftAssignment((current) => {
+      const usage = current.kind === "keyboard" ? current.usage : 0;
+      const keycodes = current.kind === "keyboard" ? current.keycodes : [0, 0, 0, 0, 0, 0];
+      return createKeyboardAssignment(usage, modifier, keycodes);
+    });
+  }
+
   function applyPickerOption(option: KeyPickerOption) {
     if (option.kind === "spacer") {
       return;
@@ -237,16 +246,27 @@ export function App() {
       <header className="topbar">
         <div className="brand">
           <img src="/cy.png" alt="" />
-          <div>
-            <h1>Cyborg Mini Remapper</h1>
-            <p>8-key WebHID migration workspace</p>
+          <div className="brand-copy">
+            <span className="eyebrow">Cyborg Project</span>
+            <h1>Mini Remapper</h1>
+            <p>WebHID keymap editor for the 8-key RP2040 board</p>
           </div>
         </div>
         <div className="connection">
-          <span>{status}</span>
-          <button type="button" onClick={connectDevice}>
-            Connect
-          </button>
+          <div className="connection-meta">
+            <span className={connected ? "status-badge online" : "status-badge offline"}>
+              {connected ? "Connected" : "Idle"}
+            </span>
+            <span className="connection-text">{status}</span>
+          </div>
+          <div className="connection-actions">
+            <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
+              Updater
+            </button>
+            <button type="button" onClick={connectDevice}>
+              {connected ? "Reconnect" : "Connect"}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -268,17 +288,7 @@ export function App() {
           onSave={() => void saveSelectedAssignment()}
           onUpdateKind={updateDraftKind}
           onUpdateUsage={updateDraftUsage}
-          onToggleModifier={(modifier) =>
-            applyPickerOption({ kind: "modifier", modifier, label: "", width: 1 })
-          }
-        />
-        <FirmwarePanel
-          connected={connected}
-          firmwareInstallSupported={firmwareInstallSupported}
-          firmwareStatus={firmwareStatus}
-          onEnterBootloader={() => void enterBootloaderMode()}
-          onInstallFirmware={() => void installBundledFirmware()}
-          onDownloadFirmware={() => void downloadBundledFirmware()}
+          onUpdateModifier={updateDraftModifier}
         />
         <KeyboardPickerPanel
           draftAssignment={draftAssignment}
@@ -288,6 +298,45 @@ export function App() {
           onConsumerOption={applyConsumerOption}
         />
       </section>
+
+      {firmwareModalOpen ? (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onClick={() => setFirmwareModalOpen(false)}
+        >
+          <div
+            className="modal-shell"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="firmware-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div className="panel-meta">
+                <span className="panel-kicker">Updater</span>
+                <h2 id="firmware-modal-title">Firmware</h2>
+              </div>
+              <button
+                type="button"
+                className="ghost-button"
+                onClick={() => setFirmwareModalOpen(false)}
+                aria-label="Close firmware updater"
+              >
+                Close
+              </button>
+            </div>
+            <FirmwarePanel
+              connected={connected}
+              firmwareInstallSupported={firmwareInstallSupported}
+              firmwareStatus={firmwareStatus}
+              onEnterBootloader={() => void enterBootloaderMode()}
+              onInstallFirmware={() => void installBundledFirmware()}
+              onDownloadFirmware={() => void downloadBundledFirmware()}
+            />
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -9,7 +9,10 @@ type HardwarePanelProps = {
 export function HardwarePanel({ deviceState }: HardwarePanelProps) {
   return (
     <aside className="panel hardware-panel">
-      <h2>Hardware</h2>
+      <div className="panel-meta">
+        <span className="panel-kicker">Board Profile</span>
+        <h2>Hardware</h2>
+      </div>
       <dl>
         <div>
           <dt>Keys</dt>

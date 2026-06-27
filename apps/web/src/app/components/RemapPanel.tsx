@@ -19,6 +19,14 @@ export function RemapPanel({
 }: RemapPanelProps) {
   return (
     <section className="panel remap-panel">
+      <div className="panel-heading">
+        <div className="panel-meta">
+          <span className="panel-kicker">Keymap</span>
+          <h2>Layers</h2>
+        </div>
+        <div className="selection-pill">K{selectedKey + 1}</div>
+      </div>
+
       <div className="remap-strip">
         <span className="strip-label">Layer</span>
         <div className="layer-tabs" aria-label="Layer selector">

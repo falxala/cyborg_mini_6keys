@@ -16,13 +16,13 @@ export function FirmwarePanel({
   onDownloadFirmware,
 }: FirmwarePanelProps) {
   return (
-    <section className="panel firmware-panel">
-      <div>
+    <div className="firmware-panel">
+      <div className="firmware-summary">
         <h2>Firmware</h2>
         <span>{firmwareStatus}</span>
       </div>
       <div className="firmware-actions">
-        <button type="button" onClick={onEnterBootloader} disabled={!connected}>
+        <button type="button" className="primary-action" onClick={onEnterBootloader} disabled={!connected}>
           BOOTSEL
         </button>
         <button type="button" onClick={onInstallFirmware} disabled={!firmwareInstallSupported}>
@@ -32,6 +32,6 @@ export function FirmwarePanel({
           Download UF2
         </button>
       </div>
-    </section>
+    </div>
   );
 }

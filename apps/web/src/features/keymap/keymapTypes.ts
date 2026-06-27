@@ -97,7 +97,7 @@ function clampBytePair(value: number) {
   return Math.max(0, Math.min(0xffff, Math.trunc(value)));
 }
 
-function formatModifier(modifier: number) {
+export function formatModifier(modifier: number) {
   const names = [
     [0x01, "Ctrl"],
     [0x02, "Shift"],
