@@ -292,6 +292,7 @@ export function App() {
           selectedKey={selectedKey}
           layerCount={keymap.length}
           layerAssignments={keymap[activeLayer]}
+          draftAssignment={draftAssignment}
           onSelectLayer={(layerIndex) => void selectLayer(layerIndex)}
           onSelectKey={setSelectedKey}
         />

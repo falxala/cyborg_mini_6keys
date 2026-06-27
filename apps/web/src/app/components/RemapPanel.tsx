@@ -1,3 +1,5 @@
+import { ConsumerKeycapSvg } from "./ConsumerKeycapSvg";
+import { consumerOptionByUsage } from "../../features/keymap/keyPickerOptions";
 import type { KeyAssignment } from "../../features/keymap/keymapTypes";
 
 type RemapPanelProps = {
@@ -5,6 +7,7 @@ type RemapPanelProps = {
   selectedKey: number;
   layerCount: number;
   layerAssignments: KeyAssignment[];
+  draftAssignment: KeyAssignment;
   onSelectLayer: (layerIndex: number) => void;
   onSelectKey: (keyIndex: number) => void;
 };
@@ -14,6 +17,7 @@ export function RemapPanel({
   selectedKey,
   layerCount,
   layerAssignments,
+  draftAssignment,
   onSelectLayer,
   onSelectKey,
 }: RemapPanelProps) {
@@ -46,19 +50,66 @@ export function RemapPanel({
       <div className="remap-strip">
         <span className="strip-label">Keys</span>
         <div className="key-grid">
-          {layerAssignments.map((assignment, keyIndex) => (
-            <button
-              key={keyIndex}
-              type="button"
-              className={keyIndex === selectedKey ? "key-tile active" : "key-tile"}
-              onClick={() => onSelectKey(keyIndex)}
-            >
-              <span>K{keyIndex + 1}</span>
-              <strong>{assignment.label}</strong>
-            </button>
-          ))}
+          {layerAssignments.map((assignment, keyIndex) => {
+            const isSelected = keyIndex === selectedKey;
+            const hasDraftChange = isSelected && !sameAssignment(assignment, draftAssignment);
+
+            return (
+              <button
+                key={keyIndex}
+                type="button"
+                className={isSelected ? "key-tile active" : "key-tile"}
+                onClick={() => onSelectKey(keyIndex)}
+              >
+                <span>K{keyIndex + 1}</span>
+                <div className="key-tile-assignments">
+                  <AssignmentPreview assignment={assignment} label={isSelected ? "Read" : undefined} />
+                  {isSelected ? (
+                    <AssignmentPreview
+                      assignment={draftAssignment}
+                      label="Edit"
+                      changed={hasDraftChange}
+                    />
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>
+  );
+}
+
+function AssignmentPreview({
+  assignment,
+  label,
+  changed = false,
+}: {
+  assignment: KeyAssignment;
+  label?: string;
+  changed?: boolean;
+}) {
+  const consumerOption =
+    assignment.kind === "consumer" ? consumerOptionByUsage(assignment.usage) : undefined;
+
+  return (
+    <div className={changed ? "assignment-preview changed" : "assignment-preview"}>
+      {label ? <em>{label}</em> : null}
+      {consumerOption ? (
+        <ConsumerKeycapSvg icon={consumerOption.icon} label={assignment.label} variant="tile" />
+      ) : (
+        <strong>{assignment.label}</strong>
+      )}
+    </div>
+  );
+}
+
+function sameAssignment(first: KeyAssignment, second: KeyAssignment) {
+  return (
+    first.kind === second.kind &&
+    first.modifier === second.modifier &&
+    first.usage === second.usage &&
+    first.keycodes.every((keycode, index) => keycode === second.keycodes[index])
   );
 }
