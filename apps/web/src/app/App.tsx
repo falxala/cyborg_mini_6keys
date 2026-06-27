@@ -309,17 +309,17 @@ export function App() {
         <RemapPanel
           activeLayer={activeLayer}
           selectedKey={selectedKey}
+          connected={connected}
           layerCount={writeKeymap.length}
           layerAssignments={writeKeymap[activeLayer]}
+          onRead={() => void readAllAssignments()}
+          onSave={() => void saveSelectedAssignment()}
           onSelectLayer={(layerIndex) => void selectLayer(layerIndex)}
           onSelectKey={setSelectedKey}
         />
         <EditorPanel
           selectedKey={selectedKey}
-          connected={connected}
           draftAssignment={draftAssignment}
-          onRead={() => void readAllAssignments()}
-          onSave={() => void saveSelectedAssignment()}
           onUpdateKind={updateDraftKind}
           onUpdateUsage={updateDraftUsage}
           modifierSlots={modifierSlots}

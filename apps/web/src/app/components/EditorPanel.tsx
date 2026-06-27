@@ -7,10 +7,7 @@ import {
 
 type EditorPanelProps = {
   selectedKey: number;
-  connected: boolean;
   draftAssignment: KeyAssignment;
-  onRead: () => void;
-  onSave: () => void;
   onUpdateKind: (kind: KeyAssignmentKind) => void;
   onUpdateUsage: (usage: number) => void;
   modifierSlots: number[];
@@ -19,10 +16,7 @@ type EditorPanelProps = {
 
 export function EditorPanel({
   selectedKey,
-  connected,
   draftAssignment,
-  onRead,
-  onSave,
   onUpdateKind,
   onUpdateUsage,
   modifierSlots,
@@ -34,14 +28,6 @@ export function EditorPanel({
         <div className="panel-meta">
           <span className="panel-kicker">Assignment</span>
           <h2>Key {selectedKey + 1}</h2>
-        </div>
-        <div className="editor-actions">
-          <button type="button" onClick={onRead} disabled={!connected}>
-            Read
-          </button>
-          <button type="button" className="primary-action" onClick={onSave} disabled={!connected}>
-            Save
-          </button>
         </div>
       </div>
 

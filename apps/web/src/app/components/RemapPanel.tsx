@@ -5,8 +5,11 @@ import type { KeyAssignment } from "../../features/keymap/keymapTypes";
 type RemapPanelProps = {
   activeLayer: number;
   selectedKey: number;
+  connected: boolean;
   layerCount: number;
   layerAssignments: KeyAssignment[];
+  onRead: () => void;
+  onSave: () => void;
   onSelectLayer: (layerIndex: number) => void;
   onSelectKey: (keyIndex: number) => void;
 };
@@ -14,8 +17,11 @@ type RemapPanelProps = {
 export function RemapPanel({
   activeLayer,
   selectedKey,
+  connected,
   layerCount,
   layerAssignments,
+  onRead,
+  onSave,
   onSelectLayer,
   onSelectKey,
 }: RemapPanelProps) {
@@ -26,7 +32,14 @@ export function RemapPanel({
           <span className="panel-kicker">Keymap</span>
           <h2>Layers</h2>
         </div>
-        <div className="selection-pill">Key {selectedKey + 1}</div>
+        <div className="remap-actions">
+          <button type="button" onClick={onRead} disabled={!connected}>
+            Read
+          </button>
+          <button type="button" className="primary-action" onClick={onSave} disabled={!connected}>
+            Save
+          </button>
+        </div>
       </div>
 
       <div className="remap-strip">
