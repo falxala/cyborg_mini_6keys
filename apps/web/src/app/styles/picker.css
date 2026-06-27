@@ -10,8 +10,8 @@
 .consumer-board,
 .keyboard-picker {
   --key-font-size: 12px;
-  --key-gap: 6px;
-  --key-unit: 46px;
+  --key-gap: 5px;
+  --key-unit: 44px;
 }
 
 .keyboard-scroll {

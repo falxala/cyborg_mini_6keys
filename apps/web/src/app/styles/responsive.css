@@ -1,24 +1,32 @@
-@container (max-width: 1160px) {
+@container (max-width: 1180px) {
   .consumer-board,
   .keyboard-picker {
     --key-font-size: 11px;
-    --key-unit: 42px;
+    --key-unit: 40px;
   }
 }
 
-@container (max-width: 1040px) {
+@container (max-width: 1080px) {
   .consumer-board,
   .keyboard-picker {
     --key-font-size: 10px;
-    --key-unit: 38px;
+    --key-unit: 36px;
   }
 }
 
-@container (max-width: 960px) {
+@container (max-width: 980px) {
   .consumer-board,
   .keyboard-picker {
     --key-font-size: 9px;
-    --key-unit: 34px;
+    --key-unit: 32px;
+  }
+}
+
+@container (max-width: 900px) {
+  .consumer-board,
+  .keyboard-picker {
+    --key-font-size: 8px;
+    --key-unit: 29px;
   }
 }
 
