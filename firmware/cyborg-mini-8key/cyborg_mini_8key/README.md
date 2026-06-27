@@ -36,11 +36,11 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 ```sh
 scripts/arduino-cli.sh compile \
   --fqbn rp2040:rp2040:waveshare_rp2040_zero \
-  --board-options usbstack=tinyusb \
+  --board-options usbstack=tinyusb,freq=125 \
   firmware/cyborg-mini-8key/cyborg_mini_8key
 ```
 
-`--board-options usbstack=tinyusb` は必須です。設定用 vendor HID report を Adafruit TinyUSB で扱います。
+`--board-options usbstack=tinyusb,freq=125` は必須です。設定用 vendor HID report を Adafruit TinyUSB で扱い、CPU クロックを 125 MHz に固定します。
 
 ## Current Scope
 
