@@ -39,6 +39,70 @@ import {
 import { t } from "../shared/i18n";
 
 export function App() {
+  const [page, setPage] = useState<"home" | "remapper">("home");
+
+  if (page === "home") {
+    return <ProductHome onOpenRemapper={() => setPage("remapper")} />;
+  }
+
+  return <RemapperApp onBackHome={() => setPage("home")} />;
+}
+
+type ProductHomeProps = {
+  onOpenRemapper: () => void;
+};
+
+function ProductHome({ onOpenRemapper }: ProductHomeProps) {
+  return (
+    <main className="app-shell home-shell">
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="brand home-brand">
+          <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
+          <div className="brand-copy">
+            <span className="eyebrow">{t.home.eyebrow}</span>
+            <h1 id="home-title">{t.home.title}</h1>
+            <p>{t.home.description}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="product-grid" aria-label={t.home.productListLabel}>
+        {t.home.products.map((product) => (
+          <article className="product-card" key={product.name}>
+            <div className="product-card-copy">
+              <span className="eyebrow">{product.status}</span>
+              <h2>{product.name}</h2>
+              <p>{product.description}</p>
+            </div>
+            <dl className="product-specs">
+              <div>
+                <dt>{t.home.keys}</dt>
+                <dd>{HARDWARE_CONFIG.keyCount}</dd>
+              </div>
+              <div>
+                <dt>{t.home.layers}</dt>
+                <dd>{HARDWARE_CONFIG.layerCount}</dd>
+              </div>
+              <div>
+                <dt>{t.home.connection}</dt>
+                <dd>{t.home.connectionValue}</dd>
+              </div>
+            </dl>
+            <button type="button" className="product-action" onClick={onOpenRemapper}>
+              {t.home.openRemapper}
+            </button>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+type RemapperAppProps = {
+  onBackHome: () => void;
+};
+
+function RemapperApp({ onBackHome }: RemapperAppProps) {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [activeLayer, setActiveLayer] = useState(0);
   const [selectedKey, setSelectedKey] = useState(0);
@@ -295,6 +359,9 @@ export function App() {
             <span className="connection-text">{status}</span>
           </div>
           <div className="connection-actions">
+            <button type="button" className="ghost-button" onClick={onBackHome}>
+              {t.home.backHome}
+            </button>
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
               {t.connection.updater}
             </button>

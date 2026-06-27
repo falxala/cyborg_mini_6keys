@@ -136,8 +136,20 @@
     align-items: flex-start;
   }
 
+  .home-hero {
+    padding: 20px;
+  }
+
+  .home-brand {
+    flex-direction: column;
+  }
+
   .brand h1 {
     font-size: 26px;
+  }
+
+  .home-brand h1 {
+    font-size: 42px;
   }
 
   .connection {

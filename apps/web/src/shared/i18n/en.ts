@@ -7,6 +7,25 @@ export const en: typeof ja = {
     description: "WebHID keymap editor for the 8-key RP2040 board",
     workspaceLabel: "Remapper workspace",
   },
+  home: {
+    eyebrow: "Cyborg Project",
+    title: "Device Hub",
+    description: "Choose a supported device to open its remapper or firmware updater.",
+    productListLabel: "Product list",
+    products: [
+      {
+        status: "Available",
+        name: "Cyborg Mini 8",
+        description: "Temporary product page for the 8-key RP2040 board.",
+      },
+    ],
+    keys: "Keys",
+    layers: "Layers",
+    connection: "Connection",
+    connectionValue: "WebHID",
+    openRemapper: "Open Remapper",
+    backHome: "Home",
+  },
   connection: {
     idle: "Idle",
     connected: "Connected",
