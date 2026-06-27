@@ -410,33 +410,49 @@ select {
   grid-row: 2;
 }
 
+.consumer-board {
+  --key-font-size: 12px;
+  --key-gap: 4px;
+  --key-unit: 43px;
+  background: #ffffff;
+  border: 5px solid #111111;
+  border-radius: 7px;
+  display: inline-block;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding: 10px;
+  max-width: 100%;
+}
+
 .consumer-strip {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
+  gap: var(--key-gap);
 }
 
 .consumer-strip .picker-key {
-  flex: 0 0 82px;
+  flex: 0 0 calc(var(--key-unit) * 2);
 }
 
 @container (max-width: 1120px) {
-  .keyboard-picker {
+  .keyboard-picker,
+  .consumer-board {
     --key-font-size: 11px;
     --key-unit: 40px;
   }
 }
 
 @container (max-width: 1040px) {
-  .keyboard-picker {
+  .keyboard-picker,
+  .consumer-board {
     --key-font-size: 10px;
     --key-unit: 37px;
   }
 }
 
 @container (max-width: 960px) {
-  .keyboard-picker {
+  .keyboard-picker,
+  .consumer-board {
     --key-font-size: 9px;
     --key-unit: 34px;
   }

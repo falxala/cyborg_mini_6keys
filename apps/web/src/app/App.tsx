@@ -420,22 +420,24 @@ export function App() {
             </div>
           </div>
 
-          <div className="consumer-strip">
-            {consumerOptions.map((option) => (
-              <button
-                key={option.usage}
-                type="button"
-                className={
-                  draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
-                    ? "picker-key active"
-                    : "picker-key"
-                }
-                onClick={() => applyConsumerOption(option)}
-              >
-                {option.label}
-              </button>
-            ))}
-            {renderPickerOption(blankOption, "blank")}
+          <div className="consumer-board">
+            <div className="consumer-strip">
+              {consumerOptions.map((option) => (
+                <button
+                  key={option.usage}
+                  type="button"
+                  className={
+                    draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
+                      ? "picker-key active"
+                      : "picker-key"
+                  }
+                  onClick={() => applyConsumerOption(option)}
+                >
+                  {option.label}
+                </button>
+              ))}
+              {renderPickerOption(blankOption, "blank")}
+            </div>
           </div>
         </section>
       </section>
