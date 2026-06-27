@@ -8,6 +8,7 @@ React + TypeScript + Vite で作り直す新しいWebHID版リマッパーです
 - UI、状態管理、WebHID通信、キー定義、表示名変換を分離する
 - 新ハードウェアの8キー構成を前提にする
 - Web Serial API は使わない
+- 固定長の設定用HID report仕様は `../../docs/hid-report.md` を参照する
 
 ## 主なディレクトリ
 

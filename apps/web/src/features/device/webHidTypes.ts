@@ -18,6 +18,10 @@ export type HidDevice = EventTarget & {
     type: "inputreport",
     listener: (event: HidInputReportEvent) => void,
   ): void;
+  removeEventListener(
+    type: "inputreport",
+    listener: (event: HidInputReportEvent) => void,
+  ): void;
 };
 
 export type HidApi = {

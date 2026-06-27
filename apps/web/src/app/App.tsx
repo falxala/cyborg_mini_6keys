@@ -1,4 +1,9 @@
 import { useMemo, useState } from "react";
+import {
+  getDeviceState,
+  setDeviceLayer,
+  type DeviceState,
+} from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
 import { HARDWARE_CONFIG } from "../features/hardware/hardwareConfig";
 import { createInitialKeymap } from "../features/keymap/defaultKeymap";
@@ -7,15 +12,36 @@ export function App() {
   const transport = useMemo(() => new WebHidTransport(), []);
   const [activeLayer, setActiveLayer] = useState(0);
   const [status, setStatus] = useState("未接続");
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const keymap = useMemo(() => createInitialKeymap(), []);
 
   async function connectDevice() {
     try {
       const device = await transport.requestDevice();
       await transport.open();
+      const state = await getDeviceState(transport);
+      setDeviceState(state);
+      setActiveLayer(state.activeLayer);
       setStatus(`${device.productName || "HID device"} に接続`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "接続に失敗しました");
+    }
+  }
+
+  async function selectLayer(layerIndex: number) {
+    setActiveLayer(layerIndex);
+
+    if (!transport.connected) {
+      return;
+    }
+
+    try {
+      await setDeviceLayer(transport, layerIndex);
+      setDeviceState((current) =>
+        current ? { ...current, activeLayer: layerIndex } : current,
+      );
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "レイヤー変更に失敗しました");
     }
   }
 
@@ -50,6 +76,14 @@ export function App() {
               <dd>{HARDWARE_CONFIG.virtualGroundCount}</dd>
             </div>
             <div>
+              <dt>Device layer</dt>
+              <dd>{deviceState?.activeLayer ?? "-"}</dd>
+            </div>
+            <div>
+              <dt>Report keys</dt>
+              <dd>{deviceState?.keyCount ?? "-"}</dd>
+            </div>
+            <div>
               <dt>External RGB</dt>
               <dd>None</dd>
             </div>
@@ -69,7 +103,7 @@ export function App() {
                   key={layerIndex}
                   type="button"
                   className={layerIndex === activeLayer ? "active" : ""}
-                  onClick={() => setActiveLayer(layerIndex)}
+                  onClick={() => void selectLayer(layerIndex)}
                 >
                   {layerIndex}
                 </button>

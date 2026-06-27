@@ -88,6 +88,8 @@ pnpm build
 - `hid_device.*`: 通常HID keyboard / consumer出力とWebHID向けvendor-defined report
 - `status_led.*`: 本体LEDのみの状態表示
 
+設定用HID report仕様は `docs/hid-report.md` にまとめています。
+
 `config.h` のピン番号は仮値です。実際のPCBピンが確定したら、`hardware/cyborg-mini-8key/pinout.md` と合わせて更新します。
 
 現時点の新firmwareは土台です。EEPROM永続化、Web側report送受信、実機コンパイル確認は次工程で行います。

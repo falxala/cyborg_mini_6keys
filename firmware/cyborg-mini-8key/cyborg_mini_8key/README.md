@@ -15,6 +15,8 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 | `hid_reports.h` | HID report ID と設定コマンド |
 | `status_led.*` | 本体LED表示 |
 
+設定用HID report仕様は `../../../docs/hid-report.md` を参照します。
+
 ## Before Flashing
 
 `config.h` のピン番号は仮値です。実際のPCBピンに合わせて以下を更新します。
