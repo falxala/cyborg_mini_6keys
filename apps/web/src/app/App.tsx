@@ -48,11 +48,15 @@ export function App() {
   const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
   const selectedAssignment = keymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
+  const [modifierSlots, setModifierSlots] = useState<number[]>(createModifierSlotsFromMask(0));
   const connected = deviceState !== null && transport.connected;
   const firmwareInstallSupported = canInstallUf2FromBrowser();
 
   useEffect(() => {
     setDraftAssignment(selectedAssignment);
+    setModifierSlots(
+      createModifierSlotsFromMask(selectedAssignment.kind === "keyboard" ? selectedAssignment.modifier : 0),
+    );
   }, [selectedAssignment]);
 
   useEffect(() => {
@@ -190,6 +194,7 @@ export function App() {
 
   function updateDraftKind(kind: KeyAssignmentKind) {
     setDraftAssignment((current) => normalizeAssignment({ ...current, kind }));
+    setModifierSlots((current) => (kind === "keyboard" ? current : createModifierSlotsFromMask(0)));
   }
 
   function updateDraftUsage(usage: number) {
@@ -210,6 +215,14 @@ export function App() {
     });
   }
 
+  function updateDraftModifierSlot(index: number, modifier: number) {
+    setModifierSlots((current) => {
+      const next = current.map((value, currentIndex) => (currentIndex === index ? modifier : value));
+      updateDraftModifier(createModifierMaskFromSlots(next));
+      return next;
+    });
+  }
+
   function applyPickerOption(option: KeyPickerOption) {
     if (option.kind === "spacer") {
       return;
@@ -217,6 +230,7 @@ export function App() {
 
     if (option.kind === "blank") {
       setDraftAssignment(createBlankAssignment());
+      setModifierSlots(createModifierSlotsFromMask(0));
       return;
     }
 
@@ -225,8 +239,9 @@ export function App() {
         const modifier = current.kind === "keyboard" ? current.modifier : 0;
         const usage = current.kind === "keyboard" ? current.usage : 0;
         const keycodes = current.kind === "keyboard" ? current.keycodes : [0, 0, 0, 0, 0, 0];
-
-        return createKeyboardAssignment(usage, modifier ^ option.modifier, keycodes);
+        const nextModifier = modifier ^ option.modifier;
+        setModifierSlots(createModifierSlotsFromMask(nextModifier));
+        return createKeyboardAssignment(usage, nextModifier, keycodes);
       });
       return;
     }
@@ -288,7 +303,8 @@ export function App() {
           onSave={() => void saveSelectedAssignment()}
           onUpdateKind={updateDraftKind}
           onUpdateUsage={updateDraftUsage}
-          onUpdateModifier={updateDraftModifier}
+          modifierSlots={modifierSlots}
+          onUpdateModifierSlot={updateDraftModifierSlot}
         />
         <KeyboardPickerPanel
           draftAssignment={draftAssignment}
@@ -339,4 +355,33 @@ export function App() {
       ) : null}
     </main>
   );
+}
+
+function createModifierSlotsFromMask(mask: number) {
+  const slots: number[] = [];
+  const modifierBits = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
+
+  for (const bit of modifierBits) {
+    if ((mask & bit) !== 0) {
+      slots.push(bit);
+    }
+  }
+
+  while (slots.length < 3) {
+    slots.push(0);
+  }
+
+  return slots.slice(0, 3);
+}
+
+function createModifierMaskFromSlots(slots: number[]) {
+  let mask = 0;
+
+  for (const slot of slots) {
+    if (slot !== 0) {
+      mask |= slot;
+    }
+  }
+
+  return mask;
 }

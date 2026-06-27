@@ -13,7 +13,8 @@ type EditorPanelProps = {
   onSave: () => void;
   onUpdateKind: (kind: KeyAssignmentKind) => void;
   onUpdateUsage: (usage: number) => void;
-  onUpdateModifier: (modifier: number) => void;
+  modifierSlots: number[];
+  onUpdateModifierSlot: (index: number, modifier: number) => void;
 };
 
 export function EditorPanel({
@@ -24,11 +25,9 @@ export function EditorPanel({
   onSave,
   onUpdateKind,
   onUpdateUsage,
-  onUpdateModifier,
+  modifierSlots,
+  onUpdateModifierSlot,
 }: EditorPanelProps) {
-  const modifierValue = draftAssignment.kind === "keyboard" ? draftAssignment.modifier : 0;
-  const selectedModifiers = selectedModifiersFromMask(modifierValue);
-
   return (
     <aside className="panel editor-panel">
       <div className="panel-heading compact">
@@ -73,18 +72,23 @@ export function EditorPanel({
       <label className="modifier-field">
         <span>Modifier</span>
         <div className="modifier-selects">
-          {selectedModifiers.map((value, index) => (
+          {modifierSlots.map((value, index) => (
             <select
               key={index}
               value={value}
               disabled={draftAssignment.kind !== "keyboard"}
-              onChange={(event) =>
-                onUpdateModifier(updateModifierMask(selectedModifiers, index, Number(event.currentTarget.value)))
-              }
+              onChange={(event) => onUpdateModifierSlot(index, Number(event.currentTarget.value))}
             >
               <option value={0}>None</option>
               {modifierOptions.map((option) => (
-                <option key={option.modifier} value={option.modifier}>
+                <option
+                  key={option.modifier}
+                  value={option.modifier}
+                  disabled={
+                    value !== option.modifier &&
+                    modifierSlots.some((selectedModifier) => selectedModifier === option.modifier)
+                  }
+                >
                   {option.label}
                 </option>
               ))}
@@ -105,30 +109,4 @@ export function EditorPanel({
       </dl>
     </aside>
   );
-}
-
-function selectedModifiersFromMask(mask: number) {
-  const values = modifierOptions
-    .filter((option) => (mask & option.modifier) !== 0)
-    .map((option) => option.modifier)
-    .slice(0, 3);
-
-  while (values.length < 3) {
-    values.push(0);
-  }
-
-  return values;
-}
-
-function updateModifierMask(current: number[], index: number, nextValue: number) {
-  const next = current.map((value, currentIndex) => (currentIndex === index ? nextValue : value));
-  let mask = 0;
-
-  for (const value of next) {
-    if (value !== 0) {
-      mask |= value;
-    }
-  }
-
-  return mask;
 }
