@@ -216,6 +216,18 @@
   font-size: 14px;
   font-weight: 800;
   dominant-baseline: middle;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.keycap-svg .shape-label-narrow {
+  font-size: 13px;
+  transform: scaleX(0.88);
+}
+
+.keycap-svg .shape-label-compact {
+  font-size: 12px;
+  transform: scaleX(0.76);
 }
 
 .consumer-keycap-svg .consumer-icon {

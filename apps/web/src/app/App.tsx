@@ -20,7 +20,7 @@ import {
   downloadFirmwareUf2,
   installFirmwareUf2,
 } from "../features/firmware/firmwareUpdater";
-import { createInitialKeymap } from "../features/keymap/defaultKeymap";
+import { HARDWARE_CONFIG } from "../features/hardware/hardwareConfig";
 import {
   type ConsumerKeyOption,
   type KeyboardLayoutMode,
@@ -45,8 +45,8 @@ export function App() {
   const [status, setStatus] = useState("未接続");
   const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
-  const [readKeymap, setReadKeymap] = useState(createInitialKeymap);
-  const [writeKeymap, setWriteKeymap] = useState(createInitialKeymap);
+  const [readKeymap, setReadKeymap] = useState(createBlankKeymap);
+  const [writeKeymap, setWriteKeymap] = useState(createBlankKeymap);
   const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
   const readAssignment = readKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const selectedAssignment = writeKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
@@ -403,4 +403,10 @@ function createModifierMaskFromSlots(slots: number[]) {
   }
 
   return mask;
+}
+
+function createBlankKeymap() {
+  return Array.from({ length: HARDWARE_CONFIG.layerCount }, () =>
+    Array.from({ length: HARDWARE_CONFIG.keyCount }, createBlankAssignment),
+  );
 }

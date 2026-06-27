@@ -84,7 +84,7 @@ function AssignmentPreview({
       {consumerOption ? (
         <ConsumerKeycapSvg icon={consumerOption.icon} label={assignment.label} variant="tile" />
       ) : (
-        <strong>{assignment.label}</strong>
+        <strong>{assignment.kind === "none" ? "なし" : assignment.label}</strong>
       )}
     </div>
   );
