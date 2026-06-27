@@ -11,6 +11,7 @@ export enum ConfigCommand {
   RemapperHeartbeat = 0x06,
   KeyEvent = 0x07,
   DiagnosticReport = 0x08,
+  DiagnosticStorage = 0x09,
 }
 
 export enum ConfigStatus {

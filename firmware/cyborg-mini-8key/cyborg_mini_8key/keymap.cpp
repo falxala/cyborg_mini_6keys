@@ -8,14 +8,6 @@ namespace {
 uint8_t currentLayer = 0;
 KeyAssignment keymap[Config::LAYER_COUNT][Config::KEY_COUNT];
 
-void clearKeymap() {
-  for (uint8_t layer = 0; layer < Config::LAYER_COUNT; layer++) {
-    for (uint8_t key = 0; key < Config::KEY_COUNT; key++) {
-      keymap[layer][key] = blankAssignment();
-    }
-  }
-}
-
 void setDefaultLayer0() {
   keymap[0][0] = consumerAssignment(HID_USAGE_CONSUMER_BRIGHTNESS_DECREMENT);
   keymap[0][1] = consumerAssignment(HID_USAGE_CONSUMER_BRIGHTNESS_INCREMENT);
@@ -57,6 +49,14 @@ void setDefaultKeymap() {
 }
 
 }  // namespace
+
+void clearKeymap() {
+  for (uint8_t layer = 0; layer < Config::LAYER_COUNT; layer++) {
+    for (uint8_t key = 0; key < Config::KEY_COUNT; key++) {
+      keymap[layer][key] = blankAssignment();
+    }
+  }
+}
 
 void beginKeymap() {
   setDefaultKeymap();

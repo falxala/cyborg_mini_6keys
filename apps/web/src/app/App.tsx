@@ -10,6 +10,7 @@ import {
   getDeviceState,
   readDeviceKeymap,
   runDiagnosticReportTest,
+  runDiagnosticStorageTest,
   sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
@@ -495,6 +496,8 @@ export function DiagnosticsApp() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
   const [reportTestStatus, setReportTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
   const [reportTestDetail, setReportTestDetail] = useState("-");
+  const [storageTestStatus, setStorageTestStatus] = useState<"idle" | "running" | "passed" | "failed">("idle");
+  const [storageTestDetail, setStorageTestDetail] = useState("-");
   const [testedKeys, setTestedKeys] = useState<boolean[]>(() =>
     Array.from({ length: HARDWARE_CONFIG.keyCount }, () => false),
   );
@@ -507,6 +510,8 @@ export function DiagnosticsApp() {
     setLastKey(null);
     setReportTestStatus("idle");
     setReportTestDetail("-");
+    setStorageTestStatus("idle");
+    setStorageTestDetail("-");
     setStatus(t.connection.initialStatus);
   });
 
@@ -537,6 +542,7 @@ export function DiagnosticsApp() {
       setTestedKeys(Array.from({ length: state.keyCount }, () => false));
       setLastKey(null);
       await runReportTest();
+      await runStorageTest();
       setStatus(t.connection.connectedTo(device.productName || t.device.fallbackName));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : t.connection.connectFailed);
@@ -559,6 +565,25 @@ export function DiagnosticsApp() {
     } catch (error) {
       setReportTestStatus("failed");
       setReportTestDetail(error instanceof Error ? error.message : t.diagnostics.reportTestFailed);
+    }
+  }
+
+  async function runStorageTest() {
+    if (!transport.connected) {
+      setStorageTestStatus("failed");
+      setStorageTestDetail(t.connection.deviceNotConnected);
+      return;
+    }
+
+    try {
+      setStorageTestStatus("running");
+      setStorageTestDetail(t.diagnostics.storageTesting);
+      const result = await runDiagnosticStorageTest(transport);
+      setStorageTestStatus("passed");
+      setStorageTestDetail(t.diagnostics.storageTestPassed(result.layerCount, result.keyCount));
+    } catch (error) {
+      setStorageTestStatus("failed");
+      setStorageTestDetail(error instanceof Error ? error.message : t.diagnostics.storageTestFailed);
     }
   }
 
@@ -612,6 +637,9 @@ export function DiagnosticsApp() {
             <button type="button" className="ghost-button" onClick={() => void runReportTest()} disabled={!connected}>
               {t.diagnostics.runReportTest}
             </button>
+            <button type="button" className="ghost-button" onClick={() => void runStorageTest()} disabled={!connected}>
+              {t.diagnostics.runStorageTest}
+            </button>
           </div>
 
           <div className="diagnostics-summary">
@@ -619,6 +647,8 @@ export function DiagnosticsApp() {
             <span>{t.diagnostics.progress(testedCount, testedKeys.length)}</span>
             <span>{lastKey === null ? t.diagnostics.noLastKey : t.diagnostics.lastKey(lastKey + 1)}</span>
           </div>
+
+          <p className="diagnostics-warning">{t.diagnostics.storageWriteWarning}</p>
 
           <div className="diagnostic-key-grid">
             {testedKeys.map((tested, index) => (
@@ -641,32 +671,48 @@ export function DiagnosticsApp() {
           <dl className="diagnostics-list">
             <div>
               <dt>{t.diagnostics.webHid}</dt>
-              <dd>{typeof navigator !== "undefined" && "hid" in navigator ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={typeof navigator !== "undefined" && "hid" in navigator} />
             </div>
             <div>
               <dt>{t.diagnostics.deviceConnection}</dt>
-              <dd>{connected ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={connected} />
             </div>
             <div>
               <dt>{t.diagnostics.keyEvent}</dt>
-              <dd>{testedCount > 0 ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={testedCount > 0} />
             </div>
             <div>
               <dt>{t.diagnostics.reportSend}</dt>
-              <dd>{reportTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={reportTestStatus === "passed"} />
             </div>
             <div>
               <dt>{t.diagnostics.reportDetail}</dt>
-              <dd>{reportTestDetail}</dd>
+              <dd className="diagnostics-detail">{reportTestDetail}</dd>
+            </div>
+            <div>
+              <dt>{t.diagnostics.storageWriteRead}</dt>
+              <DiagnosticResult passed={storageTestStatus === "passed"} />
+            </div>
+            <div>
+              <dt>{t.diagnostics.storageDetail}</dt>
+              <dd className="diagnostics-detail">{storageTestDetail}</dd>
             </div>
             <div>
               <dt>{t.diagnostics.reportKeys}</dt>
-              <dd>{deviceState?.keyCount ?? "-"}</dd>
+              <dd className="diagnostics-detail">{deviceState?.keyCount ?? "-"}</dd>
             </div>
           </dl>
         </aside>
       </section>
     </main>
+  );
+}
+
+function DiagnosticResult({ passed }: { passed: boolean }) {
+  return (
+    <dd className={passed ? "diagnostics-result passed" : "diagnostics-result failed"}>
+      {passed ? t.diagnostics.ok : t.diagnostics.ng}
+    </dd>
   );
 }
 

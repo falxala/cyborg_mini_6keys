@@ -185,6 +185,17 @@ void handleDiagnosticReport(const uint8_t* buffer, uint16_t size) {
   sendConfigResponse(ConfigCommand::DiagnosticReport, ConfigStatus::Ok, payload, sizeof(payload));
 }
 
+void handleDiagnosticStorage() {
+  const bool ok = runKeymapStorageSelfTest();
+  const uint8_t payload[] = {
+    static_cast<uint8_t>(ok ? 1 : 0),
+    Config::LAYER_COUNT,
+    Config::KEY_COUNT,
+  };
+
+  sendConfigResponse(ConfigCommand::DiagnosticStorage, ok ? ConfigStatus::Ok : ConfigStatus::StorageError, payload, sizeof(payload));
+}
+
 void sendKeyEvent(uint8_t layer, uint8_t keyIndex, bool pressed) {
   if (!remapperConnected()) {
     return;
@@ -234,6 +245,9 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       break;
     case ConfigCommand::DiagnosticReport:
       handleDiagnosticReport(buffer, size);
+      break;
+    case ConfigCommand::DiagnosticStorage:
+      handleDiagnosticStorage();
       break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);

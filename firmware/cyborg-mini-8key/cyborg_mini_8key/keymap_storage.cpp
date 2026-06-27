@@ -135,3 +135,65 @@ bool saveAssignmentToStorage(uint8_t layer, uint8_t keyIndex) {
   writeAssignmentRecord(recordAddress(layer, keyIndex), assignmentFor(layer, keyIndex));
   return EEPROM.commit();
 }
+
+bool runKeymapStorageSelfTest() {
+  KeyAssignment backup[Config::LAYER_COUNT][Config::KEY_COUNT];
+  KeyAssignment pattern[Config::LAYER_COUNT][Config::KEY_COUNT];
+
+  for (uint8_t layer = 0; layer < Config::LAYER_COUNT; layer++) {
+    for (uint8_t keyIndex = 0; keyIndex < Config::KEY_COUNT; keyIndex++) {
+      backup[layer][keyIndex] = assignmentFor(layer, keyIndex);
+
+      KeyAssignment assignment = blankAssignment();
+      assignment.kind = AssignmentKind::Keyboard;
+      assignment.modifier = static_cast<uint8_t>((layer << 4) ^ keyIndex);
+      for (uint8_t slot = 0; slot < Config::KEYBOARD_REPORT_SLOTS; slot++) {
+        assignment.keycodes[slot] = static_cast<uint8_t>(0x04 + ((layer * Config::KEY_COUNT + keyIndex + slot) % 0x40));
+      }
+      assignment.consumerUsage = static_cast<uint16_t>(0x1200 + (layer * Config::KEY_COUNT) + keyIndex);
+      pattern[layer][keyIndex] = assignment;
+      setAssignment(layer, keyIndex, assignment);
+    }
+  }
+
+  bool ok = saveKeymapToStorage();
+  if (ok) {
+    clearKeymap();
+    ok = loadKeymapFromStorage();
+  }
+
+  if (ok) {
+    for (uint8_t layer = 0; layer < Config::LAYER_COUNT; layer++) {
+      for (uint8_t keyIndex = 0; keyIndex < Config::KEY_COUNT; keyIndex++) {
+        const KeyAssignment& actual = assignmentFor(layer, keyIndex);
+        const KeyAssignment& expected = pattern[layer][keyIndex];
+        if (actual.kind != expected.kind ||
+            actual.modifier != expected.modifier ||
+            actual.consumerUsage != expected.consumerUsage) {
+          ok = false;
+          break;
+        }
+
+        for (uint8_t slot = 0; slot < Config::KEYBOARD_REPORT_SLOTS; slot++) {
+          if (actual.keycodes[slot] != expected.keycodes[slot]) {
+            ok = false;
+            break;
+          }
+        }
+
+        if (!ok) {
+          break;
+        }
+      }
+    }
+  }
+
+  for (uint8_t layer = 0; layer < Config::LAYER_COUNT; layer++) {
+    for (uint8_t keyIndex = 0; keyIndex < Config::KEY_COUNT; keyIndex++) {
+      setAssignment(layer, keyIndex, backup[layer][keyIndex]);
+    }
+  }
+
+  const bool restored = saveKeymapToStorage();
+  return ok && restored;
+}
