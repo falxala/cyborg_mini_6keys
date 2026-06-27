@@ -24,15 +24,27 @@ uint32_t lastRemapperHeartbeatMs = 0;
 bool consumerReleasePending = false;
 uint32_t consumerReleaseDueUs = 0;
 
+constexpr uint8_t CONFIG_RESPONSE_READY_RETRIES = 20;
+constexpr uint16_t CONFIG_RESPONSE_RETRY_DELAY_US = 100;
+
 uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
 }
 
-void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_t* payload, uint8_t length) {
-  if (!usbHid.ready()) {
-    return;
+bool sendConfigReportWhenReady(const uint8_t* report, uint8_t length) {
+  for (uint8_t attempt = 0; attempt < CONFIG_RESPONSE_READY_RETRIES; attempt++) {
+    if (usbHid.ready()) {
+      usbHid.sendReport(RID_CONFIG, report, length);
+      return true;
+    }
+
+    delayMicroseconds(CONFIG_RESPONSE_RETRY_DELAY_US);
   }
 
+  return false;
+}
+
+void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_t* payload, uint8_t length) {
   uint8_t report[Config::CONFIG_REPORT_SIZE] = { 0 };
   report[0] = static_cast<uint8_t>(command);
   report[1] = static_cast<uint8_t>(status);
@@ -45,7 +57,7 @@ void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_
     report[3 + i] = payload[i];
   }
 
-  usbHid.sendReport(RID_CONFIG, report, sizeof(report));
+  sendConfigReportWhenReady(report, sizeof(report));
 }
 
 void handleGetState() {
