@@ -43,12 +43,23 @@ void beginKeyScanner() {
   lastRawChangeUs = micros();
 }
 
-bool updateKeyScanner() {
+bool updateKeyScanner(bool lowLatencyPress) {
   const uint8_t rawMask = readRawKeyMask();
+  const uint32_t nowUs = micros();
 
   if (rawMask != lastRawMask) {
     lastRawMask = rawMask;
-    lastRawChangeUs = micros();
+    lastRawChangeUs = nowUs;
+
+    if (lowLatencyPress) {
+      const uint8_t newlyPressed = rawMask & ~stableMask;
+      if (newlyPressed != 0) {
+        oldStableMask = stableMask;
+        stableMask |= newlyPressed;
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -56,7 +67,7 @@ bool updateKeyScanner() {
     return false;
   }
 
-  if (static_cast<uint32_t>(micros() - lastRawChangeUs) < Config::DEBOUNCE_US) {
+  if (static_cast<uint32_t>(nowUs - lastRawChangeUs) < Config::DEBOUNCE_US) {
     return false;
   }
 

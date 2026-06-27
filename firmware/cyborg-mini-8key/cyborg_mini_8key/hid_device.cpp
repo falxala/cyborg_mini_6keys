@@ -20,6 +20,8 @@ Adafruit_USBD_HID usbHid(
   false
 );
 uint32_t lastRemapperHeartbeatMs = 0;
+bool consumerReleasePending = false;
+uint32_t consumerReleaseDueUs = 0;
 
 uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
@@ -222,9 +224,14 @@ void releaseKeyboardReport(uint8_t reportId) {
 }
 
 void sendConsumerTap(uint16_t usage) {
+  if (consumerReleasePending) {
+    usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+    consumerReleasePending = false;
+  }
+
   usbHid.sendReport16(RID_CONSUMER_CONTROL, usage);
-  delay(2);
-  usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+  consumerReleaseDueUs = micros() + 2000;
+  consumerReleasePending = true;
 }
 
 }  // namespace
@@ -240,6 +247,17 @@ void beginHidDevice() {
 
 bool hidDeviceMounted() {
   return TinyUSBDevice.mounted();
+}
+
+void updateHidDevice() {
+  if (!consumerReleasePending) {
+    return;
+  }
+
+  if (static_cast<uint32_t>(micros() - consumerReleaseDueUs) < 0x80000000UL) {
+    usbHid.sendReport16(RID_CONSUMER_CONTROL, 0);
+    consumerReleasePending = false;
+  }
 }
 
 bool remapperConnected() {

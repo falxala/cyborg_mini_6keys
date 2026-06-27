@@ -11,9 +11,12 @@ void setup() {
 }
 
 void loop() {
-  if (updateKeyScanner()) {
+  const bool remapperActive = remapperConnected();
+
+  if (updateKeyScanner(!remapperActive)) {
     sendKeyChanges(previousKeyMask(), currentKeyMask(), activeLayer());
   }
 
-  updateStatusHeartbeat(hidDeviceMounted(), remapperConnected());
+  updateHidDevice();
+  updateStatusHeartbeat(hidDeviceMounted(), remapperActive);
 }
