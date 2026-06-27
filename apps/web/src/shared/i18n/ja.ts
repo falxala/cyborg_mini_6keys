@@ -53,7 +53,7 @@ export const ja = {
     idle: "Idle",
     connected: "Connected",
     connect: "Connect",
-    reconnect: "Reconnect",
+    disconnect: "Disconnect",
     updater: "Updater",
     initialStatus: "未接続",
     connectedTo: (name: string) => `${name} に接続`,

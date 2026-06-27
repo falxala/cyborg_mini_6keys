@@ -197,6 +197,12 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
     }
   }
 
+  async function disconnectDevice() {
+    await transport.close().catch(() => undefined);
+    setDeviceState(null);
+    setStatus(t.connection.initialStatus);
+  }
+
   async function selectLayer(layerIndex: number) {
     setActiveLayer(layerIndex);
 
@@ -386,8 +392,8 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
               {t.connection.updater}
             </button>
-            <button type="button" onClick={connectDevice}>
-              {connected ? t.connection.reconnect : t.connection.connect}
+            <button type="button" onClick={connected ? disconnectDevice : connectDevice}>
+              {connected ? t.connection.disconnect : t.connection.connect}
             </button>
           </div>
         </div>
@@ -533,6 +539,13 @@ export function DiagnosticsApp() {
     }
   }
 
+  async function disconnectDevice() {
+    await transport.close().catch(() => undefined);
+    setDeviceState(null);
+    setLastKey(null);
+    setStatus(t.connection.initialStatus);
+  }
+
   function resetDiagnostics() {
     setTestedKeys(Array.from({ length: deviceState?.keyCount ?? HARDWARE_CONFIG.keyCount }, () => false));
     setLastKey(null);
@@ -563,8 +576,8 @@ export function DiagnosticsApp() {
             <a className="ghost-button nav-button" href={remapperUrl}>
               {t.home.openRemapper}
             </a>
-            <button type="button" onClick={connectDevice}>
-              {connected ? t.connection.reconnect : t.connection.connect}
+            <button type="button" onClick={connected ? disconnectDevice : connectDevice}>
+              {connected ? t.connection.disconnect : t.connection.connect}
             </button>
           </div>
         </div>

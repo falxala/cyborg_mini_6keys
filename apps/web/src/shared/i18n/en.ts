@@ -55,7 +55,7 @@ export const en: typeof ja = {
     idle: "Idle",
     connected: "Connected",
     connect: "Connect",
-    reconnect: "Reconnect",
+    disconnect: "Disconnect",
     updater: "Updater",
     initialStatus: "Disconnected",
     connectedTo: (name) => `Connected to ${name}`,
