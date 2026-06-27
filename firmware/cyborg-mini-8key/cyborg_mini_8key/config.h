@@ -43,6 +43,7 @@ constexpr uint8_t STATUS_LED_PIN = 255;
 constexpr uint8_t STATUS_LED_BRIGHTNESS = 255;
 
 constexpr uint16_t DEBOUNCE_US = 5000;
-constexpr uint16_t STATUS_HEARTBEAT_MS = 80;
+constexpr uint16_t STATUS_COLOR_WHEEL_MS = 40;
+constexpr uint16_t STATUS_DIGITAL_HEARTBEAT_MS = 500;
 
 }  // namespace Config

@@ -6,7 +6,7 @@
 
 namespace {
 
-uint32_t lastToggleMs = 0;
+uint32_t lastUpdateMs = 0;
 bool heartbeatState = false;
 uint8_t colorWheelPosition = 0;
 Adafruit_NeoPixel statusPixel(1, Config::STATUS_LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -53,18 +53,31 @@ void updateStatusHeartbeat(bool mounted) {
   if (!mounted) {
     setStatusLed(false);
     heartbeatState = false;
+    lastUpdateMs = 0;
     return;
   }
 
   const uint32_t now = millis();
-  if (now - lastToggleMs < Config::STATUS_HEARTBEAT_MS) {
+
+  if (Config::STATUS_LED_KIND == Config::StatusLedKind::NeoPixel) {
+    if (lastUpdateMs != 0 && now - lastUpdateMs < Config::STATUS_COLOR_WHEEL_MS) {
+      return;
+    }
+
+    lastUpdateMs = now;
+    colorWheelPosition += 2;
+    statusPixel.setPixelColor(0, colorWheel(colorWheelPosition));
+    statusPixel.show();
     return;
   }
 
-  lastToggleMs = now;
-  heartbeatState = !heartbeatState;
-  if (heartbeatState) {
-    colorWheelPosition += 19;
+  if (Config::STATUS_LED_KIND == Config::StatusLedKind::Digital) {
+    if (lastUpdateMs != 0 && now - lastUpdateMs < Config::STATUS_DIGITAL_HEARTBEAT_MS) {
+      return;
+    }
+
+    lastUpdateMs = now;
+    heartbeatState = !heartbeatState;
+    setStatusLed(heartbeatState);
   }
-  setStatusLed(heartbeatState);
 }
