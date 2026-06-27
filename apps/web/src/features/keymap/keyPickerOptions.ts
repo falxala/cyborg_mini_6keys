@@ -47,6 +47,15 @@ export type KeyPickerOption =
 export type ConsumerKeyOption = {
   usage: number;
   label: string;
+  icon:
+    | "mute"
+    | "volume-down"
+    | "volume-up"
+    | "previous"
+    | "play-pause"
+    | "next"
+    | "brightness-down"
+    | "brightness-up";
 };
 
 export const keyboardRows: KeyPickerOption[][] = [
@@ -163,15 +172,19 @@ export const numpadRows: KeyPickerOption[][] = [
 ];
 
 export const consumerOptions: ConsumerKeyOption[] = [
-  { usage: 0x00e2, label: "Mute" },
-  { usage: 0x00ea, label: "Vol-" },
-  { usage: 0x00e9, label: "Vol+" },
-  { usage: 0x00b6, label: "Prev" },
-  { usage: 0x00cd, label: "Play" },
-  { usage: 0x00b5, label: "Next" },
-  { usage: 0x0070, label: "Bri-" },
-  { usage: 0x006f, label: "Bri+" },
+  { usage: 0x00e2, label: "Mute", icon: "mute" },
+  { usage: 0x00ea, label: "Vol-", icon: "volume-down" },
+  { usage: 0x00e9, label: "Vol+", icon: "volume-up" },
+  { usage: 0x00b6, label: "Prev", icon: "previous" },
+  { usage: 0x00cd, label: "Play", icon: "play-pause" },
+  { usage: 0x00b5, label: "Next", icon: "next" },
+  { usage: 0x0070, label: "Bri-", icon: "brightness-down" },
+  { usage: 0x006f, label: "Bri+", icon: "brightness-up" },
 ];
+
+export function consumerOptionByUsage(usage: number) {
+  return consumerOptions.find((option) => option.usage === usage);
+}
 
 export const modifierOptions: ModifierKeyOption[] = [
   mod(0x01, "Ctrl"),
@@ -186,7 +199,7 @@ export const modifierOptions: ModifierKeyOption[] = [
 
 export const blankOption: BlankKeyOption = {
   kind: "blank",
-  label: "Blank",
+  label: "未割り当て",
   accent: true,
   width: 2,
 };

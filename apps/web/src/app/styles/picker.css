@@ -213,9 +213,47 @@
 
 .keycap-svg .shape-label {
   fill: var(--key-text);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   dominant-baseline: middle;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.keycap-svg .shape-label-narrow {
+  font-size: 13px;
+  transform: scaleX(0.88);
+}
+
+.keycap-svg .shape-label-compact {
+  font-size: 12px;
+  transform: scaleX(0.76);
+}
+
+.consumer-keycap-svg .consumer-icon {
+  color: var(--key-text);
+}
+
+.consumer-strip .consumer-keycap-svg {
+  height: 38px;
+  margin-top: 2px;
+}
+
+.consumer-keycap-svg .icon-fill {
+  fill: currentColor;
+}
+
+.consumer-keycap-svg .icon-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.consumer-keycap-svg .icon-stroke.danger {
+  stroke: #c94d35;
 }
 
 .consumer-strip {

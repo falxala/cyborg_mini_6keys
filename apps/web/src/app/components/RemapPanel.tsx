@@ -1,3 +1,5 @@
+import { ConsumerKeycapSvg } from "./ConsumerKeycapSvg";
+import { consumerOptionByUsage } from "../../features/keymap/keyPickerOptions";
 import type { KeyAssignment } from "../../features/keymap/keymapTypes";
 
 type RemapPanelProps = {
@@ -24,7 +26,7 @@ export function RemapPanel({
           <span className="panel-kicker">Keymap</span>
           <h2>Layers</h2>
         </div>
-        <div className="selection-pill">K{selectedKey + 1}</div>
+        <div className="selection-pill">Key {selectedKey + 1}</div>
       </div>
 
       <div className="remap-strip">
@@ -46,19 +48,44 @@ export function RemapPanel({
       <div className="remap-strip">
         <span className="strip-label">Keys</span>
         <div className="key-grid">
-          {layerAssignments.map((assignment, keyIndex) => (
-            <button
-              key={keyIndex}
-              type="button"
-              className={keyIndex === selectedKey ? "key-tile active" : "key-tile"}
-              onClick={() => onSelectKey(keyIndex)}
-            >
-              <span>K{keyIndex + 1}</span>
-              <strong>{assignment.label}</strong>
-            </button>
-          ))}
+          {layerAssignments.map((assignment, keyIndex) => {
+            const isSelected = keyIndex === selectedKey;
+
+            return (
+              <button
+                key={keyIndex}
+                type="button"
+                className={isSelected ? "key-tile active" : "key-tile"}
+                onClick={() => onSelectKey(keyIndex)}
+              >
+                <span>Key {keyIndex + 1}</span>
+                <div className="key-tile-assignments">
+                  <AssignmentPreview assignment={assignment} />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>
+  );
+}
+
+function AssignmentPreview({
+  assignment,
+}: {
+  assignment: KeyAssignment;
+}) {
+  const consumerOption =
+    assignment.kind === "consumer" ? consumerOptionByUsage(assignment.usage) : undefined;
+
+  return (
+    <div className="assignment-preview">
+      {consumerOption ? (
+        <ConsumerKeycapSvg icon={consumerOption.icon} label={assignment.label} variant="tile" />
+      ) : (
+        <strong>{assignment.kind === "none" ? "なし" : assignment.label}</strong>
+      )}
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { ConsumerKeycapSvg } from "./ConsumerKeycapSvg";
 import { KeycapSvg } from "./KeycapSvg";
 import {
   blankOption,
@@ -139,9 +140,10 @@ export function KeyboardPickerPanel({
                   ? "picker-key active"
                   : "picker-key"
               }
+              aria-label={option.label}
               onClick={() => onConsumerOption(option)}
             >
-              <KeycapSvg label={option.label} units={2.16} />
+              <ConsumerKeycapSvg icon={option.icon} label={option.label} />
             </button>
           ))}
           {renderPickerOption(blankOption, "blank")}

@@ -185,9 +185,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 10px;
+  align-items: stretch;
+  gap: 8px;
   min-height: 84px;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid rgba(78, 61, 38, 0.14);
   background: rgba(255, 251, 246, 0.96);
   box-shadow: inset 0 -6px 0 rgba(169, 151, 125, 0.18);
@@ -202,11 +203,44 @@
   text-transform: uppercase;
 }
 
-.key-tile strong {
+.key-tile-assignments {
+  display: grid;
+  gap: 6px;
+  place-items: center;
+  text-align: center;
+}
+
+.assignment-preview {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  place-items: center;
+}
+
+.assignment-preview strong {
   display: block;
-  font-size: 14px;
-  line-height: 1.25;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.12;
   overflow-wrap: anywhere;
+}
+
+.assignment-preview .consumer-keycap-svg-tile {
+  width: 100%;
+  height: 34px;
+  color: var(--text);
+}
+
+.assignment-preview .consumer-keycap-svg-tile .shape-fill {
+  fill: rgba(255, 252, 247, 0.9);
+}
+
+.assignment-preview .consumer-keycap-svg-tile .shape-shadow {
+  fill: rgba(169, 151, 125, 0.18);
+}
+
+.assignment-preview .consumer-keycap-svg-tile .shape-stroke {
+  stroke: rgba(78, 61, 38, 0.18);
 }
 
 .key-tile.active {
@@ -215,6 +249,18 @@
   box-shadow:
     inset 0 0 0 1px rgba(13, 122, 114, 0.28),
     inset 0 -6px 0 rgba(13, 122, 114, 0.18);
+}
+
+.key-tile.active .consumer-keycap-svg-tile .shape-fill {
+  fill: rgba(224, 242, 238, 0.98);
+}
+
+.key-tile.active .consumer-keycap-svg-tile .shape-shadow {
+  fill: rgba(13, 122, 114, 0.16);
+}
+
+.key-tile.active .consumer-keycap-svg-tile .shape-stroke {
+  stroke: rgba(13, 122, 114, 0.35);
 }
 
 .editor-panel .panel-heading {
