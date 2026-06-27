@@ -133,21 +133,14 @@ select {
 }
 
 .hardware-panel dl {
-  align-items: center;
-  display: flex;
-  gap: 10px 14px;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr;
   margin: 0;
-}
-
-.hardware-panel {
-  align-items: center;
-  display: flex;
-  gap: 12px;
 }
 
 .hardware-panel h2 {
-  margin: 0;
+  margin-bottom: 8px;
 }
 
 .hardware-panel dl div {
@@ -514,10 +507,5 @@ select {
 
   .editor-panel {
     grid-template-columns: 1fr;
-  }
-
-  .hardware-panel {
-    align-items: stretch;
-    flex-direction: column;
   }
 }
