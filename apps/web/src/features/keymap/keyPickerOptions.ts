@@ -164,6 +164,17 @@ export const consumerOptions: ConsumerKeyOption[] = [
   { usage: 0x006f, label: "Bri+" },
 ];
 
+export const modifierOptions: ModifierKeyOption[] = [
+  mod(0x01, "Ctrl"),
+  mod(0x02, "Shift"),
+  mod(0x04, "Alt"),
+  mod(0x08, "Meta"),
+  mod(0x10, "RCtrl"),
+  mod(0x20, "RShift"),
+  mod(0x40, "RAlt"),
+  mod(0x80, "RMeta"),
+];
+
 export const blankOption: BlankKeyOption = {
   kind: "blank",
   label: "Blank",

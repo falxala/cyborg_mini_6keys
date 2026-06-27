@@ -20,6 +20,7 @@ import { createInitialKeymap } from "../features/keymap/defaultKeymap";
 import {
   blankOption,
   consumerOptions,
+  modifierOptions,
   keyboardRows,
   keyOptionLabel,
   navigationRows,
@@ -203,10 +204,6 @@ export function App() {
         keycodes: current.kind === "keyboard" ? [usage, 0, 0, 0, 0, 0] : current.keycodes,
       }),
     );
-  }
-
-  function updateDraftModifier(modifier: number) {
-    setDraftAssignment((current) => normalizeAssignment({ ...current, modifier }));
   }
 
   function applyPickerOption(option: KeyPickerOption) {
@@ -398,16 +395,22 @@ export function App() {
             />
           </label>
 
-          <label>
+          <div className="modifier-grid" aria-label="Modifier selector">
+            {modifierOptions.map((option) => (
+              <button
+                key={option.modifier}
+                type="button"
+                className={pickerOptionClassName(option)}
+                onClick={() => applyPickerOption(option)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <label className="modifier-summary">
             <span>Modifier</span>
-            <input
-              type="number"
-              min={0}
-              max={255}
-              value={draftAssignment.modifier}
-              disabled={draftAssignment.kind !== "keyboard"}
-              onChange={(event) => updateDraftModifier(Number(event.currentTarget.value))}
-            />
+            <div>{draftAssignment.kind === "keyboard" ? draftAssignment.label : "-"}</div>
           </label>
 
           <dl className="assignment-summary">

@@ -263,8 +263,30 @@ select {
 
 .editor-panel label:first-of-type,
 .editor-panel .assignment-summary,
-.editor-panel .primary-action {
+.editor-panel .primary-action,
+.modifier-grid,
+.modifier-summary {
   grid-column: 1 / -1;
+}
+
+.modifier-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.modifier-grid .picker-key {
+  width: 100%;
+}
+
+.modifier-summary div {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #c8d0d8;
+  border-radius: 6px;
+  display: flex;
+  min-height: 38px;
+  padding: 8px 10px;
 }
 
 .assignment-summary {
@@ -547,6 +569,10 @@ select {
 
   .editor-panel {
     grid-template-columns: 1fr;
+  }
+
+  .modifier-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .firmware-panel {
