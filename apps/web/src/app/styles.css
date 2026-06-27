@@ -139,6 +139,12 @@ select {
 .editor-panel {
   grid-column: 2;
   grid-row: 2;
+  align-content: start;
+  display: grid;
+  gap: 6px 10px;
+  grid-template-columns: 1fr 1fr;
+  height: clamp(296px, 24vw, 304px);
+  padding: 10px 12px;
 }
 
 .firmware-panel,
@@ -260,7 +266,7 @@ select {
 .key-grid {
   display: grid;
   gap: 3px;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-self: stretch;
   align-content: start;
   width: 100%;
@@ -291,21 +297,20 @@ select {
 }
 
 .panel-heading.compact {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .panel-heading.compact button {
   padding: 5px 8px;
 }
 
-.editor-panel {
-  display: grid;
-  gap: 8px 10px;
-  grid-template-columns: 1fr 1fr;
-}
-
 .editor-panel .panel-heading {
   grid-column: 1 / -1;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 6px;
 }
 
 .editor-panel label {
@@ -321,12 +326,11 @@ select {
 
 .editor-panel input,
 .editor-panel select {
-  padding: 8px 10px;
+  padding: 7px 9px;
 }
 
 .editor-panel label:first-of-type,
 .editor-panel .assignment-summary,
-.editor-panel .primary-action,
 .modifier-grid,
 .modifier-summary {
   grid-column: 1 / -1;
@@ -348,17 +352,17 @@ select {
   border: 1px solid #c8d0d8;
   border-radius: 6px;
   display: flex;
-  min-height: 38px;
-  padding: 8px 10px;
+  min-height: 34px;
+  padding: 7px 9px;
 }
 
 .assignment-summary {
   border-top: 1px solid #e3e8ef;
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: 1fr 1fr;
   margin: 0;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 
 .assignment-summary div {
@@ -376,7 +380,7 @@ select {
   background: #223047;
   border-color: #223047;
   color: #ffffff;
-  padding: 9px 12px;
+  padding: 7px 10px;
 }
 
 .firmware-panel {
@@ -649,6 +653,7 @@ select {
 
   .editor-panel {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .modifier-grid {

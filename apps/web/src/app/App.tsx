@@ -369,9 +369,19 @@ export function App() {
         <aside className="panel editor-panel">
           <div className="panel-heading compact">
             <h2>K{selectedKey + 1}</h2>
-            <button type="button" onClick={() => void readAllAssignments()} disabled={!connected}>
-              Read
-            </button>
+            <div className="editor-actions">
+              <button type="button" onClick={() => void readAllAssignments()} disabled={!connected}>
+                Read
+              </button>
+              <button
+                type="button"
+                className="primary-action"
+                onClick={() => void saveSelectedAssignment()}
+                disabled={!connected}
+              >
+                Save
+              </button>
+            </div>
           </div>
 
           <label>
@@ -427,14 +437,6 @@ export function App() {
             </div>
           </dl>
 
-          <button
-            type="button"
-            className="primary-action"
-            onClick={() => void saveSelectedAssignment()}
-            disabled={!connected}
-          >
-            Save
-          </button>
         </aside>
 
         <section className="panel firmware-panel">
