@@ -671,40 +671,48 @@ export function DiagnosticsApp() {
           <dl className="diagnostics-list">
             <div>
               <dt>{t.diagnostics.webHid}</dt>
-              <dd>{typeof navigator !== "undefined" && "hid" in navigator ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={typeof navigator !== "undefined" && "hid" in navigator} />
             </div>
             <div>
               <dt>{t.diagnostics.deviceConnection}</dt>
-              <dd>{connected ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={connected} />
             </div>
             <div>
               <dt>{t.diagnostics.keyEvent}</dt>
-              <dd>{testedCount > 0 ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={testedCount > 0} />
             </div>
             <div>
               <dt>{t.diagnostics.reportSend}</dt>
-              <dd>{reportTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={reportTestStatus === "passed"} />
             </div>
             <div>
               <dt>{t.diagnostics.reportDetail}</dt>
-              <dd>{reportTestDetail}</dd>
+              <dd className="diagnostics-detail">{reportTestDetail}</dd>
             </div>
             <div>
               <dt>{t.diagnostics.storageWriteRead}</dt>
-              <dd>{storageTestStatus === "passed" ? t.diagnostics.ok : t.diagnostics.ng}</dd>
+              <DiagnosticResult passed={storageTestStatus === "passed"} />
             </div>
             <div>
               <dt>{t.diagnostics.storageDetail}</dt>
-              <dd>{storageTestDetail}</dd>
+              <dd className="diagnostics-detail">{storageTestDetail}</dd>
             </div>
             <div>
               <dt>{t.diagnostics.reportKeys}</dt>
-              <dd>{deviceState?.keyCount ?? "-"}</dd>
+              <dd className="diagnostics-detail">{deviceState?.keyCount ?? "-"}</dd>
             </div>
           </dl>
         </aside>
       </section>
     </main>
+  );
+}
+
+function DiagnosticResult({ passed }: { passed: boolean }) {
+  return (
+    <dd className={passed ? "diagnostics-result passed" : "diagnostics-result failed"}>
+      {passed ? t.diagnostics.ok : t.diagnostics.ng}
+    </dd>
   );
 }
 
