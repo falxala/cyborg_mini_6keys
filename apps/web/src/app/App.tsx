@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { EditorPanel } from "./components/EditorPanel";
+import { FirmwarePanel } from "./components/FirmwarePanel";
+import { HardwarePanel } from "./components/HardwarePanel";
+import { KeyboardPickerPanel } from "./components/KeyboardPickerPanel";
+import { RemapPanel } from "./components/RemapPanel";
+import { updateKeymap } from "./updateKeymap";
 import {
   enterDeviceBootloader,
   getDeviceState,
@@ -9,22 +15,13 @@ import {
   type DeviceState,
 } from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
-import { CYBORG_MINI_USB, formatUsbId } from "../features/device/usbIdentity";
 import {
   canInstallUf2FromBrowser,
   downloadFirmwareUf2,
   installFirmwareUf2,
 } from "../features/firmware/firmwareUpdater";
-import { HARDWARE_CONFIG } from "../features/hardware/hardwareConfig";
 import { createInitialKeymap } from "../features/keymap/defaultKeymap";
 import {
-  blankOption,
-  consumerOptions,
-  modifierOptions,
-  keyboardRows,
-  keyOptionLabel,
-  navigationRows,
-  numpadRows,
   type ConsumerKeyOption,
   type KeyboardLayoutMode,
   type KeyPickerOption,
@@ -52,8 +49,6 @@ export function App() {
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const connected = deviceState !== null && transport.connected;
   const firmwareInstallSupported = canInstallUf2FromBrowser();
-  const systemRows = navigationRows.slice(0, 1);
-  const navigationBodyRows = navigationRows.slice(1);
 
   useEffect(() => {
     setDraftAssignment(selectedAssignment);
@@ -237,45 +232,6 @@ export function App() {
     setDraftAssignment(createConsumerAssignment(option.usage));
   }
 
-  function pickerOptionClassName(option: KeyPickerOption) {
-    if (option.kind === "spacer") {
-      return "picker-spacer";
-    }
-
-    const accent = option.accent ? " layout-accent" : "";
-    const active =
-      (option.kind === "blank" && draftAssignment.kind === "none") ||
-      (option.kind === "key" &&
-        draftAssignment.kind === "keyboard" &&
-        draftAssignment.usage === option.code) ||
-      (option.kind === "modifier" &&
-        draftAssignment.kind === "keyboard" &&
-        (draftAssignment.modifier & option.modifier) !== 0);
-
-    return active ? `picker-key active${accent}` : `picker-key${accent}`;
-  }
-
-  function renderPickerOption(option: KeyPickerOption, key: string) {
-    const width = option.kind === "spacer" ? option.width : option.width ?? 1;
-    const style = { "--key-units": width } as CSSProperties;
-
-    if (option.kind === "spacer") {
-      return <span key={key} className="picker-spacer" style={style} />;
-    }
-
-    return (
-      <button
-        key={key}
-        type="button"
-        className={pickerOptionClassName(option)}
-        style={style}
-        onClick={() => applyPickerOption(option)}
-      >
-        {keyOptionLabel(option, keyboardLayout)}
-      </button>
-    );
-  }
-
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -295,281 +251,43 @@ export function App() {
       </header>
 
       <section className="workspace" aria-label="Remapper workspace">
-        <aside className="panel hardware-panel">
-          <h2>Hardware</h2>
-          <dl>
-            <div>
-              <dt>Keys</dt>
-              <dd>{HARDWARE_CONFIG.keyCount}</dd>
-            </div>
-            <div>
-              <dt>Virtual GND</dt>
-              <dd>{HARDWARE_CONFIG.virtualGroundCount}</dd>
-            </div>
-            <div>
-              <dt>Device layer</dt>
-              <dd>{deviceState?.activeLayer ?? "-"}</dd>
-            </div>
-            <div>
-              <dt>Report keys</dt>
-              <dd>{deviceState?.keyCount ?? "-"}</dd>
-            </div>
-            <div>
-              <dt>USB ID</dt>
-              <dd>
-                {formatUsbId(CYBORG_MINI_USB.vendorId)}:{formatUsbId(CYBORG_MINI_USB.productId)}
-              </dd>
-            </div>
-            <div>
-              <dt>External RGB</dt>
-              <dd>None</dd>
-            </div>
-            <div>
-              <dt>OLED</dt>
-              <dd>None</dd>
-            </div>
-          </dl>
-        </aside>
-
-        <section className="panel remap-panel">
-          <div className="remap-strip">
-            <span className="strip-label">Layer</span>
-            <div className="layer-tabs" aria-label="Layer selector">
-              {keymap.map((_, layerIndex) => (
-                <button
-                  key={layerIndex}
-                  type="button"
-                  className={layerIndex === activeLayer ? "active" : ""}
-                  onClick={() => void selectLayer(layerIndex)}
-                >
-                  {layerIndex}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="remap-strip">
-            <span className="strip-label">Keys</span>
-            <div className="key-grid">
-              {keymap[activeLayer].map((assignment, keyIndex) => (
-                <button
-                  key={keyIndex}
-                  type="button"
-                  className={keyIndex === selectedKey ? "key-tile active" : "key-tile"}
-                  onClick={() => setSelectedKey(keyIndex)}
-                >
-                  <span>K{keyIndex + 1}</span>
-                  <strong>{assignment.label}</strong>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <aside className="panel editor-panel">
-          <div className="panel-heading compact">
-            <h2>K{selectedKey + 1}</h2>
-            <div className="editor-actions">
-              <button type="button" onClick={() => void readAllAssignments()} disabled={!connected}>
-                Read
-              </button>
-              <button
-                type="button"
-                className="primary-action"
-                onClick={() => void saveSelectedAssignment()}
-                disabled={!connected}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-
-          <label>
-            <span>Type</span>
-            <select
-              value={draftAssignment.kind}
-              onChange={(event) => updateDraftKind(event.currentTarget.value as KeyAssignmentKind)}
-            >
-              <option value="none">None</option>
-              <option value="keyboard">Keyboard</option>
-              <option value="consumer">Consumer</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Usage</span>
-            <input
-              type="number"
-              min={0}
-              max={draftAssignment.kind === "consumer" ? 65535 : 255}
-              value={draftAssignment.usage}
-              disabled={draftAssignment.kind === "none"}
-              onChange={(event) => updateDraftUsage(Number(event.currentTarget.value))}
-            />
-          </label>
-
-          <div className="modifier-grid" aria-label="Modifier selector">
-            {modifierOptions.map((option) => (
-              <button
-                key={option.modifier}
-                type="button"
-                className={pickerOptionClassName(option)}
-                onClick={() => applyPickerOption(option)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          <label className="modifier-summary">
-            <span>Modifier</span>
-            <div>{draftAssignment.kind === "keyboard" ? draftAssignment.label : "-"}</div>
-          </label>
-
-          <dl className="assignment-summary">
-            <div>
-              <dt>Label</dt>
-              <dd>{draftAssignment.label}</dd>
-            </div>
-            <div>
-              <dt>Usage hex</dt>
-              <dd>{formatHex(draftAssignment.usage, draftAssignment.kind === "consumer" ? 4 : 2)}</dd>
-            </div>
-          </dl>
-
-        </aside>
-
-        <section className="panel firmware-panel">
-          <div>
-            <h2>Firmware</h2>
-            <span>{firmwareStatus}</span>
-          </div>
-          <div className="firmware-actions">
-            <button type="button" onClick={() => void enterBootloaderMode()} disabled={!connected}>
-              BOOTSEL
-            </button>
-            <button
-              type="button"
-              onClick={() => void installBundledFirmware()}
-              disabled={!firmwareInstallSupported}
-            >
-              Install UF2
-            </button>
-            <button type="button" onClick={() => void downloadBundledFirmware()}>
-              Download UF2
-            </button>
-          </div>
-        </section>
-
-        <section className="panel picker-panel">
-          <div className="panel-heading">
-            <h2>Keyboard</h2>
-            <div className="layout-tabs" aria-label="Keyboard layout selector">
-              <button
-                type="button"
-                className={keyboardLayout === "jis" ? "active" : ""}
-                onClick={() => setKeyboardLayout("jis")}
-              >
-                JIS
-              </button>
-              <button
-                type="button"
-                className={keyboardLayout === "us" ? "active" : ""}
-                onClick={() => setKeyboardLayout("us")}
-              >
-                US
-              </button>
-            </div>
-          </div>
-
-          <div className="consumer-board">
-            <div className="consumer-strip">
-              {consumerOptions.map((option) => (
-                <button
-                  key={option.usage}
-                  type="button"
-                  className={
-                    draftAssignment.kind === "consumer" && draftAssignment.usage === option.usage
-                      ? "picker-key active"
-                      : "picker-key"
-                  }
-                  onClick={() => applyConsumerOption(option)}
-                >
-                  {option.label}
-                </button>
-              ))}
-              {renderPickerOption(blankOption, "blank")}
-            </div>
-          </div>
-
-          <div className={`keyboard-picker ${keyboardLayout}`}>
-            <div className="keyboard-main">
-              {keyboardRows.map((row, rowIndex) => (
-                <div key={rowIndex} className="picker-row">
-                  {row.map((option, optionIndex) =>
-                    renderPickerOption(option, `main-${rowIndex}-${optionIndex}`),
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="keyboard-indicator" aria-hidden="true">
-              <span>No others needed...</span>
-              <strong>CYBORG</strong>
-              <div>
-                <i />
-                <i />
-                <i />
-              </div>
-            </div>
-
-            <div className="keyboard-cluster system-cluster">
-              {systemRows.map((row, rowIndex) => (
-                <div key={rowIndex} className="picker-row compact">
-                  {row.map((option, optionIndex) =>
-                    renderPickerOption(option, `sys-${rowIndex}-${optionIndex}`),
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="keyboard-cluster navigation-cluster">
-              {navigationBodyRows.map((row, rowIndex) => (
-                <div key={rowIndex} className="picker-row compact">
-                  {row.map((option, optionIndex) =>
-                    renderPickerOption(option, `nav-${rowIndex}-${optionIndex}`),
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="keyboard-cluster numpad-cluster">
-              {numpadRows.map((row, rowIndex) => (
-                <div key={rowIndex} className="picker-row compact">
-                  {row.map((option, optionIndex) =>
-                    renderPickerOption(option, `num-${rowIndex}-${optionIndex}`),
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <HardwarePanel deviceState={deviceState} />
+        <RemapPanel
+          activeLayer={activeLayer}
+          selectedKey={selectedKey}
+          layerCount={keymap.length}
+          layerAssignments={keymap[activeLayer]}
+          onSelectLayer={(layerIndex) => void selectLayer(layerIndex)}
+          onSelectKey={setSelectedKey}
+        />
+        <EditorPanel
+          selectedKey={selectedKey}
+          connected={connected}
+          draftAssignment={draftAssignment}
+          onRead={() => void readAllAssignments()}
+          onSave={() => void saveSelectedAssignment()}
+          onUpdateKind={updateDraftKind}
+          onUpdateUsage={updateDraftUsage}
+          onToggleModifier={(modifier) =>
+            applyPickerOption({ kind: "modifier", modifier, label: "", width: 1 })
+          }
+        />
+        <FirmwarePanel
+          connected={connected}
+          firmwareInstallSupported={firmwareInstallSupported}
+          firmwareStatus={firmwareStatus}
+          onEnterBootloader={() => void enterBootloaderMode()}
+          onInstallFirmware={() => void installBundledFirmware()}
+          onDownloadFirmware={() => void downloadBundledFirmware()}
+        />
+        <KeyboardPickerPanel
+          draftAssignment={draftAssignment}
+          keyboardLayout={keyboardLayout}
+          onKeyboardLayoutChange={setKeyboardLayout}
+          onPickerOption={applyPickerOption}
+          onConsumerOption={applyConsumerOption}
+        />
       </section>
     </main>
-  );
-}
-
-function updateKeymap(
-  keymap: KeyAssignment[][],
-  layer: number,
-  keyIndex: number,
-  assignment: KeyAssignment,
-) {
-  return keymap.map((layerAssignments, layerIndex) =>
-    layerIndex === layer
-      ? layerAssignments.map((current, currentKeyIndex) =>
-          currentKeyIndex === keyIndex ? assignment : current,
-        )
-      : layerAssignments,
   );
 }

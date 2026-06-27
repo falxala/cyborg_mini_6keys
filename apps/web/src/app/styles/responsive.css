@@ -1,0 +1,79 @@
+@container (max-width: 1120px) {
+  .keyboard-picker,
+  .consumer-board {
+    --key-font-size: 11px;
+    --key-unit: 40px;
+  }
+
+  .key-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 1040px) {
+  .keyboard-picker,
+  .consumer-board {
+    --key-font-size: 10px;
+    --key-unit: 37px;
+  }
+}
+
+@container (max-width: 960px) {
+  .keyboard-picker,
+  .consumer-board {
+    --key-font-size: 9px;
+    --key-unit: 34px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .topbar,
+  .connection,
+  .panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .hardware-panel,
+  .remap-panel,
+  .editor-panel,
+  .firmware-panel,
+  .picker-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .key-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .remap-panel {
+    height: auto;
+  }
+
+  .editor-panel {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .modifier-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .firmware-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .firmware-actions {
+    justify-content: flex-start;
+  }
+}
