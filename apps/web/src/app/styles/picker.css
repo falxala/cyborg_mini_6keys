@@ -155,6 +155,10 @@
   visibility: hidden;
 }
 
+.picker-decor.numpad-plus-lower {
+  visibility: hidden;
+}
+
 .keycap-svg {
   display: block;
   overflow: visible;
@@ -166,7 +170,8 @@
 }
 
 .keycap-svg-jis-enter,
-.keycap-svg-numpad-enter {
+.keycap-svg-numpad-enter,
+.keycap-svg-numpad-plus {
   position: absolute;
   top: 0;
   left: 0;
@@ -178,6 +183,11 @@
 }
 
 .keycap-svg-numpad-enter {
+  width: var(--key-unit);
+  height: calc((var(--key-unit) * 2) + var(--key-gap));
+}
+
+.keycap-svg-numpad-plus {
   width: var(--key-unit);
   height: calc((var(--key-unit) * 2) + var(--key-gap));
 }

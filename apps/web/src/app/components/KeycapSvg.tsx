@@ -1,4 +1,4 @@
-type KeycapShape = "regular" | "jis-enter" | "numpad-enter";
+type KeycapShape = "regular" | "jis-enter" | "numpad-enter" | "numpad-plus";
 
 type KeycapSvgProps = {
   label: string;
@@ -27,6 +27,19 @@ export function KeycapSvg({ label, units, shape = "regular" }: KeycapSvgProps) {
   if (shape === "numpad-enter") {
     return (
       <svg className="keycap-svg keycap-svg-numpad-enter" viewBox="0 0 44 94" aria-hidden="true">
+        <path className="shape-fill" d="M1 1H43V93H1V1Z" />
+        <path className="shape-shadow" d="M2 88H42V92H2V88Z" />
+        <path className="shape-stroke" d="M1 1H43V93H1V1Z" />
+        <text x="22" y="47" textAnchor="middle" className="shape-label">
+          {label}
+        </text>
+      </svg>
+    );
+  }
+
+  if (shape === "numpad-plus") {
+    return (
+      <svg className="keycap-svg keycap-svg-numpad-plus" viewBox="0 0 44 94" aria-hidden="true">
         <path className="shape-fill" d="M1 1H43V93H1V1Z" />
         <path className="shape-shadow" d="M2 88H42V92H2V88Z" />
         <path className="shape-stroke" d="M1 1H43V93H1V1Z" />

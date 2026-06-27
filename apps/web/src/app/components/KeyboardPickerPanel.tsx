@@ -59,6 +59,10 @@ export function KeyboardPickerPanel({
       return "jis-enter" as const;
     }
 
+    if (option.kind === "key" && option.code === 87) {
+      return "numpad-plus" as const;
+    }
+
     if (option.kind === "key" && option.code === 88) {
       return "numpad-enter" as const;
     }

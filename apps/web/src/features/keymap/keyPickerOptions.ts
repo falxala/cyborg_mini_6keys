@@ -32,7 +32,7 @@ export type SpacerOption = {
 
 export type DecorationOption = {
   kind: "decoration";
-  decoration: "jis-enter-lower" | "numpad-enter-lower";
+  decoration: "jis-enter-lower" | "numpad-enter-lower" | "numpad-plus-lower";
   sourceCode: number;
   width: number;
 };
@@ -157,7 +157,7 @@ export const navigationRows: KeyPickerOption[][] = [
 export const numpadRows: KeyPickerOption[][] = [
   [key(83, "Num"), key(84, "/"), key(85, "*"), key(86, "-")],
   [key(95, "7"), key(96, "8"), key(97, "9"), key(87, "+")],
-  [key(92, "4"), key(93, "5"), key(94, "6"), gap(1)],
+  [key(92, "4"), key(93, "5"), key(94, "6"), decor("numpad-plus-lower", 87, 1)],
   [key(89, "1"), key(90, "2"), key(91, "3"), key(88, "Enter")],
   [key(98, "0", { width: 2 }), key(99, "."), decor("numpad-enter-lower", 88, 1)],
 ];
