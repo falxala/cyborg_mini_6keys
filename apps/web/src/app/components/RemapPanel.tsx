@@ -7,7 +7,6 @@ type RemapPanelProps = {
   selectedKey: number;
   layerCount: number;
   layerAssignments: KeyAssignment[];
-  draftAssignment: KeyAssignment;
   onSelectLayer: (layerIndex: number) => void;
   onSelectKey: (keyIndex: number) => void;
 };
@@ -17,7 +16,6 @@ export function RemapPanel({
   selectedKey,
   layerCount,
   layerAssignments,
-  draftAssignment,
   onSelectLayer,
   onSelectKey,
 }: RemapPanelProps) {
@@ -52,7 +50,6 @@ export function RemapPanel({
         <div className="key-grid">
           {layerAssignments.map((assignment, keyIndex) => {
             const isSelected = keyIndex === selectedKey;
-            const hasDraftChange = isSelected && !sameAssignment(assignment, draftAssignment);
 
             return (
               <button
@@ -63,14 +60,7 @@ export function RemapPanel({
               >
                 <span>K{keyIndex + 1}</span>
                 <div className="key-tile-assignments">
-                  <AssignmentPreview assignment={assignment} label={isSelected ? "Read" : undefined} />
-                  {isSelected ? (
-                    <AssignmentPreview
-                      assignment={draftAssignment}
-                      label="Edit"
-                      changed={hasDraftChange}
-                    />
-                  ) : null}
+                  <AssignmentPreview assignment={assignment} />
                 </div>
               </button>
             );
@@ -83,33 +73,19 @@ export function RemapPanel({
 
 function AssignmentPreview({
   assignment,
-  label,
-  changed = false,
 }: {
   assignment: KeyAssignment;
-  label?: string;
-  changed?: boolean;
 }) {
   const consumerOption =
     assignment.kind === "consumer" ? consumerOptionByUsage(assignment.usage) : undefined;
 
   return (
-    <div className={changed ? "assignment-preview changed" : "assignment-preview"}>
-      {label ? <em>{label}</em> : null}
+    <div className="assignment-preview">
       {consumerOption ? (
         <ConsumerKeycapSvg icon={consumerOption.icon} label={assignment.label} variant="tile" />
       ) : (
         <strong>{assignment.label}</strong>
       )}
     </div>
-  );
-}
-
-function sameAssignment(first: KeyAssignment, second: KeyAssignment) {
-  return (
-    first.kind === second.kind &&
-    first.modifier === second.modifier &&
-    first.usage === second.usage &&
-    first.keycodes.every((keycode, index) => keycode === second.keycodes[index])
   );
 }

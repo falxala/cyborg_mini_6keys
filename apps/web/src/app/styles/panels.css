@@ -186,7 +186,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  min-height: 96px;
+  min-height: 84px;
   padding: 10px;
   border: 1px solid rgba(78, 61, 38, 0.14);
   background: rgba(255, 251, 246, 0.96);
@@ -209,28 +209,7 @@
 
 .assignment-preview {
   display: grid;
-  gap: 3px;
   min-width: 0;
-}
-
-.assignment-preview em {
-  color: var(--text-muted);
-  font-size: 9px;
-  font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.assignment-preview.changed em {
-  color: var(--accent-strong);
-}
-
-.assignment-preview.changed {
-  margin-left: -4px;
-  padding-left: 4px;
-  border-left: 2px solid var(--accent);
 }
 
 .assignment-preview strong {

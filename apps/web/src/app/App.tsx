@@ -32,6 +32,7 @@ import {
   createKeyboardAssignment,
   formatHex,
   normalizeAssignment,
+  sameAssignment,
   type KeyAssignment,
   type KeyAssignmentKind,
 } from "../features/keymap/keymapTypes";
@@ -44,9 +45,11 @@ export function App() {
   const [status, setStatus] = useState("未接続");
   const [firmwareStatus, setFirmwareStatus] = useState("UF2 ready");
   const [deviceState, setDeviceState] = useState<DeviceState | null>(null);
-  const [keymap, setKeymap] = useState(createInitialKeymap);
+  const [readKeymap, setReadKeymap] = useState(createInitialKeymap);
+  const [writeKeymap, setWriteKeymap] = useState(createInitialKeymap);
   const [keyboardLayout, setKeyboardLayout] = useState<KeyboardLayoutMode>("jis");
-  const selectedAssignment = keymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
+  const readAssignment = readKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
+  const selectedAssignment = writeKeymap[activeLayer]?.[selectedKey] ?? normalizeAssignment({ kind: "none" });
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const [modifierSlots, setModifierSlots] = useState<number[]>(createModifierSlotsFromMask(0));
   const connected = deviceState !== null && transport.connected;
@@ -96,7 +99,8 @@ export function App() {
         productId: `0x${device.productId.toString(16).padStart(4, "0").toUpperCase()}`,
       });
       setDeviceState(state);
-      setKeymap(loadedKeymap);
+      setReadKeymap(loadedKeymap);
+      setWriteKeymap(loadedKeymap);
       setActiveLayer(state.activeLayer);
       setStatus(`${device.productName || "HID device"} に接続`);
     } catch (error) {
@@ -130,7 +134,8 @@ export function App() {
     try {
       setStatus("キーマップ読み込み中");
       const loadedKeymap = await readDeviceKeymap(transport, deviceState.layerCount, deviceState.keyCount);
-      setKeymap(loadedKeymap);
+      setReadKeymap(loadedKeymap);
+      setWriteKeymap(loadedKeymap);
       setStatus("キーマップを読み込みました");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "読み込みに失敗しました");
@@ -145,9 +150,15 @@ export function App() {
 
     const normalized = normalizeAssignment(draftAssignment);
 
+    if (sameAssignment(readAssignment, normalized)) {
+      setStatus(`Layer ${activeLayer} K${selectedKey + 1} は変更なしのため書き込みをスキップしました`);
+      return;
+    }
+
     try {
       await setDeviceKey(transport, activeLayer, selectedKey, normalized);
-      setKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
+      setReadKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
+      setWriteKeymap((current) => updateKeymap(current, activeLayer, selectedKey, normalized));
       setStatus(`Layer ${activeLayer} K${selectedKey + 1} を保存しました`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "保存に失敗しました");
@@ -193,12 +204,12 @@ export function App() {
   }
 
   function updateDraftKind(kind: KeyAssignmentKind) {
-    setDraftAssignment((current) => normalizeAssignment({ ...current, kind }));
+    updateSelectedAssignment((current) => normalizeAssignment({ ...current, kind }));
     setModifierSlots((current) => (kind === "keyboard" ? current : createModifierSlotsFromMask(0)));
   }
 
   function updateDraftUsage(usage: number) {
-    setDraftAssignment((current) =>
+    updateSelectedAssignment((current) =>
       normalizeAssignment({
         ...current,
         usage,
@@ -208,7 +219,7 @@ export function App() {
   }
 
   function updateDraftModifier(modifier: number) {
-    setDraftAssignment((current) => {
+    updateSelectedAssignment((current) => {
       const usage = current.kind === "keyboard" ? current.usage : 0;
       const keycodes = current.kind === "keyboard" ? current.keycodes : [0, 0, 0, 0, 0, 0];
       return createKeyboardAssignment(usage, modifier, keycodes);
@@ -229,13 +240,13 @@ export function App() {
     }
 
     if (option.kind === "blank") {
-      setDraftAssignment(createBlankAssignment());
+      updateSelectedAssignment(() => createBlankAssignment());
       setModifierSlots(createModifierSlotsFromMask(0));
       return;
     }
 
     if (option.kind === "modifier") {
-      setDraftAssignment((current) => {
+      updateSelectedAssignment((current) => {
         const modifier = current.kind === "keyboard" ? current.modifier : 0;
         const usage = current.kind === "keyboard" ? current.usage : 0;
         const keycodes = current.kind === "keyboard" ? current.keycodes : [0, 0, 0, 0, 0, 0];
@@ -246,14 +257,22 @@ export function App() {
       return;
     }
 
-    setDraftAssignment((current) => {
+    updateSelectedAssignment((current) => {
       const modifier = current.kind === "keyboard" ? current.modifier : 0;
       return createKeyboardAssignment(option.code, modifier);
     });
   }
 
   function applyConsumerOption(option: ConsumerKeyOption) {
-    setDraftAssignment(createConsumerAssignment(option.usage));
+    updateSelectedAssignment(() => createConsumerAssignment(option.usage));
+  }
+
+  function updateSelectedAssignment(updater: (current: KeyAssignment) => KeyAssignment) {
+    setDraftAssignment((current) => {
+      const next = normalizeAssignment(updater(current));
+      setWriteKeymap((currentKeymap) => updateKeymap(currentKeymap, activeLayer, selectedKey, next));
+      return next;
+    });
   }
 
   return (
@@ -290,9 +309,8 @@ export function App() {
         <RemapPanel
           activeLayer={activeLayer}
           selectedKey={selectedKey}
-          layerCount={keymap.length}
-          layerAssignments={keymap[activeLayer]}
-          draftAssignment={draftAssignment}
+          layerCount={writeKeymap.length}
+          layerAssignments={writeKeymap[activeLayer]}
           onSelectLayer={(layerIndex) => void selectLayer(layerIndex)}
           onSelectKey={setSelectedKey}
         />

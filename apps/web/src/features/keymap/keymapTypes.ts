@@ -75,6 +75,15 @@ export function formatHex(value: number, width = 2) {
   return `0x${value.toString(16).toUpperCase().padStart(width, "0")}`;
 }
 
+export function sameAssignment(first: KeyAssignment, second: KeyAssignment) {
+  return (
+    first.kind === second.kind &&
+    first.modifier === second.modifier &&
+    first.usage === second.usage &&
+    first.keycodes.every((keycode, index) => keycode === second.keycodes[index])
+  );
+}
+
 function createEmptyKeycodes() {
   return [0, 0, 0, 0, 0, 0];
 }
