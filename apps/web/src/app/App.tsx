@@ -332,8 +332,8 @@ export function App() {
         </aside>
 
         <section className="panel remap-panel">
-          <div className="panel-heading">
-            <h2>Layer {activeLayer}</h2>
+          <div className="remap-strip">
+            <span className="strip-label">Layer</span>
             <div className="layer-tabs" aria-label="Layer selector">
               {keymap.map((_, layerIndex) => (
                 <button
@@ -348,18 +348,21 @@ export function App() {
             </div>
           </div>
 
-          <div className="key-grid">
-            {keymap[activeLayer].map((assignment, keyIndex) => (
-              <button
-                key={keyIndex}
-                type="button"
-                className={keyIndex === selectedKey ? "key-tile active" : "key-tile"}
-                onClick={() => setSelectedKey(keyIndex)}
-              >
-                <span>K{keyIndex + 1}</span>
-                <strong>{assignment.label}</strong>
-              </button>
-            ))}
+          <div className="remap-strip">
+            <span className="strip-label">Keys</span>
+            <div className="key-grid">
+              {keymap[activeLayer].map((assignment, keyIndex) => (
+                <button
+                  key={keyIndex}
+                  type="button"
+                  className={keyIndex === selectedKey ? "key-tile active" : "key-tile"}
+                  onClick={() => setSelectedKey(keyIndex)}
+                >
+                  <span>K{keyIndex + 1}</span>
+                  <strong>{assignment.label}</strong>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 

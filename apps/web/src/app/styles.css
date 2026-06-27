@@ -133,6 +133,14 @@ select {
   margin: 0 0 10px;
 }
 
+.strip-label {
+  color: #65707c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .hardware-panel dl {
   display: grid;
   gap: 6px;
@@ -161,12 +169,23 @@ select {
   margin: 0;
 }
 
-.panel-heading {
+.panel-heading,
+.remap-strip {
   align-items: center;
   display: flex;
   gap: 10px;
   justify-content: space-between;
   margin-bottom: 10px;
+}
+
+.remap-strip .layer-tabs,
+.remap-strip .key-grid {
+  flex: 1;
+  min-width: 0;
+}
+
+.remap-strip .layer-tabs {
+  flex-wrap: wrap;
 }
 
 .panel-heading h2 {
@@ -200,7 +219,7 @@ select {
 .key-grid {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 .key-tile {
@@ -208,8 +227,8 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 58px;
-  padding: 8px;
+  min-height: 50px;
+  padding: 7px 8px;
   text-align: left;
 }
 
@@ -528,6 +547,10 @@ select {
   .consumer-board {
     --key-font-size: 11px;
     --key-unit: 40px;
+  }
+
+  .key-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
