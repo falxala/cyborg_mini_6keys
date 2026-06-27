@@ -124,17 +124,18 @@ select {
   background: #ffffff;
   border: 1px solid #d8dee6;
   border-radius: 8px;
-  padding: 12px;
+  padding: 14px;
 }
 
 .panel h2 {
-  font-size: 14px;
+  font-size: 16px;
   margin: 0 0 10px;
 }
 
 .hardware-panel dl {
   display: grid;
-  gap: 6px;
+  gap: 8px 12px;
+  grid-template-columns: 1fr 1fr;
   margin: 0;
 }
 
@@ -144,7 +145,7 @@ select {
 
 .hardware-panel dl div {
   display: flex;
-  font-size: 12px;
+  font-size: 14px;
   justify-content: space-between;
 }
 
@@ -176,8 +177,8 @@ select {
 
 .layer-tabs button,
 .layout-tabs button {
-  height: 28px;
-  min-width: 28px;
+  height: 32px;
+  min-width: 32px;
   padding: 0 10px;
 }
 
@@ -204,18 +205,18 @@ select {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 54px;
+  min-height: 58px;
   padding: 8px;
   text-align: left;
 }
 
 .key-tile span {
   color: #65707c;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .key-tile strong {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .key-tile.active {
@@ -233,7 +234,12 @@ select {
 
 .editor-panel {
   display: grid;
-  gap: 8px;
+  gap: 8px 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.editor-panel .panel-heading {
+  grid-column: 1 / -1;
 }
 
 .editor-panel label {
@@ -244,21 +250,27 @@ select {
 .editor-panel label span,
 .assignment-summary dt {
   color: #65707c;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .editor-panel input,
 .editor-panel select {
-  padding: 5px 8px;
+  padding: 8px 10px;
+}
+
+.editor-panel label:first-of-type,
+.editor-panel .assignment-summary,
+.editor-panel .primary-action {
+  grid-column: 1 / -1;
 }
 
 .assignment-summary {
   border-top: 1px solid #e3e8ef;
   display: grid;
-  gap: 6px;
+  gap: 8px;
   grid-template-columns: 1fr 1fr;
   margin: 0;
-  padding-top: 8px;
+  padding-top: 10px;
 }
 
 .assignment-summary div {
@@ -276,7 +288,7 @@ select {
   background: #223047;
   border-color: #223047;
   color: #ffffff;
-  padding: 7px 10px;
+  padding: 9px 12px;
 }
 
 .picker-panel {
@@ -487,5 +499,10 @@ select {
 
   .key-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hardware-panel dl,
+  .editor-panel {
+    grid-template-columns: 1fr;
   }
 }
