@@ -22,6 +22,12 @@ export type DeviceState = {
   virtualGroundCount: number;
 };
 
+export type DeviceKeyEvent = {
+  layer: number;
+  keyIndex: number;
+  pressed: boolean;
+};
+
 export async function getDeviceState(transport: WebHidTransport): Promise<DeviceState> {
   const response = await sendCommand(transport, ConfigCommand.GetState);
   assertConfigOk(response);
@@ -99,6 +105,25 @@ export async function enterDeviceBootloader(transport: WebHidTransport) {
 
 export async function sendRemapperHeartbeat(transport: WebHidTransport) {
   await transport.sendConfigReport(createConfigReport(ConfigCommand.RemapperHeartbeat));
+}
+
+export function subscribeDeviceKeyEvents(
+  transport: WebHidTransport,
+  handler: (event: DeviceKeyEvent) => void,
+) {
+  return transport.addConfigReportListener((raw) => {
+    const response = decodeConfigResponse(raw);
+    if (response.command !== ConfigCommand.KeyEvent) {
+      return;
+    }
+
+    assertConfigOk(response);
+    handler({
+      layer: response.payload[0] ?? 0,
+      keyIndex: response.payload[1] ?? 0,
+      pressed: (response.payload[2] ?? 0) !== 0,
+    });
+  });
 }
 
 async function sendCommand(

@@ -8,6 +8,8 @@
 #include "keymap.h"
 #include "keymap_storage.h"
 
+bool remapperConnected();
+
 namespace {
 
 Adafruit_USBD_HID usbHid(
@@ -153,6 +155,20 @@ void handleRemapperHeartbeat() {
   lastRemapperHeartbeatMs = millis();
 }
 
+void sendKeyEvent(uint8_t layer, uint8_t keyIndex, bool pressed) {
+  if (!remapperConnected()) {
+    return;
+  }
+
+  const uint8_t payload[] = {
+    layer,
+    keyIndex,
+    static_cast<uint8_t>(pressed ? 1 : 0),
+  };
+
+  sendConfigResponse(ConfigCommand::KeyEvent, ConfigStatus::Ok, payload, sizeof(payload));
+}
+
 void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t const* buffer, uint16_t size) {
   if (reportId != RID_CONFIG || (reportType != HID_REPORT_TYPE_OUTPUT && reportType != HID_REPORT_TYPE_FEATURE)) {
     return;
@@ -182,6 +198,9 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       break;
     case ConfigCommand::RemapperHeartbeat:
       handleRemapperHeartbeat();
+      break;
+    case ConfigCommand::KeyEvent:
+      sendConfigResponse(command, ConfigStatus::Unsupported, nullptr, 0);
       break;
     default:
       sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);
@@ -257,6 +276,10 @@ void sendKeyChanges(uint8_t oldMask, uint8_t newMask, uint8_t layer) {
     const uint8_t reportId = keyboardReportIdFor(keyIndex);
     const bool pressed = (newMask & bit) != 0;
     const KeyAssignment& assignment = assignmentFor(layer, keyIndex);
+
+    if (pressed) {
+      sendKeyEvent(layer, keyIndex, pressed);
+    }
 
     if (!pressed) {
       releaseKeyboardReport(reportId);

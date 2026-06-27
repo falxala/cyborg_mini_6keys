@@ -3,6 +3,8 @@ import { CONFIG_REPORT_ID } from "./hidProtocol";
 import { CYBORG_MINI_USB } from "./usbIdentity";
 import { t } from "../../shared/i18n";
 
+export type ConfigReportListener = (report: Uint8Array) => void;
+
 export class WebHidTransport {
   private device: HidDevice | null = null;
 
@@ -56,14 +58,20 @@ export class WebHidTransport {
         reject(new Error(t.device.timeout));
       }, timeoutMs);
 
+      const expectedCommand = report[0];
       const listener = (event: HidInputReportEvent) => {
         if (event.reportId !== CONFIG_REPORT_ID) {
           return;
         }
 
-        cleanup();
         const view = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
-        resolve(Uint8Array.from(view));
+        const raw = Uint8Array.from(view);
+        if (raw[0] !== expectedCommand) {
+          return;
+        }
+
+        cleanup();
+        resolve(raw);
       };
 
       const cleanup = () => {
@@ -82,6 +90,24 @@ export class WebHidTransport {
   async sendConfigReport(report: Uint8Array) {
     const device = this.requireOpenDevice();
     await device.sendReport(CONFIG_REPORT_ID, toArrayBuffer(report));
+  }
+
+  addConfigReportListener(listener: ConfigReportListener) {
+    const device = this.requireOpenDevice();
+    const inputListener = (event: HidInputReportEvent) => {
+      if (event.reportId !== CONFIG_REPORT_ID) {
+        return;
+      }
+
+      const view = new Uint8Array(event.data.buffer, event.data.byteOffset, event.data.byteLength);
+      listener(Uint8Array.from(view));
+    };
+
+    device.addEventListener("inputreport", inputListener);
+
+    return () => {
+      device.removeEventListener("inputreport", inputListener);
+    };
   }
 
   private getHidApi() {

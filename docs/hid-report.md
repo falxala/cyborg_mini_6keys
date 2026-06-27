@@ -52,6 +52,9 @@ byte 3..31  response payload
 | `0x04` | `SetKey` | key assignment payload | `layer, keyIndex` |
 | `0x05` | `EnterBootloader` | none | none, then reboot to UF2 bootloader |
 | `0x06` | `RemapperHeartbeat` | none | none |
+| `0x07` | `KeyEvent` | not supported | `layer, keyIndex, pressed` |
+
+`KeyEvent` is an asynchronous device-to-Web input report. The firmware emits it when a physical key is pressed while the remapper heartbeat is active, so the UI can select the matching key tile.
 
 ## Key Assignment Payload
 

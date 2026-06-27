@@ -12,6 +12,7 @@ import {
   sendRemapperHeartbeat,
   setDeviceLayer,
   setDeviceKey,
+  subscribeDeviceKeyEvents,
   type DeviceState,
 } from "../features/device/deviceCommands";
 import { WebHidTransport } from "../features/device/webHidTransport";
@@ -118,6 +119,8 @@ function RemapperApp({ onBackHome }: RemapperAppProps) {
   const [draftAssignment, setDraftAssignment] = useState<KeyAssignment>(selectedAssignment);
   const [modifierSlots, setModifierSlots] = useState<number[]>(createModifierSlotsFromMask(0));
   const connected = deviceState !== null && transport.connected;
+  const deviceLayerCount = deviceState?.layerCount ?? 0;
+  const deviceKeyCount = deviceState?.keyCount ?? 0;
   const firmwareInstallSupported = canInstallUf2FromBrowser();
 
   useEffect(() => {
@@ -150,6 +153,28 @@ function RemapperApp({ onBackHome }: RemapperAppProps) {
       window.clearInterval(interval);
     };
   }, [connected, transport]);
+
+  useEffect(() => {
+    if (!connected || deviceLayerCount === 0 || deviceKeyCount === 0) {
+      return;
+    }
+
+    return subscribeDeviceKeyEvents(transport, (event) => {
+      if (!event.pressed) {
+        return;
+      }
+
+      if (event.layer >= deviceLayerCount || event.keyIndex >= deviceKeyCount) {
+        return;
+      }
+
+      setActiveLayer(event.layer);
+      setSelectedKey(event.keyIndex);
+      setDeviceState((current) =>
+        current && current.activeLayer !== event.layer ? { ...current, activeLayer: event.layer } : current,
+      );
+    });
+  }, [connected, deviceKeyCount, deviceLayerCount, transport]);
 
   async function connectDevice() {
     try {
