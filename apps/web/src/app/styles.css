@@ -28,6 +28,24 @@ button:hover {
   border-color: #8793a0;
 }
 
+button:disabled,
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+input,
+select {
+  border: 1px solid #c8d0d8;
+  border-radius: 6px;
+  color: inherit;
+  font: inherit;
+  min-width: 0;
+  padding: 8px 10px;
+  width: 100%;
+}
+
 .app-shell {
   min-height: 100vh;
   padding: 24px;
@@ -82,7 +100,8 @@ button:hover {
 
 .connection button,
 .layer-tabs button,
-.key-tile {
+.key-tile,
+.editor-panel button {
   border-radius: 6px;
   cursor: pointer;
 }
@@ -184,14 +203,59 @@ button:hover {
   font-size: 18px;
 }
 
-.migration-panel ol {
-  color: #4d5965;
-  margin: 0;
-  padding-left: 20px;
+.key-tile.active {
+  border-color: #2f6fed;
+  box-shadow: inset 0 0 0 1px #2f6fed;
 }
 
-.migration-panel li + li {
-  margin-top: 10px;
+.panel-heading.compact {
+  margin-bottom: 16px;
+}
+
+.panel-heading.compact button {
+  padding: 7px 10px;
+}
+
+.editor-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.editor-panel label {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-panel label span,
+.assignment-summary dt {
+  color: #65707c;
+  font-size: 13px;
+}
+
+.assignment-summary {
+  border-top: 1px solid #e3e8ef;
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding-top: 14px;
+}
+
+.assignment-summary div {
+  display: grid;
+  gap: 4px;
+}
+
+.assignment-summary dd {
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.primary-action {
+  background: #223047;
+  border-color: #223047;
+  color: #ffffff;
+  padding: 10px 12px;
 }
 
 @media (max-width: 900px) {
