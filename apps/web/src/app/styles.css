@@ -129,6 +129,9 @@ select {
 .remap-panel {
   grid-column: 2;
   grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(280px, 26vw, 320px);
 }
 
 .editor-panel {
@@ -208,6 +211,12 @@ select {
   flex-wrap: wrap;
 }
 
+.remap-panel .remap-strip:last-child {
+  flex: 1;
+  align-items: flex-start;
+  margin-bottom: 0;
+}
+
 .panel-heading h2 {
   margin: 0;
 }
@@ -240,6 +249,8 @@ select {
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(8, minmax(0, 1fr));
+  align-self: stretch;
+  align-content: start;
 }
 
 .key-tile {
@@ -617,6 +628,10 @@ select {
 
   .key-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .remap-panel {
+    min-height: auto;
   }
 
   .editor-panel {
