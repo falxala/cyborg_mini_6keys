@@ -8,16 +8,16 @@
 
 Direct入力は8本です。各入力はファームウェアで `INPUT_PULLUP` に設定します。
 
-| Logical key | Firmware index | GPIO | Notes |
-| --- | ---: | --- | --- |
-| K1 | 0 | TBD | Direct input |
-| K2 | 1 | TBD | Direct input |
-| K3 | 2 | TBD | Direct input |
-| K4 | 3 | TBD | Direct input |
-| K5 | 4 | TBD | Direct input |
-| K6 | 5 | TBD | Direct input |
-| K7 | 6 | TBD | Direct input |
-| K8 | 7 | TBD | Direct input |
+| Logical key | Firmware index | GPIO | Virtual ground rail | Notes |
+| --- | ---: | --- | --- | --- |
+| K1 | 0 | 7 | VGND1 | Direct input |
+| K2 | 1 | 6 | VGND1 | Direct input |
+| K3 | 2 | 5 | VGND1 | Direct input |
+| K4 | 3 | 4 | VGND1 | Direct input |
+| K5 | 4 | 12 | VGND2 | Direct input |
+| K6 | 5 | 11 | VGND2 | Direct input |
+| K7 | 6 | 10 | VGND2 | Direct input |
+| K8 | 7 | 9 | VGND2 | Direct input |
 
 ## Virtual Ground
 
@@ -25,8 +25,8 @@ Direct入力は8本です。各入力はファームウェアで `INPUT_PULLUP` 
 
 | Rail | Firmware index | GPIO | Notes |
 | --- | ---: | --- | --- |
-| VGND1 | 0 | TBD | First physical group |
-| VGND2 | 1 | TBD | Second physical group |
+| VGND1 | 0 | 1 | K1-K4 physical group |
+| VGND2 | 1 | 8 | K5-K8 physical group |
 
 ## Removed Parts
 

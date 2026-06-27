@@ -10,14 +10,13 @@ constexpr uint8_t KEYBOARD_REPORT_SLOTS = 6;
 constexpr uint8_t VIRTUAL_GROUND_COUNT = 2;
 constexpr uint8_t CONFIG_REPORT_SIZE = 32;
 
-// TODO: Replace these placeholders with the final PCB pinout before flashing.
 constexpr uint8_t KEY_PINS[KEY_COUNT] = {
-  0, 1, 2, 3, 4, 5, 6, 7
+  7, 6, 5, 4, 12, 11, 10, 9
 };
 
 // These pins are driven LOW and used as virtual ground rails.
 constexpr uint8_t VIRTUAL_GROUND_PINS[VIRTUAL_GROUND_COUNT] = {
-  8, 9
+  1, 8
 };
 
 enum class StatusLedKind : uint8_t {
