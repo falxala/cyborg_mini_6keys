@@ -10,6 +10,11 @@ export const LEGACY_WAVESHARE_USB = {
   productId: 0x0003,
 } as const;
 
+export const CURRENT_ADAFRUIT_USB = {
+  vendorId: 0x239a,
+  productId: 0xcafe,
+} as const;
+
 export function formatUsbId(value: number) {
   return `0x${value.toString(16).padStart(4, "0").toUpperCase()}`;
 }

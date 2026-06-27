@@ -1,6 +1,6 @@
 import type { HidDevice, HidInputReportEvent, HidNavigator } from "./webHidTypes";
 import { CONFIG_REPORT_ID } from "./hidProtocol";
-import { CYBORG_MINI_USB, LEGACY_WAVESHARE_USB } from "./usbIdentity";
+import { CURRENT_ADAFRUIT_USB, CYBORG_MINI_USB, LEGACY_WAVESHARE_USB } from "./usbIdentity";
 
 export class WebHidTransport {
   private device: HidDevice | null = null;
@@ -20,6 +20,10 @@ export class WebHidTransport {
         {
           vendorId: LEGACY_WAVESHARE_USB.vendorId,
           productId: LEGACY_WAVESHARE_USB.productId,
+        },
+        {
+          vendorId: CURRENT_ADAFRUIT_USB.vendorId,
+          productId: CURRENT_ADAFRUIT_USB.productId,
         },
       ],
     });
