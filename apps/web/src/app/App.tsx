@@ -367,14 +367,14 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand">
+        <a className="brand brand-link" href={homeHref} aria-label={t.home.backHome}>
           <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
           <div className="brand-copy">
             <span className="eyebrow">{t.app.eyebrow}</span>
             <h1>{t.app.title}</h1>
             <p>{t.app.description}</p>
           </div>
-        </div>
+        </a>
         <div className="connection">
           <div className="connection-meta">
             <span className={connected ? "status-badge online" : "status-badge offline"}>
@@ -383,12 +383,6 @@ export function RemapperApp({ homeHref = homeUrl }: RemapperAppProps) {
             <span className="connection-text">{status}</span>
           </div>
           <div className="connection-actions">
-            <a className="ghost-button nav-button" href={homeHref}>
-              {t.home.backHome}
-            </a>
-            <a className="ghost-button nav-button" href={diagnosticsUrl}>
-              {t.diagnostics.nav}
-            </a>
             <button type="button" className="ghost-button" onClick={() => setFirmwareModalOpen(true)}>
               {t.connection.updater}
             </button>

@@ -250,6 +250,11 @@ select {
   backdrop-filter: blur(16px);
 }
 
+.brand-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .brand img {
   width: 54px;
   height: 54px;
