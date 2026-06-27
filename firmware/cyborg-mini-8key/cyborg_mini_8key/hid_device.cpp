@@ -5,6 +5,7 @@
 #include "hid_reports.h"
 #include "key_assignment.h"
 #include "keymap.h"
+#include "keymap_storage.h"
 
 namespace {
 
@@ -44,14 +45,14 @@ uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
 }
 
-void sendConfigResponse(ConfigCommand command, uint8_t status, const uint8_t* payload, uint8_t length) {
+void sendConfigResponse(ConfigCommand command, ConfigStatus status, const uint8_t* payload, uint8_t length) {
   if (!usbHid.ready()) {
     return;
   }
 
   uint8_t report[Config::CONFIG_REPORT_SIZE] = { 0 };
   report[0] = static_cast<uint8_t>(command);
-  report[1] = status;
+  report[1] = static_cast<uint8_t>(status);
   report[2] = length;
   if (report[2] > Config::CONFIG_REPORT_SIZE - 3) {
     report[2] = Config::CONFIG_REPORT_SIZE - 3;
@@ -72,33 +73,38 @@ void handleGetState() {
     Config::VIRTUAL_GROUND_COUNT,
   };
 
-  sendConfigResponse(ConfigCommand::GetState, 0, payload, sizeof(payload));
+  sendConfigResponse(ConfigCommand::GetState, ConfigStatus::Ok, payload, sizeof(payload));
 }
 
 void handleSetLayer(const uint8_t* buffer, uint16_t size) {
   if (size < 2) {
-    sendConfigResponse(ConfigCommand::SetLayer, 1, nullptr, 0);
+    sendConfigResponse(ConfigCommand::SetLayer, ConfigStatus::InvalidLength, nullptr, 0);
     return;
   }
 
   const uint8_t layer = buffer[1];
   if (layer >= Config::LAYER_COUNT) {
-    sendConfigResponse(ConfigCommand::SetLayer, 2, nullptr, 0);
+    sendConfigResponse(ConfigCommand::SetLayer, ConfigStatus::OutOfRange, nullptr, 0);
     return;
   }
 
   setActiveLayer(layer);
-  sendConfigResponse(ConfigCommand::SetLayer, 0, &layer, 1);
+  sendConfigResponse(ConfigCommand::SetLayer, ConfigStatus::Ok, &layer, 1);
 }
 
 void handleGetKey(const uint8_t* buffer, uint16_t size) {
   if (size < 3) {
-    sendConfigResponse(ConfigCommand::GetKey, 1, nullptr, 0);
+    sendConfigResponse(ConfigCommand::GetKey, ConfigStatus::InvalidLength, nullptr, 0);
     return;
   }
 
   const uint8_t layer = buffer[1];
   const uint8_t keyIndex = buffer[2];
+  if (layer >= Config::LAYER_COUNT || keyIndex >= Config::KEY_COUNT) {
+    sendConfigResponse(ConfigCommand::GetKey, ConfigStatus::OutOfRange, nullptr, 0);
+    return;
+  }
+
   const KeyAssignment& assignment = assignmentFor(layer, keyIndex);
 
   uint8_t payload[12] = { 0 };
@@ -112,12 +118,12 @@ void handleGetKey(const uint8_t* buffer, uint16_t size) {
   payload[10] = static_cast<uint8_t>(assignment.consumerUsage & 0xFF);
   payload[11] = static_cast<uint8_t>((assignment.consumerUsage >> 8) & 0xFF);
 
-  sendConfigResponse(ConfigCommand::GetKey, 0, payload, sizeof(payload));
+  sendConfigResponse(ConfigCommand::GetKey, ConfigStatus::Ok, payload, sizeof(payload));
 }
 
 void handleSetKey(const uint8_t* buffer, uint16_t size) {
   if (size < 13) {
-    sendConfigResponse(ConfigCommand::SetKey, 1, nullptr, 0);
+    sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::InvalidLength, nullptr, 0);
     return;
   }
 
@@ -127,6 +133,13 @@ void handleSetKey(const uint8_t* buffer, uint16_t size) {
   assignment.kind = static_cast<AssignmentKind>(buffer[3]);
   assignment.modifier = buffer[4];
 
+  if (assignment.kind != AssignmentKind::None &&
+      assignment.kind != AssignmentKind::Keyboard &&
+      assignment.kind != AssignmentKind::Consumer) {
+    sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::OutOfRange, nullptr, 0);
+    return;
+  }
+
   for (uint8_t i = 0; i < Config::KEYBOARD_REPORT_SLOTS; i++) {
     assignment.keycodes[i] = buffer[5 + i];
   }
@@ -135,12 +148,17 @@ void handleSetKey(const uint8_t* buffer, uint16_t size) {
                              (static_cast<uint16_t>(buffer[12]) << 8);
 
   if (!setAssignment(layer, keyIndex, assignment)) {
-    sendConfigResponse(ConfigCommand::SetKey, 2, nullptr, 0);
+    sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::OutOfRange, nullptr, 0);
+    return;
+  }
+
+  if (!saveAssignmentToStorage(layer, keyIndex)) {
+    sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::StorageError, nullptr, 0);
     return;
   }
 
   const uint8_t payload[] = { layer, keyIndex };
-  sendConfigResponse(ConfigCommand::SetKey, 0, payload, sizeof(payload));
+  sendConfigResponse(ConfigCommand::SetKey, ConfigStatus::Ok, payload, sizeof(payload));
 }
 
 void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t const* buffer, uint16_t size) {
@@ -168,7 +186,7 @@ void setReportCallback(uint8_t reportId, hid_report_type_t reportType, uint8_t c
       handleSetKey(buffer, size);
       break;
     default:
-      sendConfigResponse(command, 0xFF, nullptr, 0);
+      sendConfigResponse(command, ConfigStatus::UnknownCommand, nullptr, 0);
       break;
   }
 }

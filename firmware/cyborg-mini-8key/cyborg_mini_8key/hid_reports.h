@@ -22,3 +22,11 @@ enum class ConfigCommand : uint8_t {
   GetKey = 0x03,
   SetKey = 0x04,
 };
+
+enum class ConfigStatus : uint8_t {
+  Ok = 0x00,
+  InvalidLength = 0x01,
+  OutOfRange = 0x02,
+  StorageError = 0x03,
+  UnknownCommand = 0xFF,
+};

@@ -13,6 +13,7 @@ export enum ConfigStatus {
   Ok = 0x00,
   InvalidLength = 0x01,
   OutOfRange = 0x02,
+  StorageError = 0x03,
   UnknownCommand = 0xff,
 }
 

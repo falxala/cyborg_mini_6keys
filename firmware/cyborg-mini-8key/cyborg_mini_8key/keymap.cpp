@@ -1,6 +1,7 @@
 #include "keymap.h"
 
 #include "Adafruit_TinyUSB.h"
+#include "keymap_storage.h"
 
 namespace {
 
@@ -48,13 +49,23 @@ void setDefaultLayer2() {
   keymap[2][7] = keyboardAssignment(HID_KEY_PAGE_DOWN);
 }
 
-}  // namespace
-
-void beginKeymap() {
+void setDefaultKeymap() {
   clearKeymap();
   setDefaultLayer0();
   setDefaultLayer1();
   setDefaultLayer2();
+}
+
+}  // namespace
+
+void beginKeymap() {
+  setDefaultKeymap();
+  beginKeymapStorage();
+
+  if (!loadKeymapFromStorage()) {
+    setDefaultKeymap();
+    saveKeymapToStorage();
+  }
 }
 
 uint8_t activeLayer() {

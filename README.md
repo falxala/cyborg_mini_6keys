@@ -85,6 +85,7 @@ pnpm build
 - `config.h`: 8本のDirect入力、2本の仮想GND、本体LEDなどのピン設定
 - `key_scanner.*`: `INPUT_PULLUP` のDirect入力と `OUTPUT LOW` の仮想GNDによる8キー読み取り
 - `keymap.*`: 6レイヤー x 8キーのRAM上キーマップ
+- `keymap_storage.*`: EEPROMエミュレーション上の固定長キーマップ保存
 - `hid_device.*`: 通常HID keyboard / consumer出力とWebHID向けvendor-defined report
 - `status_led.*`: 本体LEDのみの状態表示
 
@@ -103,7 +104,7 @@ scripts/compile-firmware.sh
 
 `scripts/compile-firmware.sh` は既定で `rp2040:rp2040:waveshare_rp2040_zero` と `usbstack=tinyusb` を使います。別ターゲットで確認する場合は `FQBN=rp2040:rp2040:rpipico scripts/compile-firmware.sh` のように上書きします。
 
-現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。EEPROM永続化、実機フラッシュ、WebHID経由の実機通信確認は次工程です。
+現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。キーマップは EEPROM エミュレーションに永続化します。実機フラッシュ、WebHID経由の実機通信確認は次工程です。
 
 ## 現行 Web ツール
 

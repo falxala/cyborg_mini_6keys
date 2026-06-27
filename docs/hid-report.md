@@ -38,6 +38,7 @@ byte 3..31  response payload
 | `0x00` | `Ok` | Success |
 | `0x01` | `InvalidLength` | Request payload is too short |
 | `0x02` | `OutOfRange` | Layer or key index is invalid |
+| `0x03` | `StorageError` | Device could not persist the updated assignment |
 | `0xff` | `UnknownCommand` | Command is not supported |
 
 ## Commands
