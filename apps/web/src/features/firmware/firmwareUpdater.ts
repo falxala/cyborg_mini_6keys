@@ -1,5 +1,5 @@
 export const FIRMWARE_UF2_NAME = "cyborg-mini-8key.uf2";
-export const FIRMWARE_UF2_URL = `/firmware/${FIRMWARE_UF2_NAME}`;
+export const FIRMWARE_UF2_URL = `${import.meta.env.BASE_URL}firmware/${FIRMWARE_UF2_NAME}`;
 
 type Uf2WriteData = Blob | BufferSource | string;
 

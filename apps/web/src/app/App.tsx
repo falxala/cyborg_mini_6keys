@@ -260,7 +260,7 @@ export function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <img src="/cy.png" alt="" />
+          <img src={`${import.meta.env.BASE_URL}cy.png`} alt="" />
           <div className="brand-copy">
             <span className="eyebrow">Cyborg Project</span>
             <h1>Mini Remapper</h1>
