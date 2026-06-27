@@ -133,19 +133,28 @@ select {
 }
 
 .hardware-panel dl {
-  display: grid;
-  gap: 8px 12px;
-  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  display: flex;
+  gap: 10px 14px;
+  flex-wrap: wrap;
   margin: 0;
 }
 
+.hardware-panel {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
 .hardware-panel h2 {
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .hardware-panel dl div {
+  align-items: baseline;
   display: flex;
   font-size: 14px;
+  gap: 6px;
   justify-content: space-between;
 }
 
@@ -503,8 +512,12 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .hardware-panel dl,
   .editor-panel {
     grid-template-columns: 1fr;
+  }
+
+  .hardware-panel {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
