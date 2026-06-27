@@ -11,6 +11,11 @@ export class WebHidTransport {
 
   async requestDevice() {
     const hid = this.getHidApi();
+    console.info("[hid] requesting device with filters", [
+      CYBORG_MINI_USB,
+      LEGACY_WAVESHARE_USB,
+      CURRENT_ADAFRUIT_USB,
+    ]);
     const devices = await hid.requestDevice({
       filters: [
         {
@@ -30,6 +35,7 @@ export class WebHidTransport {
 
     if (devices.length > 0) {
       this.device = devices[0];
+      this.logSelectedDevice(this.device);
       return this.device;
     }
 
@@ -42,6 +48,7 @@ export class WebHidTransport {
     }
 
     this.device = fallbackDevices[0];
+    this.logSelectedDevice(this.device);
     return this.device;
   }
 
@@ -114,6 +121,14 @@ export class WebHidTransport {
     }
 
     return this.device;
+  }
+
+  private logSelectedDevice(device: HidDevice) {
+    console.info("[hid] selected device", {
+      productName: device.productName,
+      vendorId: `0x${device.vendorId.toString(16).padStart(4, "0").toUpperCase()}`,
+      productId: `0x${device.productId.toString(16).padStart(4, "0").toUpperCase()}`,
+    });
   }
 }
 

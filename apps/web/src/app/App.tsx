@@ -89,6 +89,11 @@ export function App() {
       await sendRemapperHeartbeat(transport);
       const state = await getDeviceState(transport);
       const loadedKeymap = await readDeviceKeymap(transport, state.layerCount, state.keyCount);
+      console.info("[hid] connected", {
+        productName: device.productName,
+        vendorId: `0x${device.vendorId.toString(16).padStart(4, "0").toUpperCase()}`,
+        productId: `0x${device.productId.toString(16).padStart(4, "0").toUpperCase()}`,
+      });
       setDeviceState(state);
       setKeymap(loadedKeymap);
       setActiveLayer(state.activeLayer);
