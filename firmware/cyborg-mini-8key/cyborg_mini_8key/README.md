@@ -29,6 +29,20 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 - `STATUS_LED_PIN`
 - `README_DRIVE_ENABLED`
 
+## Timing Tuning
+
+`config.h` の以下の値で、入力遅延・CPU負荷・WebHID応答待ちを調整します。
+
+| Setting | Default | Purpose |
+| --- | ---: | --- |
+| `DEBOUNCE_US` | `5000` | キー入力のチャタリング除去時間 |
+| `IDLE_SCAN_SLEEP_US` | `100` | 通常キーボード時のスキャン間sleep |
+| `REMAPPER_SCAN_SLEEP_US` | `1000` | Remapper / Diagnostics接続中のスキャン間sleep |
+| `CONFIG_RESPONSE_READY_RETRIES` | `20` | WebHID設定応答でHID readyを待つ回数 |
+| `CONFIG_RESPONSE_RETRY_DELAY_US` | `100` | WebHID設定応答のretry間隔 |
+
+通常入力の遅延を優先する場合は `IDLE_SCAN_SLEEP_US` を小さくします。発熱や消費電力を優先する場合は大きくします。
+
 ## Build
 
 リポジトリルートで Arduino CLI wrapper を使います。

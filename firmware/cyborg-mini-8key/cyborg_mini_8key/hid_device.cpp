@@ -28,21 +28,18 @@ uint8_t wakeOldMask = 0;
 uint8_t wakeNewMask = 0;
 uint8_t wakeLayer = 0;
 
-constexpr uint8_t CONFIG_RESPONSE_READY_RETRIES = 20;
-constexpr uint16_t CONFIG_RESPONSE_RETRY_DELAY_US = 100;
-
 uint8_t keyboardReportIdFor(uint8_t keyIndex) {
   return static_cast<uint8_t>(RID_KEYBOARD_1 + keyIndex);
 }
 
 bool sendConfigReportWhenReady(const uint8_t* report, uint8_t length) {
-  for (uint8_t attempt = 0; attempt < CONFIG_RESPONSE_READY_RETRIES; attempt++) {
+  for (uint8_t attempt = 0; attempt < Config::CONFIG_RESPONSE_READY_RETRIES; attempt++) {
     if (usbHid.ready()) {
       usbHid.sendReport(RID_CONFIG, report, length);
       return true;
     }
 
-    delayMicroseconds(CONFIG_RESPONSE_RETRY_DELAY_US);
+    delayMicroseconds(Config::CONFIG_RESPONSE_RETRY_DELAY_US);
   }
 
   return false;

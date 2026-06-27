@@ -1,4 +1,5 @@
 #include "hid_device.h"
+#include "config.h"
 #include "key_scanner.h"
 #include "keymap.h"
 #include "status_led.h"
@@ -9,12 +10,9 @@
 
 namespace {
 
-constexpr uint32_t IDLE_SLEEP_US = 100;
-constexpr uint32_t REMAPPER_SLEEP_US = 1000;
-
 void sleepBetweenScans(bool remapperActive) {
 #if defined(ARDUINO_ARCH_RP2040)
-  sleep_us(remapperActive ? REMAPPER_SLEEP_US : IDLE_SLEEP_US);
+  sleep_us(remapperActive ? Config::REMAPPER_SCAN_SLEEP_US : Config::IDLE_SCAN_SLEEP_US);
 #else
   (void)remapperActive;
 #endif
