@@ -39,7 +39,7 @@ export function normalizeAssignment(
       modifier: 0,
       usage: 0,
       keycodes: createEmptyKeycodes(),
-      label: "Blank",
+      label: "未割り当て",
     };
   }
 

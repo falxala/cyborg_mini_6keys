@@ -213,8 +213,8 @@
 
 .keycap-svg .shape-label {
   fill: var(--key-text);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   dominant-baseline: middle;
 }
 

@@ -185,6 +185,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
   gap: 8px;
   min-height: 84px;
   padding: 10px;
@@ -205,23 +206,28 @@
 .key-tile-assignments {
   display: grid;
   gap: 6px;
+  place-items: center;
+  text-align: center;
 }
 
 .assignment-preview {
   display: grid;
+  width: 100%;
   min-width: 0;
+  place-items: center;
 }
 
 .assignment-preview strong {
   display: block;
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.12;
   overflow-wrap: anywhere;
 }
 
 .assignment-preview .consumer-keycap-svg-tile {
   width: 100%;
-  height: 26px;
+  height: 34px;
   color: var(--text);
 }
 

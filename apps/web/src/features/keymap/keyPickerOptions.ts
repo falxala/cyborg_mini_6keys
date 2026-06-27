@@ -199,7 +199,7 @@ export const modifierOptions: ModifierKeyOption[] = [
 
 export const blankOption: BlankKeyOption = {
   kind: "blank",
-  label: "Blank",
+  label: "未割り当て",
   accent: true,
   width: 2,
 };
