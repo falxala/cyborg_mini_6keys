@@ -302,7 +302,7 @@ select {
   --key-gap: 4px;
   --key-unit: 43px;
   background: #ffffff;
-  border: 5px solid #111111;
+  border: 3px solid #111111;
   border-radius: 7px;
   display: grid;
   gap: 12px;
@@ -343,7 +343,7 @@ select {
 .picker-key {
   align-items: center;
   background: #ffffff;
-  border: 3px solid #101010;
+  border: 2px solid #101010;
   border-radius: 9px;
   box-shadow:
     inset 0 -4px 0 #dfe4eb,
@@ -371,14 +371,16 @@ select {
 .picker-key.active {
   background: #eaf1ff;
   border-color: #2f6fed;
-  box-shadow: inset 0 0 0 1px #2f6fed;
+  box-shadow:
+    inset 0 -4px 0 #dfe4eb,
+    0 1px 0 #101010;
   color: #173d8f;
 }
 
 .keyboard-indicator {
   align-items: center;
   align-self: start;
-  border: 3px solid #101010;
+  border: 2px solid #101010;
   display: grid;
   gap: 4px;
   grid-column: 3;
@@ -438,10 +440,10 @@ select {
   --key-gap: 4px;
   --key-unit: 43px;
   background: #ffffff;
-  border: 5px solid #111111;
+  border: 3px solid #111111;
   border-radius: 7px;
   display: inline-block;
-  margin-top: 12px;
+  margin-bottom: 12px;
   overflow-x: auto;
   padding: 10px;
   max-width: 100%;
