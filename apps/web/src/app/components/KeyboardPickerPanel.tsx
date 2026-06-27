@@ -124,16 +124,6 @@ export function KeyboardPickerPanel({
           ))}
         </div>
 
-        <div className="keyboard-indicator" aria-hidden="true">
-          <span>HID CONFIG</span>
-          <strong>CYBORG MINI 8</strong>
-          <div>
-            <i />
-            <i />
-            <i />
-          </div>
-        </div>
-
         <div className="keyboard-cluster system-cluster">
           {systemRows.map((row, rowIndex) => (
             <div key={rowIndex} className="picker-row compact">

@@ -30,7 +30,7 @@
   display: grid;
   gap: 14px;
   grid-template-columns: max-content max-content max-content;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto;
   padding: 16px;
   border: 1px solid rgba(78, 61, 38, 0.18);
   border-radius: 8px;
@@ -66,9 +66,10 @@
 }
 
 .numpad-cluster {
-  align-self: end;
+  align-self: start;
   grid-column: 3;
-  grid-row: 2;
+  grid-row: 1 / span 2;
+  margin-top: calc(var(--key-unit) + 8px);
 }
 
 .picker-row {
@@ -124,50 +125,6 @@
     inset 0 -5px 0 rgba(13, 122, 114, 0.2),
     0 1px 0 rgba(8, 84, 79, 0.16);
   color: var(--accent-strong);
-}
-
-.keyboard-indicator {
-  display: grid;
-  gap: 6px;
-  align-self: start;
-  grid-column: 3;
-  grid-row: 1;
-  min-width: 170px;
-  padding: 12px 14px;
-  border: 1px solid rgba(78, 61, 38, 0.18);
-  border-radius: 8px;
-  background: rgba(41, 41, 39, 0.96);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  color: #f3ede6;
-}
-
-.keyboard-indicator span {
-  color: rgba(243, 237, 230, 0.72);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.keyboard-indicator strong {
-  font-size: 14px;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-}
-
-.keyboard-indicator div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.keyboard-indicator i {
-  display: block;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #c78446;
-  box-shadow: 0 0 12px rgba(184, 110, 52, 0.42);
 }
 
 .consumer-strip {
