@@ -232,8 +232,8 @@
 }
 
 .editor-panel .assignment-summary,
-.modifier-grid,
-.modifier-summary {
+.modifier-field,
+.modifier-selects {
   grid-column: 1 / -1;
 }
 
@@ -246,24 +246,10 @@
   padding: 0 12px;
 }
 
-.modifier-grid {
+.modifier-selects {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.modifier-grid .picker-key {
-  width: 100%;
-}
-
-.modifier-summary div {
-  display: flex;
-  align-items: center;
-  min-height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 251, 246, 0.78);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .assignment-summary {

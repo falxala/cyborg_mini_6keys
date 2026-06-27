@@ -112,7 +112,7 @@
     grid-template-columns: 1fr;
   }
 
-  .modifier-grid {
+  .modifier-selects {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -157,6 +157,10 @@
   }
 
   .assignment-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .modifier-selects {
     grid-template-columns: 1fr;
   }
 }

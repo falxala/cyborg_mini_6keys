@@ -1,7 +1,6 @@
 import { modifierOptions } from "../../features/keymap/keyPickerOptions";
 import {
   formatHex,
-  formatModifier,
   type KeyAssignment,
   type KeyAssignmentKind,
 } from "../../features/keymap/keymapTypes";
@@ -28,20 +27,7 @@ export function EditorPanel({
   onUpdateModifier,
 }: EditorPanelProps) {
   const modifierValue = draftAssignment.kind === "keyboard" ? draftAssignment.modifier : 0;
-  const modifierChoices = [{ value: 0, label: "None" }, ...modifierOptions.map((option) => ({
-    value: option.modifier,
-    label: option.label,
-  }))];
-
-  if (
-    modifierValue !== 0 &&
-    !modifierChoices.some((choice) => choice.value === modifierValue)
-  ) {
-    modifierChoices.push({
-      value: modifierValue,
-      label: formatModifier(modifierValue),
-    });
-  }
+  const selectedModifiers = selectedModifiersFromMask(modifierValue);
 
   return (
     <aside className="panel editor-panel">
@@ -84,24 +70,27 @@ export function EditorPanel({
         />
       </label>
 
-      <label>
+      <label className="modifier-field">
         <span>Modifier</span>
-        <select
-          value={modifierValue}
-          disabled={draftAssignment.kind !== "keyboard"}
-          onChange={(event) => onUpdateModifier(Number(event.currentTarget.value))}
-        >
-          {modifierChoices.map((choice) => (
-            <option key={choice.value} value={choice.value}>
-              {choice.label}
-            </option>
+        <div className="modifier-selects">
+          {selectedModifiers.map((value, index) => (
+            <select
+              key={index}
+              value={value}
+              disabled={draftAssignment.kind !== "keyboard"}
+              onChange={(event) =>
+                onUpdateModifier(updateModifierMask(selectedModifiers, index, Number(event.currentTarget.value)))
+              }
+            >
+              <option value={0}>None</option>
+              {modifierOptions.map((option) => (
+                <option key={option.modifier} value={option.modifier}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           ))}
-        </select>
-      </label>
-
-      <label className="modifier-summary">
-        <span>Modifier</span>
-        <div>{draftAssignment.kind === "keyboard" ? draftAssignment.label : "-"}</div>
+        </div>
       </label>
 
       <dl className="assignment-summary">
@@ -116,4 +105,30 @@ export function EditorPanel({
       </dl>
     </aside>
   );
+}
+
+function selectedModifiersFromMask(mask: number) {
+  const values = modifierOptions
+    .filter((option) => (mask & option.modifier) !== 0)
+    .map((option) => option.modifier)
+    .slice(0, 3);
+
+  while (values.length < 3) {
+    values.push(0);
+  }
+
+  return values;
+}
+
+function updateModifierMask(current: number[], index: number, nextValue: number) {
+  const next = current.map((value, currentIndex) => (currentIndex === index ? nextValue : value));
+  let mask = 0;
+
+  for (const value of next) {
+    if (value !== 0) {
+      mask |= value;
+    }
+  }
+
+  return mask;
 }
