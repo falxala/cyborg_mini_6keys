@@ -3,6 +3,7 @@ dist/
 *.local
 *.tsbuildinfo
 .tools/
+.arduino/
 
 .DS_Store
 

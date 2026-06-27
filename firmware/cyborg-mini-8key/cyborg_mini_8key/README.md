@@ -23,7 +23,21 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 
 - `KEY_PINS`
 - `VIRTUAL_GROUND_PINS`
+- `STATUS_LED_KIND`
 - `STATUS_LED_PIN`
+
+## Build
+
+リポジトリルートで Arduino CLI wrapper を使います。
+
+```sh
+scripts/arduino-cli.sh compile \
+  --fqbn rp2040:rp2040:waveshare_rp2040_zero \
+  --board-options usbstack=tinyusb \
+  firmware/cyborg-mini-8key/cyborg_mini_8key
+```
+
+`--board-options usbstack=tinyusb` は必須です。設定用 vendor HID report を Adafruit TinyUSB で扱います。
 
 ## Current Scope
 

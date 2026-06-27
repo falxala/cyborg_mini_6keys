@@ -92,7 +92,18 @@ pnpm build
 
 `config.h` のピン番号は仮値です。実際のPCBピンが確定したら、`hardware/cyborg-mini-8key/pinout.md` と合わせて更新します。
 
-現時点の新firmwareは土台です。EEPROM永続化、Web側report送受信、実機コンパイル確認は次工程で行います。
+Arduino CLI はリポジトリ内 wrapper から使います。ローカルの core / library / cache は `.arduino/` 以下に閉じ、`.tools/bin/arduino-cli` の本体はコミットしません。
+
+```sh
+scripts/arduino-cli.sh core update-index
+scripts/arduino-cli.sh core install rp2040:rp2040
+scripts/arduino-cli.sh lib install "Adafruit TinyUSB Library"
+scripts/compile-firmware.sh
+```
+
+`scripts/compile-firmware.sh` は既定で `rp2040:rp2040:waveshare_rp2040_zero` と `usbstack=tinyusb` を使います。別ターゲットで確認する場合は `FQBN=rp2040:rp2040:rpipico scripts/compile-firmware.sh` のように上書きします。
+
+現時点の新firmwareは土台です。Arduino CLI でのコンパイルは確認済みです。EEPROM永続化、実機フラッシュ、WebHID経由の実機通信確認は次工程です。
 
 ## 現行 Web ツール
 
