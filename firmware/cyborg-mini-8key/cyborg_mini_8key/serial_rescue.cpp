@@ -7,17 +7,16 @@
 #include "key_assignment.h"
 #include "keymap.h"
 #include "keymap_storage.h"
-#include "readme_drive.h"
 
 namespace {
 
 constexpr uint32_t SERIAL_BAUD = 115200;
 constexpr uint16_t LINE_BUFFER_SIZE = 96;
+constexpr uint32_t RESCUE_ACTIVE_TIMEOUT_MS = 5000;
 
-bool enabled = false;
-bool greeted = false;
 char lineBuffer[LINE_BUFFER_SIZE];
 uint8_t lineLength = 0;
+uint32_t lastSerialCommandMs = 0;
 
 char* nextToken(char*& cursor) {
   while (*cursor == ' ' || *cursor == '\t') {
@@ -308,25 +307,10 @@ void printPrompt() {
 }  // namespace
 
 void beginSerialRescue() {
-  enabled = readmeDriveActive();
-  if (!enabled) {
-    return;
-  }
-
   Serial.begin(SERIAL_BAUD);
 }
 
 void updateSerialRescue() {
-  if (!enabled) {
-    return;
-  }
-
-  if (Serial && !greeted) {
-    printHelp();
-    printPrompt();
-    greeted = true;
-  }
-
   while (Serial.available() > 0) {
     const char ch = static_cast<char>(Serial.read());
     if (ch == '\r') {
@@ -335,6 +319,7 @@ void updateSerialRescue() {
 
     if (ch == '\n') {
       lineBuffer[lineLength] = '\0';
+      lastSerialCommandMs = millis();
       handleCommand(lineBuffer);
       lineLength = 0;
       printPrompt();
@@ -353,5 +338,5 @@ void updateSerialRescue() {
 }
 
 bool serialRescueActive() {
-  return enabled;
+  return lastSerialCommandMs != 0 && millis() - lastSerialCommandMs <= RESCUE_ACTIVE_TIMEOUT_MS;
 }
