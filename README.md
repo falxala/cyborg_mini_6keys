@@ -125,7 +125,16 @@ Default firmware identity:
 | Manufacturer | `Cyborg Project` |
 | Product | `Cyborg Mini 8 Keys` |
 
-This VID/PID is for development. Replace it with an assigned VID/PID before commercial distribution.
+`0xCAFE` is used as the project-local development/vendor ID. Keep project PIDs under the `0xC6xx` range to avoid accidental reuse inside this repository.
+
+Reserved project PIDs:
+
+| PID | Use |
+| --- | --- |
+| `0xC608` | Cyborg Mini 8 Keys normal firmware |
+| `0xC609` | Reserved for rescue-mode identity if split from normal firmware |
+
+For broader commercial distribution, replace this with an assigned VID/PID, a permitted vendor sublicense, or an allocated pid.codes PID.
 
 WebHID filter is managed in `apps/web/src/features/device/usbIdentity.ts`.
 
