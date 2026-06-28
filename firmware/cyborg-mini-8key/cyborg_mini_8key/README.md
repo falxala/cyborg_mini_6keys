@@ -15,6 +15,7 @@ Arduino IDE / Arduino CLI で開くスケッチ本体です。
 | `hid_device.*` | USB HID keyboard / consumer / config report |
 | `hid_reports.h` | HID report ID と設定コマンド |
 | `readme_drive.*` | Read-only USB MSC README / URL shortcut drive |
+| `serial_rescue.*` | Key 5起動時だけ有効な対話式Serial救済コマンド |
 | `status_led.*` | 本体LED表示 |
 
 設定用HID report仕様は `../../../docs/hid-report.md` を参照します。
@@ -62,7 +63,8 @@ scripts/arduino-cli.sh compile \
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
-- Key 5 起動時だけ表示する Read-only README drive with `README.TXT` and `REMAPPER.URL`
+- Key 5 起動時だけ表示する Read-only README drive with `README.TXT`, `REMAPPER.URL`, and `RESCUE.CMD`
+- Key 5 起動時だけ有効な対話式Serial rescue
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 - 通常時のみ押下を低遅延化し、Remapper接続中は通常キー送信を抑止
 - USB suspendからのremote wakeup後にキー状態を再送
@@ -72,12 +74,31 @@ scripts/arduino-cli.sh compile \
 
 既定では、READMEドライブは表示しません。`config.h` の `README_DRIVE_ENABLED` は `false` です。
 
-Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。Key 5 は firmware index `4`、GPIO `12` です。
+Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。Key 5 は firmware index `4`、GPIO `12` です。この起動中だけ、Serial rescueも有効になります。
 
 含まれるファイルは以下のみです。
 
 - `README.TXT`
 - `REMAPPER.URL`
+- `RESCUE.CMD`
+
+Windowsでは `RESCUE.CMD` を実行すると、PowerShellの `System.IO.Ports.SerialPort` を使う対話プロンプトを開きます。`help` でコマンド一覧を表示できます。
+
+主なSerial rescueコマンド:
+
+```text
+state
+dump
+layer 0
+get 0 1
+none 0 1
+key 1 1 0x00 0x04
+consumer 0 1 0x00e2
+diag
+bootloader
+```
+
+`none` / `key` / `consumer` は指定キーの割り当てをすぐ保存します。key番号は `1-8`、layerは `0-5` です。
 
 常時表示したい場合は `config.h` の `README_DRIVE_ENABLED` を `true` にします。
 

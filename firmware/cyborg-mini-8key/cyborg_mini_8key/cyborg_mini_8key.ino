@@ -2,6 +2,7 @@
 #include "config.h"
 #include "key_scanner.h"
 #include "keymap.h"
+#include "serial_rescue.h"
 #include "status_led.h"
 
 #if defined(ARDUINO_ARCH_RP2040)
@@ -25,16 +26,20 @@ void setup() {
   beginKeymap();
   beginKeyScanner();
   beginHidDevice();
+  beginSerialRescue();
 }
 
 void loop() {
   const bool remapperActive = remapperConnected();
+  const bool rescueActive = serialRescueActive();
+  const bool configActive = remapperActive || rescueActive;
 
-  if (updateKeyScanner(!remapperActive)) {
+  if (updateKeyScanner(!configActive) && !rescueActive) {
     sendKeyChanges(previousKeyMask(), currentKeyMask(), activeLayer());
   }
 
   updateHidDevice();
-  updateStatusHeartbeat(hidDeviceMounted(), remapperActive);
-  sleepBetweenScans(remapperActive);
+  updateSerialRescue();
+  updateStatusHeartbeat(hidDeviceMounted(), configActive);
+  sleepBetweenScans(configActive);
 }

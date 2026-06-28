@@ -9,7 +9,7 @@
 - 仮想GND用GPIOはファームウェア側で `OUTPUT LOW`
 - 外付けRGB LED / OLED は廃止
 - LED表示は本体LEDのみ
-- Key 5を押しながらUSB接続すると、README driveをその起動だけ表示
+- Key 5を押しながらUSB接続すると、README driveとSerial rescueをその起動だけ表示
 
 ## Documents
 
