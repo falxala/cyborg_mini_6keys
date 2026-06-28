@@ -7,6 +7,7 @@
     "build": "pnpm --filter @cyborg-mini/web build",
     "firmware:build": "scripts/compile-firmware.sh",
     "firmware:web": "scripts/build-web-firmware.sh",
+    "rescue-cmd:assets": "scripts/build-rescue-cmd-asset.sh",
     "preview": "pnpm --filter @cyborg-mini/web preview",
     "typecheck": "pnpm --filter @cyborg-mini/web typecheck"
   }

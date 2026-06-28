@@ -4,6 +4,7 @@
 
 #include "Adafruit_TinyUSB.h"
 #include "config.h"
+#include "rescue_cmd_asset.h"
 
 namespace {
 
@@ -29,17 +30,6 @@ constexpr char URL_TEXT[] =
   "[InternetShortcut]\r\n"
   "URL=https://falxala.github.io/cyborg_mini_6keys/\r\n";
 
-constexpr char RESCUE_CMD_TEXT[] =
-  "@echo off\r\n"
-  "powershell -NoProfile -ExecutionPolicy Bypass -Command \""
-  "$ports=@([System.IO.Ports.SerialPort]::GetPortNames()|Sort-Object); "
-  "if($ports.Count -eq 0){Write-Host 'No COM ports found'; pause; exit}; "
-  "if($ports.Count -eq 1){$port=$ports[0]}else{for($i=0;$i -lt $ports.Count;$i++){Write-Host ('[{0}] {1}' -f ($i+1),$ports[$i])}; $n=[int](Read-Host 'Port number'); $port=$ports[$n-1]}; "
-  "$s=New-Object System.IO.Ports.SerialPort($port,115200,'None',8,'One'); $s.NewLine='`n'; $s.ReadTimeout=200; $s.Open(); "
-  "Write-Host 'Type help or exit'; "
-  "while($true){$cmd=Read-Host 'cyborg'; if($cmd -eq 'exit'){break}; $s.WriteLine($cmd); Start-Sleep -Milliseconds 120; while($s.BytesToRead -gt 0){try{Write-Host $s.ReadLine()}catch{break}}}; "
-  "$s.Close()\"\r\n";
-
 constexpr uint32_t CLUSTER_SIZE = BLOCK_SIZE * SECTORS_PER_CLUSTER;
 constexpr uint16_t clusterCount(uint32_t size) {
   return static_cast<uint16_t>((size + CLUSTER_SIZE - 1) / CLUSTER_SIZE);
@@ -50,7 +40,7 @@ constexpr uint16_t README_CLUSTERS = clusterCount(sizeof(README_TEXT) - 1);
 constexpr uint16_t URL_CLUSTER = README_CLUSTER + README_CLUSTERS;
 constexpr uint16_t URL_CLUSTERS = clusterCount(sizeof(URL_TEXT) - 1);
 constexpr uint16_t RESCUE_CMD_CLUSTER = URL_CLUSTER + URL_CLUSTERS;
-constexpr uint16_t RESCUE_CMD_CLUSTERS = clusterCount(sizeof(RESCUE_CMD_TEXT) - 1);
+constexpr uint16_t RESCUE_CMD_CLUSTERS = clusterCount(RescueCmdAsset::RESCUE_CMD_TEXT_SIZE);
 constexpr uint16_t TOTAL_DATA_CLUSTERS = README_CLUSTERS + URL_CLUSTERS + RESCUE_CMD_CLUSTERS;
 constexpr uint32_t BLOCK_COUNT = DATA_LBA + (TOTAL_DATA_CLUSTERS * SECTORS_PER_CLUSTER);
 
@@ -65,7 +55,7 @@ struct DriveFile {
 const DriveFile DRIVE_FILES[] = {
   {"README  TXT", reinterpret_cast<const uint8_t*>(README_TEXT), sizeof(README_TEXT) - 1, README_CLUSTER, README_CLUSTERS},
   {"REMAPPERURL", reinterpret_cast<const uint8_t*>(URL_TEXT), sizeof(URL_TEXT) - 1, URL_CLUSTER, URL_CLUSTERS},
-  {"RESCUE  CMD", reinterpret_cast<const uint8_t*>(RESCUE_CMD_TEXT), sizeof(RESCUE_CMD_TEXT) - 1, RESCUE_CMD_CLUSTER, RESCUE_CMD_CLUSTERS},
+  {"RESCUE  CMD", RescueCmdAsset::RESCUE_CMD_TEXT, RescueCmdAsset::RESCUE_CMD_TEXT_SIZE, RESCUE_CMD_CLUSTER, RESCUE_CMD_CLUSTERS},
 };
 
 Adafruit_USBD_MSC readmeMsc;

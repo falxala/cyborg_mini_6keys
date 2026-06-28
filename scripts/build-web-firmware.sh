@@ -14,6 +14,8 @@ SKETCH_DIR="$ROOT_DIR/firmware/cyborg-mini-8key/cyborg_mini_8key"
 
 mkdir -p "$BUILD_DIR" "$EXPORT_DIR" "$PUBLIC_DIR"
 
+"$ROOT_DIR/scripts/build-rescue-cmd-asset.sh"
+
 "$ROOT_DIR/scripts/arduino-cli.sh" compile \
   --fqbn "$FQBN" \
   --board-options usbstack=tinyusb,freq=125 \
@@ -26,3 +28,4 @@ mkdir -p "$BUILD_DIR" "$EXPORT_DIR" "$PUBLIC_DIR"
   "$SKETCH_DIR"
 
 cp "$EXPORT_DIR/cyborg_mini_8key.ino.uf2" "$PUBLIC_DIR/cyborg-mini-8key.uf2"
+cp "$SKETCH_DIR/rescue.cmd" "$PUBLIC_DIR/RESCUE.CMD"

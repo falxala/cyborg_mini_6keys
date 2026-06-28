@@ -8,6 +8,8 @@ USB_PID="${USB_PID:-0xC608}"
 USB_MANUFACTURER="${USB_MANUFACTURER:-Cyborg Project}"
 USB_PRODUCT="${USB_PRODUCT:-Cyborg Mini 8 Keys}"
 
+"$ROOT_DIR/scripts/build-rescue-cmd-asset.sh"
+
 exec "$ROOT_DIR/scripts/arduino-cli.sh" compile \
   --fqbn "$FQBN" \
   --board-options usbstack=tinyusb,freq=125 \

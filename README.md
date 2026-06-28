@@ -106,6 +106,8 @@ pnpm firmware:build
 pnpm firmware:web
 ```
 
+`pnpm firmware:web` は配信用UF2に加えて、Windows offline rescue用の `apps/web/public/firmware/RESCUE.CMD` も更新します。
+
 ## Deployment
 
 GitHub Pages deploy workflowは `main` へのpush、または手動実行で動きます。PR / feature branchではPages deployを走らせません。
