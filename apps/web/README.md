@@ -80,11 +80,7 @@ pnpm install
 pnpm dev
 pnpm typecheck
 pnpm build
-pnpm build:remapper
-pnpm build:remapper-drive
 pnpm firmware:web
 ```
 
 `pnpm firmware:web` は `apps/web/public/firmware/cyborg-mini-8key.uf2` を更新します。
-
-`pnpm build:remapper-drive` はRP2040のread-only driveへ同梱するため、Remapperだけを相対パス/固定ファイル名で出力します。ファームウェア用ヘッダを更新する場合はリポジトリルートで `pnpm remapper-drive:assets` を実行します。

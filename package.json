@@ -5,9 +5,6 @@
   "scripts": {
     "dev": "pnpm --filter @cyborg-mini/web dev",
     "build": "pnpm --filter @cyborg-mini/web build",
-    "build:remapper": "pnpm --filter @cyborg-mini/web build:remapper",
-    "build:remapper-drive": "pnpm --filter @cyborg-mini/web build:remapper-drive",
-    "remapper-drive:assets": "scripts/build-remapper-drive-assets.sh",
     "firmware:build": "scripts/compile-firmware.sh",
     "firmware:web": "scripts/build-web-firmware.sh",
     "preview": "pnpm --filter @cyborg-mini/web preview",

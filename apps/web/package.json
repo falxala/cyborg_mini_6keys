@@ -5,8 +5,6 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
-    "build:remapper": "tsc --noEmit && vite build --mode remapper",
-    "build:remapper-drive": "tsc --noEmit && vite build --mode remapper-drive",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit"
   },

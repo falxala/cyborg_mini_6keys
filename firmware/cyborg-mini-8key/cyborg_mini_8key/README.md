@@ -62,7 +62,7 @@ scripts/arduino-cli.sh compile \
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
-- Key 5 起動時だけ表示する Read-only drive with `README.TXT`, `REMAPPER.URL`, and local Remapper files
+- Key 5 起動時だけ表示する Read-only README drive with `README.TXT` and `REMAPPER.URL`
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 - 通常時のみ押下を低遅延化し、Remapper接続中は通常キー送信を抑止
 - USB suspendからのremote wakeup後にキー状態を再送
@@ -74,19 +74,10 @@ scripts/arduino-cli.sh compile \
 
 Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。Key 5 は firmware index `4`、GPIO `12` です。
 
-含まれるファイルは以下です。
+含まれるファイルは以下のみです。
 
 - `README.TXT`
 - `REMAPPER.URL`
-- `REMAPPER.HTM`
-- `REMAPPER.JS`
-- `REMAPPER.CSS`
-
-Web Remapperを更新した場合は、リポジトリルートで以下を実行して埋め込み用assetを再生成します。
-
-```sh
-pnpm remapper-drive:assets
-```
 
 常時表示したい場合は `config.h` の `README_DRIVE_ENABLED` を `true` にします。
 

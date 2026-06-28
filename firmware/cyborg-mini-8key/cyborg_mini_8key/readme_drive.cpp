@@ -4,67 +4,30 @@
 
 #include "Adafruit_TinyUSB.h"
 #include "config.h"
-#include "remapper_drive_assets.h"
 
 namespace {
 
 constexpr uint16_t BLOCK_SIZE = 512;
-constexpr uint8_t SECTORS_PER_CLUSTER = 8;
+constexpr uint32_t BLOCK_COUNT = 32;
 constexpr uint32_t FAT1_LBA = 1;
 constexpr uint32_t FAT2_LBA = 2;
 constexpr uint32_t ROOT_LBA = 3;
-constexpr uint32_t ROOT_SECTORS = 2;
 constexpr uint32_t DATA_LBA = 5;
+constexpr uint16_t README_CLUSTER = 2;
+constexpr uint16_t URL_CLUSTER = 3;
 
 constexpr char README_TEXT[] =
   "Cyborg Mini 8 Keys\r\n"
   "\r\n"
-  "Open REMAPPER.HTM to use the bundled local remapper.\r\n"
-  "\r\n"
-  "Online remapper:\r\n"
+  "Open the remapper:\r\n"
   "https://falxala.github.io/cyborg_mini_6keys/\r\n"
   "\r\n"
+  "This read-only drive contains only a shortcut and this README.\r\n"
   "To show this drive for one boot, hold Key 5 while plugging in USB.\r\n";
 
 constexpr char URL_TEXT[] =
   "[InternetShortcut]\r\n"
   "URL=https://falxala.github.io/cyborg_mini_6keys/\r\n";
-
-constexpr uint32_t CLUSTER_SIZE = BLOCK_SIZE * SECTORS_PER_CLUSTER;
-
-constexpr uint16_t clusterCount(uint32_t size) {
-  return static_cast<uint16_t>((size + CLUSTER_SIZE - 1) / CLUSTER_SIZE);
-}
-
-constexpr uint16_t README_CLUSTER = 2;
-constexpr uint16_t README_CLUSTERS = clusterCount(sizeof(README_TEXT) - 1);
-constexpr uint16_t URL_CLUSTER = README_CLUSTER + README_CLUSTERS;
-constexpr uint16_t URL_CLUSTERS = clusterCount(sizeof(URL_TEXT) - 1);
-constexpr uint16_t REMAPPER_HTML_CLUSTER = URL_CLUSTER + URL_CLUSTERS;
-constexpr uint16_t REMAPPER_HTML_CLUSTERS = clusterCount(RemapperDriveAssets::REMAPPER_HTML_SIZE);
-constexpr uint16_t REMAPPER_JS_CLUSTER = REMAPPER_HTML_CLUSTER + REMAPPER_HTML_CLUSTERS;
-constexpr uint16_t REMAPPER_JS_CLUSTERS = clusterCount(RemapperDriveAssets::REMAPPER_JS_SIZE);
-constexpr uint16_t REMAPPER_CSS_CLUSTER = REMAPPER_JS_CLUSTER + REMAPPER_JS_CLUSTERS;
-constexpr uint16_t REMAPPER_CSS_CLUSTERS = clusterCount(RemapperDriveAssets::REMAPPER_CSS_SIZE);
-constexpr uint16_t TOTAL_DATA_CLUSTERS =
-  README_CLUSTERS + URL_CLUSTERS + REMAPPER_HTML_CLUSTERS + REMAPPER_JS_CLUSTERS + REMAPPER_CSS_CLUSTERS;
-constexpr uint32_t BLOCK_COUNT = DATA_LBA + (TOTAL_DATA_CLUSTERS * SECTORS_PER_CLUSTER);
-
-struct DriveFile {
-  const char* name;
-  const uint8_t* data;
-  uint32_t size;
-  uint16_t firstCluster;
-  uint16_t clusters;
-};
-
-const DriveFile DRIVE_FILES[] = {
-  {"README  TXT", reinterpret_cast<const uint8_t*>(README_TEXT), sizeof(README_TEXT) - 1, README_CLUSTER, README_CLUSTERS},
-  {"REMAPPERURL", reinterpret_cast<const uint8_t*>(URL_TEXT), sizeof(URL_TEXT) - 1, URL_CLUSTER, URL_CLUSTERS},
-  {"REMAPPERHTM", RemapperDriveAssets::REMAPPER_HTML, RemapperDriveAssets::REMAPPER_HTML_SIZE, REMAPPER_HTML_CLUSTER, REMAPPER_HTML_CLUSTERS},
-  {"REMAPPERJS ", RemapperDriveAssets::REMAPPER_JS, RemapperDriveAssets::REMAPPER_JS_SIZE, REMAPPER_JS_CLUSTER, REMAPPER_JS_CLUSTERS},
-  {"REMAPPERCSS", RemapperDriveAssets::REMAPPER_CSS, RemapperDriveAssets::REMAPPER_CSS_SIZE, REMAPPER_CSS_CLUSTER, REMAPPER_CSS_CLUSTERS},
-};
 
 Adafruit_USBD_MSC readmeMsc;
 
@@ -129,19 +92,19 @@ void buildBootSector(uint8_t* buffer) {
   buffer[2] = 0x90;
   memcpy(buffer + 3, "MSDOS5.0", 8);
   putLe16(buffer, 11, BLOCK_SIZE);
-  buffer[13] = SECTORS_PER_CLUSTER;
+  buffer[13] = 1; // sectors per cluster
   putLe16(buffer, 14, 1); // reserved sectors
   buffer[16] = 2; // FAT count
   putLe16(buffer, 17, 32); // root entries
-  putLe16(buffer, 19, static_cast<uint16_t>(BLOCK_COUNT));
+  putLe16(buffer, 19, BLOCK_COUNT);
   buffer[21] = 0xf8;
   putLe16(buffer, 22, 1); // sectors per FAT
   putLe16(buffer, 24, 1); // sectors per track
   putLe16(buffer, 26, 1); // heads
   buffer[36] = 0x80;
   buffer[38] = 0x29;
-  putLe32(buffer, 39, 0x43385742);
-  memcpy(buffer + 43, "CYBORG8WEB ", 11);
+  putLe32(buffer, 39, 0x43384d42);
+  memcpy(buffer + 43, "CYBORG8    ", 11);
   memcpy(buffer + 54, "FAT12   ", 8);
   buffer[510] = 0x55;
   buffer[511] = 0xaa;
@@ -151,50 +114,14 @@ void buildFatSector(uint8_t* buffer) {
   buffer[0] = 0xf8;
   buffer[1] = 0xff;
   buffer[2] = 0xff;
-
-  for (const DriveFile& file : DRIVE_FILES) {
-    for (uint16_t index = 0; index < file.clusters; index++) {
-      const uint16_t cluster = file.firstCluster + index;
-      const uint16_t value = index + 1 < file.clusters ? cluster + 1 : 0xfff;
-      putFat12Entry(buffer, cluster, value);
-    }
-  }
+  putFat12Entry(buffer, README_CLUSTER, 0xfff);
+  putFat12Entry(buffer, URL_CLUSTER, 0xfff);
 }
 
 void buildRootSector(uint8_t* buffer) {
-  writeDirectoryEntry(buffer, 0, "CYBORG8WEB ", 0x08, 0, 0);
-
-  for (uint8_t index = 0; index < sizeof(DRIVE_FILES) / sizeof(DRIVE_FILES[0]); index++) {
-    const DriveFile& file = DRIVE_FILES[index];
-    writeDirectoryEntry(buffer, 32 * (index + 1), file.name, 0x01, file.firstCluster, file.size);
-  }
-}
-
-void readDataSector(uint32_t sector, uint8_t* block) {
-  if (sector < DATA_LBA) {
-    return;
-  }
-
-  const uint32_t dataSector = sector - DATA_LBA;
-  const uint16_t cluster = static_cast<uint16_t>(2 + (dataSector / SECTORS_PER_CLUSTER));
-  const uint8_t sectorInCluster = static_cast<uint8_t>(dataSector % SECTORS_PER_CLUSTER);
-
-  for (const DriveFile& file : DRIVE_FILES) {
-    if (cluster < file.firstCluster || cluster >= file.firstCluster + file.clusters) {
-      continue;
-    }
-
-    const uint32_t fileOffset =
-      ((cluster - file.firstCluster) * CLUSTER_SIZE) + (static_cast<uint32_t>(sectorInCluster) * BLOCK_SIZE);
-    if (fileOffset >= file.size) {
-      return;
-    }
-
-    const uint32_t remaining = file.size - fileOffset;
-    const uint32_t length = remaining < BLOCK_SIZE ? remaining : BLOCK_SIZE;
-    memcpy(block, file.data + fileOffset, length);
-    return;
-  }
+  writeDirectoryEntry(buffer, 0, "CYBORG8    ", 0x08, 0, 0);
+  writeDirectoryEntry(buffer, 32, "README  TXT", 0x01, README_CLUSTER, sizeof(README_TEXT) - 1);
+  writeDirectoryEntry(buffer, 64, "REMAPPERURL", 0x01, URL_CLUSTER, sizeof(URL_TEXT) - 1);
 }
 
 int32_t readCallback(uint32_t lba, void* buffer, uint32_t bufsize) {
@@ -213,10 +140,12 @@ int32_t readCallback(uint32_t lba, void* buffer, uint32_t bufsize) {
       buildBootSector(block);
     } else if (sector == FAT1_LBA || sector == FAT2_LBA) {
       buildFatSector(block);
-    } else if (sector >= ROOT_LBA && sector < ROOT_LBA + ROOT_SECTORS) {
+    } else if (sector == ROOT_LBA) {
       buildRootSector(block);
-    } else {
-      readDataSector(sector, block);
+    } else if (sector == DATA_LBA + (README_CLUSTER - 2)) {
+      putText(block, 0, README_TEXT, sizeof(README_TEXT) - 1);
+    } else if (sector == DATA_LBA + (URL_CLUSTER - 2)) {
+      putText(block, 0, URL_TEXT, sizeof(URL_TEXT) - 1);
     }
   }
 
