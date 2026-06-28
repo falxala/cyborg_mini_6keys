@@ -53,7 +53,7 @@ scripts/                        Arduino CLI wrapper / firmware build scripts
 | Key 7 | 6 | 10 | VGND2 GPIO 8 |
 | Key 8 | 7 | 9 | VGND2 GPIO 8 |
 
-Key 5を押しながらUSB接続すると、Read-only README driveとSerial rescueをその起動だけ表示します。通常は非表示です。Windowsではドライブ内の `RESCUE.CMD` から対話式の救済プロンプトを開けます。
+Key 5を押しながらUSB接続すると、Read-only README driveとSerial rescueをその起動だけ表示します。通常は非表示です。Windowsではドライブ内の `RESCUE.CMD` から対話式の救済プロンプトを開けます。このモード中は本体LEDを弱い緑で点灯します。
 
 ## Firmware
 

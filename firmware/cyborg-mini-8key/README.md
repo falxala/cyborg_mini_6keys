@@ -15,6 +15,7 @@ Arduinoスケッチ本体は `cyborg_mini_8key/` にあります。
 - WebHIDからUF2ブートローダへ入る更新用reportを持つ
 - Remapper接続中は通常のKeyboard / Consumer送信を止める
 - Key 5起動時だけ、オフライン救済用の対話式Serialコマンドを有効にする
+- Serial rescue / README drive起動中は本体LEDを弱い緑で点灯する
 - Diagnostics用のHID report送受信検査とstorage write/read/restore検査を持つ
 
 ## キースキャン

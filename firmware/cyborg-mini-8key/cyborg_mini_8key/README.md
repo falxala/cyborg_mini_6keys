@@ -65,6 +65,7 @@ scripts/arduino-cli.sh compile \
 - EEPROMエミュレーションへのキーマップ永続化
 - Key 5 起動時だけ表示する Read-only README drive with `README.TXT`, `REMAPPER.URL`, and `RESCUE.CMD`
 - Key 5 起動時だけ有効な対話式Serial rescue
+- README drive / Serial rescue中は弱い緑の本体LED表示
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
 - 通常時のみ押下を低遅延化し、Remapper接続中は通常キー送信を抑止
 - USB suspendからのremote wakeup後にキー状態を再送
@@ -74,7 +75,7 @@ scripts/arduino-cli.sh compile \
 
 既定では、READMEドライブは表示しません。`config.h` の `README_DRIVE_ENABLED` は `false` です。
 
-Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。Key 5 は firmware index `4`、GPIO `12` です。この起動中だけ、Serial rescueも有効になります。
+Key 5 を押しながらUSB接続した時だけ、PCに小さいRead-only USBメモリとして `CYBORG8` ドライブを表示します。Key 5 は firmware index `4`、GPIO `12` です。この起動中だけ、Serial rescueも有効になり、本体LEDは弱い緑で点灯します。
 
 含まれるファイルは以下のみです。
 

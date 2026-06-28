@@ -40,6 +40,6 @@ void loop() {
 
   updateHidDevice();
   updateSerialRescue();
-  updateStatusHeartbeat(hidDeviceMounted(), configActive);
+  updateStatusHeartbeat(hidDeviceMounted(), remapperActive, rescueActive);
   sleepBetweenScans(configActive);
 }
