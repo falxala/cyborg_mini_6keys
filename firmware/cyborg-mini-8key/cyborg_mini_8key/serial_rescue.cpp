@@ -323,10 +323,14 @@ void updateSerialRescue() {
 
     if (ch == '\n') {
       lineBuffer[lineLength] = '\0';
-      lastSerialCommandMs = millis();
-      handleCommand(lineBuffer);
+      if (lineLength > 0) {
+        lastSerialCommandMs = millis();
+        handleCommand(lineBuffer);
+      }
       lineLength = 0;
-      printPrompt();
+      if (lastSerialCommandMs != 0) {
+        printPrompt();
+      }
       continue;
     }
 
