@@ -44,10 +44,12 @@ export class WebHidTransport {
   }
 
   async close() {
-    if (this.device?.opened) {
-      await this.device.close();
-    }
+    const device = this.device;
     this.device = null;
+
+    if (device?.opened) {
+      await device.close();
+    }
   }
 
   async requestConfigReport(report: Uint8Array, timeoutMs = 1000) {
