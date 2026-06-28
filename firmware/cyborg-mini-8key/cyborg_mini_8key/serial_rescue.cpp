@@ -298,10 +298,12 @@ void handleCommand(char* line) {
   } else {
     Serial.println(F("ERR unknown"));
   }
+  Serial.flush();
 }
 
 void printPrompt() {
   Serial.print(F("cyborg> "));
+  Serial.flush();
 }
 
 }  // namespace
@@ -311,6 +313,8 @@ void beginSerialRescue() {
 }
 
 void updateSerialRescue() {
+  yield();
+
   while (Serial.available() > 0) {
     const char ch = static_cast<char>(Serial.read());
     if (ch == '\r') {

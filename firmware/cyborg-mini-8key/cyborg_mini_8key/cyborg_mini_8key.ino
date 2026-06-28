@@ -26,8 +26,8 @@ void setup() {
   beginStatusLed();
   beginKeymap();
   beginKeyScanner();
-  beginHidDevice();
   beginSerialRescue();
+  beginHidDevice();
 }
 
 void loop() {
