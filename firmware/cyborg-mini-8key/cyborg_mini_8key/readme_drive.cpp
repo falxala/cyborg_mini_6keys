@@ -16,15 +16,25 @@ constexpr uint32_t ROOT_LBA = 3;
 constexpr uint32_t DATA_LBA = 5;
 
 constexpr char README_TEXT[] =
+  "\xef\xbb\xbf"
   "Cyborg Mini 8 Keys\r\n"
   "\r\n"
-  "Open the remapper:\r\n"
+  "このドライブはレスキューモードで起動したときだけ表示されます。\r\n"
+  "レスキューモード中は、本体LEDが弱い緑色で点灯します。\r\n"
+  "\r\n"
+  "オンライン設定ページ:\r\n"
   "https://falxala.github.io/cyborg_mini_6keys/\r\n"
   "\r\n"
-  "Windows offline rescue:\r\n"
-  "Run RESCUE.CMD and type help in the serial prompt.\r\n"
+  "このドライブのファイル:\r\n"
+  "- REMAPPER.URL: オンライン設定ページを開きます。\r\n"
+  "- RESCUE.CMD: Windows用のオフライン救済プロンプトを開きます。\r\n"
   "\r\n"
-  "To show this drive for one boot, hold Key 5 while plugging in USB.\r\n";
+  "通常はオンライン設定ページを使ってください。\r\n"
+  "Web設定が使えない場合だけ RESCUE.CMD を実行します。\r\n"
+  "救済プロンプトでは help でコマンド一覧、exit で終了できます。\r\n"
+  "\r\n"
+  "このドライブを表示するには、Key 5を押したままUSBに接続します。\r\n"
+  "レスキューモードを終了するには、USBを抜いて通常どおり接続し直します。\r\n";
 
 constexpr char URL_TEXT[] =
   "[InternetShortcut]\r\n"

@@ -64,6 +64,7 @@ scripts/arduino-cli.sh compile \
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
 - Key 5 起動時だけ表示する Read-only README drive with `README.TXT`, `REMAPPER.URL`, and `RESCUE.CMD`
+- `README.TXT` is UTF-8 with BOM for Windows Notepad compatibility.
 - Key 5 起動時だけ有効な対話式Serial rescue
 - README drive / Serial rescue中は弱い緑の本体LED表示
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示
@@ -102,6 +103,82 @@ bootloader
 ```
 
 `none` / `key` / `consumer` は指定キーの割り当てをすぐ保存します。key番号は `1-8`、layerは `0-5` です。
+
+### Serial Rescue Examples
+
+`key` はKeyboard assignmentを書き込みます。形式は以下です。
+
+```text
+key <layer> <key 1-8> <modifier> <keycode> [keycode...]
+```
+
+例:
+
+```text
+# Layer 1 / Key 1 を A にする
+key 1 1 0x00 0x04
+
+# Layer 1 / Key 2 を Ctrl+C にする
+key 1 2 0x01 0x06
+
+# Layer 1 / Key 3 を Ctrl+Shift+Esc にする
+key 1 3 0x03 0x29
+```
+
+`modifier` はUSB HID keyboard modifier bitmapです。
+
+| Modifier | Value |
+| --- | ---: |
+| Left Ctrl | `0x01` |
+| Left Shift | `0x02` |
+| Left Alt | `0x04` |
+| Left GUI | `0x08` |
+| Right Ctrl | `0x10` |
+| Right Shift | `0x20` |
+| Right Alt | `0x40` |
+| Right GUI | `0x80` |
+
+`consumer` はConsumer Control assignmentを書き込みます。
+
+```text
+# Layer 0 / Key 1 をMuteにする
+consumer 0 1 0x00e2
+
+# Layer 0 / Key 2 をVolume Upにする
+consumer 0 2 0x00e9
+
+# Layer 0 / Key 3 をVolume Downにする
+consumer 0 3 0x00ea
+```
+
+`none` は割り当てを消します。
+
+```text
+none 2 8
+```
+
+PowerShellから直接送る場合は、LF (`0x0A`) でコマンドを終端します。`WriteLine()` ではなくbyte配列で送ると安定します。
+
+```powershell
+$port = "COM5"
+$s = [System.IO.Ports.SerialPort]::new($port, 115200, "None", 8, "One")
+$s.NewLine = [string][char]10
+$s.DtrEnable = $true
+$s.RtsEnable = $true
+$s.Open()
+
+$bytes = [Text.Encoding]::ASCII.GetBytes("probe" + [char]10)
+$s.Write($bytes, 0, $bytes.Length)
+Start-Sleep -Milliseconds 200
+$s.ReadLine()
+
+$bytes = [Text.Encoding]::ASCII.GetBytes("key 1 1 0x00 0x04" + [char]10)
+$s.Write($bytes, 0, $bytes.Length)
+Start-Sleep -Milliseconds 200
+$s.ReadLine()
+
+$s.Close()
+```
 
 常時表示したい場合は `config.h` の `README_DRIVE_ENABLED` を `true` にします。
 
