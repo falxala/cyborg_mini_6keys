@@ -63,8 +63,8 @@ scripts/arduino-cli.sh compile \
 - WebHID向けvendor-defined config reportの受け口
 - RAM上のキーマップ更新
 - EEPROMエミュレーションへのキーマップ永続化
-- Key 5 起動時だけ表示する Read-only README drive with `README.TXT`, `REMAPPER.URL`, and `RESCUE.CMD`
-- `README.TXT` is UTF-8 with BOM for Windows Notepad compatibility.
+- Key 5 起動時だけ表示する Read-only README drive with `README.TXT`, `READMEEN.TXT`, `REMAPPER.URL`, and `RESCUE.CMD`
+- `README.TXT` / `READMEEN.TXT` are UTF-8 with BOM for Windows Notepad compatibility.
 - Key 5 起動時だけ有効な対話式Serial rescue
 - README drive / Serial rescue中は弱い緑の本体LED表示
 - 通常時は低輝度白、Remapper接続中はカラーホイールの本体LED状態表示

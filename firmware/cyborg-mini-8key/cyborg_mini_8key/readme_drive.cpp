@@ -36,6 +36,27 @@ constexpr char README_TEXT[] =
   "このドライブを表示するには、Key 5を押したままUSBに接続します。\r\n"
   "レスキューモードを終了するには、USBを抜いて通常どおり接続し直します。\r\n";
 
+constexpr char README_EN_TEXT[] =
+  "\xef\xbb\xbf"
+  "Cyborg Mini 8 Keys\r\n"
+  "\r\n"
+  "This drive appears only when the device starts in rescue mode.\r\n"
+  "The onboard LED stays dim green while rescue mode is active.\r\n"
+  "\r\n"
+  "Online key remapper:\r\n"
+  "https://falxala.github.io/cyborg_mini_6keys/\r\n"
+  "\r\n"
+  "Files on this drive:\r\n"
+  "- REMAPPER.URL opens the online remapper.\r\n"
+  "- RESCUE.CMD opens a Windows offline rescue prompt.\r\n"
+  "\r\n"
+  "Use the online remapper for normal setup.\r\n"
+  "Run RESCUE.CMD only when the web remapper is not available.\r\n"
+  "At the rescue prompt, type help to see commands, or exit to close it.\r\n"
+  "\r\n"
+  "To show this drive, hold Key 5 while plugging in USB.\r\n"
+  "To leave rescue mode, unplug USB and reconnect normally.\r\n";
+
 constexpr char URL_TEXT[] =
   "[InternetShortcut]\r\n"
   "URL=https://falxala.github.io/cyborg_mini_6keys/\r\n";
@@ -47,11 +68,14 @@ constexpr uint16_t clusterCount(uint32_t size) {
 
 constexpr uint16_t README_CLUSTER = 2;
 constexpr uint16_t README_CLUSTERS = clusterCount(sizeof(README_TEXT) - 1);
-constexpr uint16_t URL_CLUSTER = README_CLUSTER + README_CLUSTERS;
+constexpr uint16_t README_EN_CLUSTER = README_CLUSTER + README_CLUSTERS;
+constexpr uint16_t README_EN_CLUSTERS = clusterCount(sizeof(README_EN_TEXT) - 1);
+constexpr uint16_t URL_CLUSTER = README_EN_CLUSTER + README_EN_CLUSTERS;
 constexpr uint16_t URL_CLUSTERS = clusterCount(sizeof(URL_TEXT) - 1);
 constexpr uint16_t RESCUE_CMD_CLUSTER = URL_CLUSTER + URL_CLUSTERS;
 constexpr uint16_t RESCUE_CMD_CLUSTERS = clusterCount(RescueCmdAsset::RESCUE_CMD_TEXT_SIZE);
-constexpr uint16_t TOTAL_DATA_CLUSTERS = README_CLUSTERS + URL_CLUSTERS + RESCUE_CMD_CLUSTERS;
+constexpr uint16_t TOTAL_DATA_CLUSTERS =
+  README_CLUSTERS + README_EN_CLUSTERS + URL_CLUSTERS + RESCUE_CMD_CLUSTERS;
 constexpr uint32_t BLOCK_COUNT = DATA_LBA + (TOTAL_DATA_CLUSTERS * SECTORS_PER_CLUSTER);
 
 struct DriveFile {
@@ -64,6 +88,7 @@ struct DriveFile {
 
 const DriveFile DRIVE_FILES[] = {
   {"README  TXT", reinterpret_cast<const uint8_t*>(README_TEXT), sizeof(README_TEXT) - 1, README_CLUSTER, README_CLUSTERS},
+  {"READMEENTXT", reinterpret_cast<const uint8_t*>(README_EN_TEXT), sizeof(README_EN_TEXT) - 1, README_EN_CLUSTER, README_EN_CLUSTERS},
   {"REMAPPERURL", reinterpret_cast<const uint8_t*>(URL_TEXT), sizeof(URL_TEXT) - 1, URL_CLUSTER, URL_CLUSTERS},
   {"RESCUE  CMD", RescueCmdAsset::RESCUE_CMD_TEXT, RescueCmdAsset::RESCUE_CMD_TEXT_SIZE, RESCUE_CMD_CLUSTER, RESCUE_CMD_CLUSTERS},
 };
