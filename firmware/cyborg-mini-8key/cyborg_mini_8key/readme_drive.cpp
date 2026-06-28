@@ -261,7 +261,7 @@ bool writableCallback() {
 }  // namespace
 
 void beginReadmeDrive() {
-  if (!readmeDriveEnabledAtBoot()) {
+  if (!readmeDriveRequestedAtBoot()) {
     return;
   }
 
@@ -272,6 +272,10 @@ void beginReadmeDrive() {
   readmeMsc.setWritableCallback(writableCallback);
   readmeMsc.setUnitReady(true);
   readmeMsc.begin();
+}
+
+bool readmeDriveRequestedAtBoot() {
+  return readmeDriveEnabledAtBoot();
 }
 
 bool readmeDriveActive() {

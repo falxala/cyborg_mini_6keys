@@ -26,14 +26,17 @@ void setup() {
   beginStatusLed();
   beginKeymap();
   beginKeyScanner();
-  beginSerialRescue();
+  const bool rescueBoot = readmeDriveRequestedAtBoot();
+  if (rescueBoot) {
+    beginSerialRescue();
+  }
   beginHidDevice();
 }
 
 void loop() {
   const bool remapperActive = remapperConnected();
   const bool readmeActive = readmeDriveActive();
-  const bool rescueActive = serialRescueActive();
+  const bool rescueActive = readmeActive && serialRescueActive();
   const bool rescueIndicatorActive = readmeActive || rescueActive;
   const bool configActive = remapperActive || rescueIndicatorActive;
 
@@ -42,7 +45,9 @@ void loop() {
   }
 
   updateHidDevice();
-  updateSerialRescue();
+  if (readmeActive) {
+    updateSerialRescue();
+  }
   updateStatusHeartbeat(hidDeviceMounted(), remapperActive, rescueIndicatorActive);
   sleepBetweenScans(configActive);
 }
