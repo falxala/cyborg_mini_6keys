@@ -13,8 +13,8 @@ USB_PRODUCT="${USB_PRODUCT:-Cyborg Mini 8 Keys}"
 exec "$ROOT_DIR/scripts/arduino-cli.sh" compile \
   --fqbn "$FQBN" \
   --board-options usbstack=tinyusb,freq=125 \
-  --build-property "build.usbvid=-DUSBD_VID=$USB_VID" \
-  --build-property "build.usbpid=-DUSBD_PID=$USB_PID" \
+  --build-property "build.usbvid=-DUSBD_VID=$USB_VID -DUSB_VID=$USB_VID" \
+  --build-property "build.usbpid=-DUSBD_PID=$USB_PID -DUSB_PID=$USB_PID" \
   --build-property "build.usb_manufacturer=\"$USB_MANUFACTURER\"" \
   --build-property "build.usb_product=\"$USB_PRODUCT\"" \
   "$ROOT_DIR/firmware/cyborg-mini-8key/cyborg_mini_8key"
