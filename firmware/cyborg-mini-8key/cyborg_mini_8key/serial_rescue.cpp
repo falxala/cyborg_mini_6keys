@@ -127,6 +127,7 @@ bool parseLayerKey(char*& cursor, uint8_t& layer, uint8_t& keyIndex) {
 void printHelp() {
   Serial.println(F("Cyborg Mini serial rescue"));
   Serial.println(F("Commands:"));
+  Serial.println(F("  probe"));
   Serial.println(F("  help"));
   Serial.println(F("  state"));
   Serial.println(F("  dump"));
@@ -144,6 +145,13 @@ void handleState() {
   Serial.print(F("activeLayer="));
   Serial.print(activeLayer());
   Serial.print(F(" layers="));
+  Serial.print(Config::LAYER_COUNT);
+  Serial.print(F(" keys="));
+  Serial.println(Config::KEY_COUNT);
+}
+
+void handleProbe() {
+  Serial.print(F("CYBORG8 ACK rescue=1 layers="));
   Serial.print(Config::LAYER_COUNT);
   Serial.print(F(" keys="));
   Serial.println(Config::KEY_COUNT);
@@ -266,7 +274,9 @@ void handleCommand(char* line) {
     return;
   }
 
-  if (strcmp(command, "help") == 0 || strcmp(command, "?") == 0) {
+  if (strcmp(command, "probe") == 0) {
+    handleProbe();
+  } else if (strcmp(command, "help") == 0 || strcmp(command, "?") == 0) {
     printHelp();
   } else if (strcmp(command, "state") == 0) {
     handleState();
