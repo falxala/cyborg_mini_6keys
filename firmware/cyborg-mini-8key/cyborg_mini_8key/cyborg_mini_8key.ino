@@ -2,6 +2,7 @@
 #include "config.h"
 #include "key_scanner.h"
 #include "keymap.h"
+#include "readme_drive.h"
 #include "serial_rescue.h"
 #include "status_led.h"
 
@@ -31,15 +32,17 @@ void setup() {
 
 void loop() {
   const bool remapperActive = remapperConnected();
+  const bool readmeActive = readmeDriveActive();
   const bool rescueActive = serialRescueActive();
-  const bool configActive = remapperActive || rescueActive;
+  const bool rescueIndicatorActive = readmeActive || rescueActive;
+  const bool configActive = remapperActive || rescueIndicatorActive;
 
-  if (updateKeyScanner(!configActive) && !rescueActive) {
+  if (updateKeyScanner(!configActive) && !rescueIndicatorActive) {
     sendKeyChanges(previousKeyMask(), currentKeyMask(), activeLayer());
   }
 
   updateHidDevice();
   updateSerialRescue();
-  updateStatusHeartbeat(hidDeviceMounted(), remapperActive, rescueActive);
+  updateStatusHeartbeat(hidDeviceMounted(), remapperActive, rescueIndicatorActive);
   sleepBetweenScans(configActive);
 }
