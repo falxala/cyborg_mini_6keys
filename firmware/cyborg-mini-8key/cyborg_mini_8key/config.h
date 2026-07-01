@@ -41,6 +41,7 @@ constexpr uint8_t STATUS_LED_PIN = 255;
 
 constexpr uint8_t STATUS_LED_BRIGHTNESS = 255;
 constexpr uint8_t STATUS_KEYBOARD_WHITE = 12;
+constexpr uint8_t STATUS_RESCUE_GREEN = 18;
 
 constexpr uint16_t DEBOUNCE_US = 5000;
 constexpr uint16_t IDLE_SCAN_SLEEP_US = 100;

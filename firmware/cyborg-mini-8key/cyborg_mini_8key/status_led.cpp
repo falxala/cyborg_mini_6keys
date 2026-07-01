@@ -43,6 +43,15 @@ void setKeyboardIdleLed() {
   }
 }
 
+void setRescueLed() {
+  if (Config::STATUS_LED_KIND == Config::StatusLedKind::Digital) {
+    digitalWrite(Config::STATUS_LED_PIN, HIGH);
+  } else if (Config::STATUS_LED_KIND == Config::StatusLedKind::NeoPixel) {
+    statusPixel.setPixelColor(0, statusPixel.Color(0, Config::STATUS_RESCUE_GREEN, 0));
+    statusPixel.show();
+  }
+}
+
 }  // namespace
 
 void beginStatusLed() {
@@ -65,11 +74,20 @@ void setStatusLed(bool on) {
   }
 }
 
-void updateStatusHeartbeat(bool mounted, bool remapperConnected) {
+void updateStatusHeartbeat(bool mounted, bool remapperConnected, bool rescueActive) {
   if (!mounted) {
     setStatusLed(false);
     lastUpdateMs = 0;
     idleShown = false;
+    return;
+  }
+
+  if (rescueActive) {
+    if (!idleShown) {
+      setRescueLed();
+      idleShown = true;
+    }
+    lastUpdateMs = 0;
     return;
   }
 

@@ -134,11 +134,11 @@
 .picker-key.active,
 .picker-decor.active {
   --key-surface: var(--selection-soft);
-  --key-edge: rgba(91, 155, 234, 0.46);
+  --key-edge: rgba(27, 143, 130, 0.46);
   --key-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -5px 0 rgba(91, 155, 234, 0.2),
-    0 1px 0 rgba(53, 110, 189, 0.16);
+    inset 0 -5px 0 rgba(27, 143, 130, 0.2),
+    0 1px 0 rgba(11, 95, 88, 0.16);
   --key-text: var(--selection-strong);
 }
 
@@ -201,7 +201,7 @@
 }
 
 .picker-key.active .keycap-svg .shape-shadow {
-  fill: rgba(91, 155, 234, 0.2);
+  fill: rgba(27, 143, 130, 0.2);
 }
 
 .keycap-svg .shape-stroke {
